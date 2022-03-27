@@ -1,8 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using TMPro;
-using Unity.Mathematics;
 using UnityEngine;
 
 public class WorldGenerator : MonoBehaviour
@@ -20,9 +16,15 @@ public class WorldGenerator : MonoBehaviour
         InitCubes();
     }
 
-    private void Update()
+    
+
+    public IEnumerable ChunkUpdate()
     {
-        DetectAndUpdateChunks();
+        while (true)
+        {
+            DetectAndUpdateChunks();
+            yield return new WaitForSeconds(0.2f);
+        }
     }
 
     private void DetectAndUpdateChunks()
@@ -78,6 +80,8 @@ public class WorldGenerator : MonoBehaviour
 
                     Vector3 pos = new Vector3(x + stepSize / 2, y + stepSize / 2, z + stepSize / 2);
                     
+                    
+                    
                     GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     cube.SetActive(false);
                     cube.transform.position = pos;
@@ -118,4 +122,11 @@ public class WorldGenerator : MonoBehaviour
             p.GetComponent<MeshRenderer>().material = mapInput.boundMat;
         }
     }
+    
+    
+    
+    
+    
+    
+    
 }

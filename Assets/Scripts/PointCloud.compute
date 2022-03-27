@@ -1,0 +1,37 @@
+#include "Noise.compute"
+
+#pragma kernel GeneratePoints
+
+RWStructuredBuffer<float4> points;
+
+int numPointsPerAxis;
+float3 startPos;
+
+// noise settings
+int octaves;
+float lacunarity;
+float gain;
+float scale;
+
+float fbm(float3 x)
+{
+    float value = 0.0;
+    float amplitude = 1;
+    float frequency = 1;
+    
+    for (int i = 0; i < octaves; i++) {
+        
+        value += amplitude * snoise(frequency * x);
+        amplitude *= gain;
+        frequency *= lacunarity;
+    }
+    return value;
+}
+
+[numthreads(8,8,8)]
+void GeneratePoints(uint3 id : SV_DispatchThreadID)
+{
+    int index = id.z * numPointsPerAxis * numPointsPerAxis + id.y * numPointsPerAxis + id.x;
+    float3 p = float3(id.x, id.y, id.z) + startPos;
+    points[index] = float4(p, fbm(p / scale));
+}

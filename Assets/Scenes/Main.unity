@@ -123,6 +123,31 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &910636063 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7660806126897602098, guid: b6c52f0fa09ac4e3389c336567105707,
+    type: 3}
+  m_PrefabInstance: {fileID: 7660806126562733290}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &910636066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 910636063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 356d505b4d0324a40ae842e847f82227, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pointCloud: {fileID: 7200000, guid: 481b1507259494ce797a8b59df1ba9ef, type: 3}
+  marchingCubes: {fileID: 7200000, guid: 07998a4d4cda9456cb2046b7da181202, type: 3}
+  ns:
+    octaves: 0
+    lacunarity: 0
+    gain: 0
+    scale: 0
 --- !u!1 &1113654458
 GameObject:
   m_ObjectHideFlags: 0
