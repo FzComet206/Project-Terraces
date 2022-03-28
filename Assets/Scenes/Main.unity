@@ -148,6 +148,7 @@ MonoBehaviour:
     lacunarity: 0
     gain: 0
     scale: 0
+    isoLevel: 0
 --- !u!1 &1113654458
 GameObject:
   m_ObjectHideFlags: 0
@@ -442,8 +443,33 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7660806126897602099, guid: b6c52f0fa09ac4e3389c336567105707,
         type: 3}
+      propertyPath: mapInput.meshMat
+      value: 
+      objectReference: {fileID: 2100000, guid: ca78f2d22a12d4177883d59ea340c0af, type: 2}
+    - target: {fileID: 7660806126897602099, guid: b6c52f0fa09ac4e3389c336567105707,
+        type: 3}
+      propertyPath: mapInput.noise.gain
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7660806126897602099, guid: b6c52f0fa09ac4e3389c336567105707,
+        type: 3}
       propertyPath: mapInput.mapDivision
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 7660806126897602099, guid: b6c52f0fa09ac4e3389c336567105707,
+        type: 3}
+      propertyPath: mapInput.noise.scale
+      value: 2000
+      objectReference: {fileID: 0}
+    - target: {fileID: 7660806126897602099, guid: b6c52f0fa09ac4e3389c336567105707,
+        type: 3}
+      propertyPath: mapInput.noise.octaves
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7660806126897602099, guid: b6c52f0fa09ac4e3389c336567105707,
+        type: 3}
+      propertyPath: mapInput.noise.lacunarity
+      value: 1.2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b6c52f0fa09ac4e3389c336567105707, type: 3}

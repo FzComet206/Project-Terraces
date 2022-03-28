@@ -23,7 +23,7 @@ public class WorldGenerator : MonoBehaviour
         while (true)
         {
             DetectAndUpdateChunks();
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.1f);
         }
     }
 

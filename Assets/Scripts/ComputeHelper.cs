@@ -6,8 +6,6 @@ public class ComputeHelper: MonoBehaviour
     [SerializeField] ComputeShader pointCloud;
     [SerializeField] ComputeShader marchingCubes;
 
-    public Types.NoiseSettings ns;
-    
     public void DispatchNoiseBuffer(ComputeBuffer points, Types.NoiseSettings ns, int3 startPos, int groupSize)
     {
         pointCloud.SetInt("octaves", ns.octaves);

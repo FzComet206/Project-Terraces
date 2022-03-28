@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using Unity.Mathematics;
 using UnityEngine;
+using Vector4 = System.Numerics.Vector4;
 
 
 public static class Types 
@@ -13,7 +14,7 @@ public static class Types
         public int mapDivision;
         public Material meshMat;
         public Material boundMat;
-        public GameObject pool;
+        public Transform pool;
 
         public NoiseSettings noise;
     }
@@ -27,6 +28,25 @@ public static class Types
         public float scale;
         [Range(-1, 1)] public float isoLevel;
     }
+
+    struct Tri{
+        #pragma warning disable 649 // disable unassigned variable warning
+        public Vector3 a;
+        public Vector3 b;
+        public Vector3 c;
+        public Vector3 this [int i] {
+            get {
+                switch (i) {
+                    case 0:
+                        return a;
+                    case 1:
+                        return b;
+                    default:
+                        return c;
+                }
+            }
+        }
+    }
     
     public class Chunks
     {
@@ -38,6 +58,7 @@ public static class Types
         
         private int numPoints;
         private int numVoxels;
+        private int numVoxelsPerAxis;
         private int numPointsPerAxis;
         private int maxTriangleCount;
         
@@ -62,7 +83,7 @@ public static class Types
 
             numPointsPerAxis = input.mapSize / input.mapDivision;
             numPoints = numPointsPerAxis * numPointsPerAxis * numPointsPerAxis;
-            int numVoxelsPerAxis = numPointsPerAxis - 1;
+            numVoxelsPerAxis = numPointsPerAxis - 1;
             numVoxels = numVoxelsPerAxis * numVoxelsPerAxis * numVoxelsPerAxis;
             maxTriangleCount = numVoxels * 5;
         }
@@ -98,6 +119,7 @@ public static class Types
             Mesh mesh = new Mesh();
             mesh.vertices = this.verticies;
             mesh.triangles = this.triangles;
+            mesh.RecalculateNormals();
             
             this.chunk = new GameObject("Chunk", new Type[]
             {
@@ -107,7 +129,7 @@ public static class Types
             
             this.chunk.GetComponent<MeshFilter>().sharedMesh = mesh;
             this.chunk.GetComponent<MeshRenderer>().material = input.meshMat;
-            this.chunk.transform.parent = input.pool.transform;
+            this.chunk.transform.parent = input.pool;
         }
 
         private void Triangulate()
@@ -116,33 +138,40 @@ public static class Types
             
             ComputeHelper ch = GameObject.FindObjectOfType<ComputeHelper>();
             
-            ch.DispatchNoiseBuffer(pointsBuffer, input.noise, startPos, 8);
-            ch.DispatchTriangulateBuffer(pointsBuffer, triangleBuffer, numPointsPerAxis, input.noise.isoLevel, 8);
+            ch.DispatchNoiseBuffer(pointsBuffer, input.noise, startPos, numVoxelsPerAxis / 8);
+            ch.DispatchTriangulateBuffer(pointsBuffer, triangleBuffer, numPointsPerAxis, input.noise.isoLevel, numVoxelsPerAxis / 8);
 
             // copy to arr and set obj
-            this.verticies = new Vector3[pointsBuffer.count];
-            this.triangles = new int[triangleBuffer.count];
-            pointsBuffer.GetData(this.verticies);
-            triangleBuffer.GetData(this.triangles);
+            int numT = triangleBuffer.count;
+            Tri[] tBuffer = new Tri[numT];
             
-            ReleaseBuffers();
+            triangleBuffer.GetData(tBuffer, 0, 0, numT);
+            
+            Debug.Log(tBuffer[123].a);
+            Debug.Log(tBuffer[123].b);
+            Debug.Log(tBuffer[123].c);
+
+            this.verticies = new Vector3[tBuffer.Length * 3];
+            this.triangles = new int[tBuffer.Length * 3];
+            
+            for (int i = 0; i < tBuffer.Length; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    int id = 3 * i + j;
+                    this.verticies[id] = tBuffer[i][j];
+                    this.triangles[id] = id;
+                }
+            }
+            
+            pointsBuffer.Dispose();
+            triangleBuffer.Dispose();
         }
 
         private void CreateBuffers () {
 
             pointsBuffer = new ComputeBuffer (numPoints, sizeof (float) * 4);
             triangleBuffer = new ComputeBuffer (maxTriangleCount, sizeof (float) * 3 * 3, ComputeBufferType.Append);
-        }
-
-        private void ReleaseBuffers () {
-            if (pointsBuffer != null)
-            {
-                pointsBuffer.Release();
-            }
-            if (triangleBuffer != null)
-            {
-                triangleBuffer.Release();
-            }
         }
     }
 }
