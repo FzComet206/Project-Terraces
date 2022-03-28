@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class WorldGenerator : MonoBehaviour
@@ -6,19 +7,18 @@ public class WorldGenerator : MonoBehaviour
     [SerializeField] private Types.InputType mapInput;
     
     private Controller playerRef;
-    private GameObject[] cubes;
+    private Types.Chunks[] chunks;
 
     private void Start()
     {
         playerRef = FindObjectOfType<Controller>();
-        cubes = new GameObject[(int)Mathf.Pow(mapInput.mapDivision * 2 - 2, 3)];
+        chunks = new Types.Chunks[(int)Mathf.Pow(mapInput.mapDivision * 2 - 2, 3)];
         InitBoundingBox();
-        InitCubes();
+        GetAllChunks();
+        StartCoroutine(ChunkUpdate());
     }
 
-    
-
-    public IEnumerable ChunkUpdate()
+    public IEnumerator ChunkUpdate()
     {
         while (true)
         {
@@ -52,16 +52,18 @@ public class WorldGenerator : MonoBehaviour
                     
                     int index = _z + _y * axisNum + _x * axisNum * axisNum;
                     
-                    if (index < cubes.Length && index >= 0)
+                    if (index < chunks.Length && index >= 0)
                     {
-                        cubes[index].SetActive(true);
+                        Types.Chunks c = chunks[index];
+                        c.active = true;
+                        c.Refresh();
                     }
                 }
             }
         }
     }
 
-    public void InitCubes()
+    public void GetAllChunks()
     {
         int size = mapInput.mapSize;
         int div = mapInput.mapDivision;
@@ -78,21 +80,14 @@ public class WorldGenerator : MonoBehaviour
                     int y = (j - div + 1) * stepSize;
                     int z = (k - div + 1) * stepSize;
 
-                    Vector3 pos = new Vector3(x + stepSize / 2, y + stepSize / 2, z + stepSize / 2);
+                    int3 startPos = new int3(x, y, z);
+                    Vector3 centerPos = new Vector3(x + stepSize / 2, y + stepSize / 2, z + stepSize / 2);
                     
-                    
-                    
-                    GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    cube.SetActive(false);
-                    cube.transform.position = pos;
-                    cube.transform.parent = mapInput.pool.transform;
-                    Destroy(cube.GetComponent<Collider>());
-
                     int index = k +
                                 j * axisNum +
                                 i * axisNum * axisNum;
                     
-                    cubes[index] = cube;
+                    chunks[index] = new Types.Chunks(index, centerPos, startPos, mapInput);
                 }
             }
         }

@@ -1,3 +1,6 @@
+using System;
+using System.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 
 
@@ -8,6 +11,7 @@ public static class Types
     {
         public int mapSize;
         public int mapDivision;
+        public Material meshMat;
         public Material boundMat;
         public GameObject pool;
 
@@ -21,29 +25,36 @@ public static class Types
         public float lacunarity;
         public float gain;
         public float scale;
+        [Range(-1, 1)] public float isoLevel;
     }
     
     public class Chunks
     {
+        // input configs 
         public int index;
         public Vector3 centerPos;
-        public Vector3 startPos;
+        public int3 startPos;
+        private InputType input;
+        
+        private int numPoints;
+        private int numVoxels;
         private int numPointsPerAxis;
+        private int maxTriangleCount;
         
+        // states
         public bool active;
+        private bool generated;
         
+        // object datas
+        public GameObject chunk;
         private Vector3[] verticies;
         private int[] triangles;
 
+        // buffer datas 
         private ComputeBuffer pointsBuffer;
         private ComputeBuffer triangleBuffer;
-
-        private InputType input;
-        private int numPoints;
-        private int numVoxels;
-        private int maxTriangleCount;
         
-        public Chunks(int index, Vector3 centerPos, Vector3 startPos, InputType input)
+        public Chunks(int index, Vector3 centerPos, int3 startPos, InputType input)
         {
             this.index = index;
             this.centerPos = centerPos;
@@ -56,33 +67,67 @@ public static class Types
             maxTriangleCount = numVoxels * 5;
         }
 
-        public GameObject GetMesh()
+        public void Refresh()
+        {
+            if (this.active)
+            {
+                if (!this.generated)
+                {
+                    this.MakeMesh();
+                    this.generated = true;
+                }
+            }
+            else
+            {
+                if (this.generated)
+                {
+                    this.chunk.SetActive(false);
+                } 
+            }
+        }
+
+        private IEnumerator DeleteAfterTime()
+        {
+            yield return null;
+        } 
+
+        public void MakeMesh()
         {
             this.Triangulate();
+
+            Mesh mesh = new Mesh();
+            mesh.vertices = this.verticies;
+            mesh.triangles = this.triangles;
             
-            return new GameObject();
+            this.chunk = new GameObject("Chunk", new Type[]
+            {
+                typeof(MeshFilter),
+                typeof(MeshRenderer),
+            } );
+            
+            this.chunk.GetComponent<MeshFilter>().sharedMesh = mesh;
+            this.chunk.GetComponent<MeshRenderer>().material = input.meshMat;
+            this.chunk.transform.parent = input.pool.transform;
         }
 
         private void Triangulate()
         {
-            CreatePointsBuffers();
-
+            CreateBuffers();
+            
             ComputeHelper ch = GameObject.FindObjectOfType<ComputeHelper>();
             
-            CreateBuffers();
             ch.DispatchNoiseBuffer(pointsBuffer, input.noise, startPos, 8);
-            ch.DispatchTriangulateBuffer(pointsBuffer, triangleBuffer, 8);
-            
+            ch.DispatchTriangulateBuffer(pointsBuffer, triangleBuffer, numPointsPerAxis, input.noise.isoLevel, 8);
+
             // copy to arr and set obj
+            this.verticies = new Vector3[pointsBuffer.count];
+            this.triangles = new int[triangleBuffer.count];
+            pointsBuffer.GetData(this.verticies);
+            triangleBuffer.GetData(this.triangles);
             
             ReleaseBuffers();
         }
 
-        private void CreatePointsBuffers()
-        {
-            
-        }
-        
         private void CreateBuffers () {
 
             pointsBuffer = new ComputeBuffer (numPoints, sizeof (float) * 4);
@@ -90,11 +135,11 @@ public static class Types
         }
 
         private void ReleaseBuffers () {
-            if (pointsBuffer == null)
+            if (pointsBuffer != null)
             {
                 pointsBuffer.Release();
             }
-            if (triangleBuffer == null)
+            if (triangleBuffer != null)
             {
                 triangleBuffer.Release();
             }
