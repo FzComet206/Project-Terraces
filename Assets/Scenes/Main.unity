@@ -143,12 +143,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pointCloud: {fileID: 7200000, guid: 481b1507259494ce797a8b59df1ba9ef, type: 3}
   marchingCubes: {fileID: 7200000, guid: 07998a4d4cda9456cb2046b7da181202, type: 3}
-  ns:
-    octaves: 0
-    lacunarity: 0
-    gain: 0
-    scale: 0
-    isoLevel: 0
 --- !u!1 &1113654458
 GameObject:
   m_ObjectHideFlags: 0
@@ -435,11 +429,11 @@ PrefabInstance:
         type: 3}
       propertyPath: mapInput.pool
       value: 
-      objectReference: {fileID: 1718384371}
+      objectReference: {fileID: 1718384372}
     - target: {fileID: 7660806126897602099, guid: b6c52f0fa09ac4e3389c336567105707,
         type: 3}
       propertyPath: mapInput.mapSize
-      value: 500
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 7660806126897602099, guid: b6c52f0fa09ac4e3389c336567105707,
         type: 3}

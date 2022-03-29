@@ -37,7 +37,7 @@ public class Test : MonoBehaviour
     
         triangleBuffer.SetCounterValue(0);
         marchingCubes.SetInt("numPointsPerAxis", pointsPerAxis);
-        marchingCubes.SetFloat("isoLevel", 0);
+        marchingCubes.SetFloat("isoLevel", 0f);
         int h1 = marchingCubes.FindKernel("March");
         marchingCubes.SetBuffer(h1, "points", v4buffer);
         marchingCubes.SetBuffer(h1, "triangles", triangleBuffer);
@@ -74,10 +74,6 @@ public class Test : MonoBehaviour
         obj.GetComponent<MeshFilter>().mesh = mesh;
         obj.GetComponent<MeshRenderer>().material = mat;
         mesh.RecalculateNormals();
-        
-        Debug.Log(numPoints);
-        Debug.Log(verticies.Length);
-        Debug.Log(triangles.Length / 3);
         
         pointsBuffer.Dispose();
         triangleBuffer.Dispose();

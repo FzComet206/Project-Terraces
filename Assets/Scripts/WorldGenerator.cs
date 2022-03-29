@@ -1,5 +1,5 @@
 using System.Collections;
-using Unity.Mathematics;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class WorldGenerator : MonoBehaviour
@@ -8,91 +8,54 @@ public class WorldGenerator : MonoBehaviour
     
     private Controller playerRef;
     private Chunks[] chunks;
+    private Queue<Chunks> queue;
+    private Queue<GameObject> testQueue;
 
     private void Start()
     {
+        int d = mapInput.mapDivision; 
         playerRef = FindObjectOfType<Controller>();
-        chunks = new Chunks[(int)Mathf.Pow(mapInput.mapDivision * 2 - 2, 3)];
+        chunks = new Chunks[d * d * d];
+        queue = new Queue<Chunks>();
+        testQueue = new Queue<GameObject>();
         InitBoundingBox();
-        GetAllChunks();
+        GenerateAllChunksConfig();
         StartCoroutine(ChunkUpdate());
+        StartCoroutine(MeshUpdate());
     }
 
-    public IEnumerator ChunkUpdate()
+    private IEnumerator ChunkUpdate()
     {
         while (true)
         {
-            DetectAndUpdateChunks();
+            UpdateChunks();
             yield return new WaitForSeconds(0.1f);
         }
     }
 
-    private void DetectAndUpdateChunks()
+    private IEnumerator MeshUpdate()
     {
-        int stepSize = mapInput.mapSize/ mapInput.mapDivision;
-        int axisNum = mapInput.mapDivision * 2 - 2;
+        while (true)
+        {
+            if (testQueue.Count != 0)
+            {
+                GameObject c = testQueue.Dequeue();
+                c.SetActive(true);
+            }
+            yield return new WaitForFixedUpdate();
+        }
+    }
 
-        float offset = -30f;
+    void GenerateAllChunksConfig()
+    {
         
-        // convert position to index
-        Vector3 pos = playerRef.transform.position;
-        int x = Mathf.RoundToInt((pos.x + offset) / stepSize + mapInput.mapDivision);
-        int y = Mathf.RoundToInt((pos.y + offset) / stepSize + mapInput.mapDivision);
-        int z = Mathf.RoundToInt((pos.z + offset) / stepSize + mapInput.mapDivision);
-
-        for (int i = -1; i < 2; i++)
-        {
-            for (int j = -1; j < 2; j++)
-            {
-                for (int k = -1; k < 2; k++)
-                {
-                    int _x = x + i;
-                    int _y = y + j;
-                    int _z = z + k;
-                    
-                    int index = _z + _y * axisNum + _x * axisNum * axisNum;
-                    
-                    if (index < chunks.Length && index >= 0)
-                    {
-                        Chunks c = chunks[index];
-                        c.active = true;
-                        c.Refresh();
-                    }
-                }
-            }
-        }
     }
 
-    public void GetAllChunks()
+    void UpdateChunks()
     {
-        int size = mapInput.mapSize;
-        int div = mapInput.mapDivision;
-        int stepSize = size / div;
-        int axisNum = div * 2 - 2;
-
-        for (int i = 0; i < axisNum; i++)
-        {
-            for (int j = 0; j < axisNum; j++)
-            {
-                for (int k = 0; k < axisNum; k++)
-                {
-                    int x = (i - div + 1) * stepSize;
-                    int y = (j - div + 1) * stepSize;
-                    int z = (k - div + 1) * stepSize;
-
-                    Vector3 startPos = new Vector3(x, y, z);
-                    Vector3 centerPos = new Vector3(x + stepSize / 2, y + stepSize / 2, z + stepSize / 2);
-                    
-                    int index = k +
-                                j * axisNum +
-                                i * axisNum * axisNum;
-                    
-                    chunks[index] = new Chunks(index, centerPos, startPos, mapInput, mapInput.meshMat, mapInput.pool);
-                }
-            }
-        }
+        
     }
-    
+
     public void InitBoundingBox()
     {
         Vector3[] dirs = new Vector3[]
