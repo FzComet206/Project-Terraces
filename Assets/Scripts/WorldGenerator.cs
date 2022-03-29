@@ -7,12 +7,12 @@ public class WorldGenerator : MonoBehaviour
     [SerializeField] private Types.InputType mapInput;
     
     private Controller playerRef;
-    private Types.Chunks[] chunks;
+    private Chunks[] chunks;
 
     private void Start()
     {
         playerRef = FindObjectOfType<Controller>();
-        chunks = new Types.Chunks[(int)Mathf.Pow(mapInput.mapDivision * 2 - 2, 3)];
+        chunks = new Chunks[(int)Mathf.Pow(mapInput.mapDivision * 2 - 2, 3)];
         InitBoundingBox();
         GetAllChunks();
         StartCoroutine(ChunkUpdate());
@@ -54,7 +54,7 @@ public class WorldGenerator : MonoBehaviour
                     
                     if (index < chunks.Length && index >= 0)
                     {
-                        Types.Chunks c = chunks[index];
+                        Chunks c = chunks[index];
                         c.active = true;
                         c.Refresh();
                     }
@@ -80,14 +80,14 @@ public class WorldGenerator : MonoBehaviour
                     int y = (j - div + 1) * stepSize;
                     int z = (k - div + 1) * stepSize;
 
-                    int3 startPos = new int3(x, y, z);
+                    Vector3 startPos = new Vector3(x, y, z);
                     Vector3 centerPos = new Vector3(x + stepSize / 2, y + stepSize / 2, z + stepSize / 2);
                     
                     int index = k +
                                 j * axisNum +
                                 i * axisNum * axisNum;
                     
-                    chunks[index] = new Types.Chunks(index, centerPos, startPos, mapInput);
+                    chunks[index] = new Chunks(index, centerPos, startPos, mapInput, mapInput.meshMat, mapInput.pool);
                 }
             }
         }

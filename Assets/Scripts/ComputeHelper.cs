@@ -6,9 +6,10 @@ public class ComputeHelper: MonoBehaviour
     [SerializeField] ComputeShader pointCloud;
     [SerializeField] ComputeShader marchingCubes;
 
-    public void DispatchNoiseBuffer(ComputeBuffer points, Types.NoiseSettings ns, int3 startPos, int groupSize)
+    public void DispatchNoiseBuffer(ComputeBuffer points, Types.NoiseSettings ns, int numPointsPerAxis, Vector3 startPos, int groupSize)
     {
         pointCloud.SetInt("octaves", ns.octaves);
+        pointCloud.SetInt("numPointsPerAxis", numPointsPerAxis);
         pointCloud.SetFloat("scale", ns.scale);
         pointCloud.SetFloat("lacunarity", ns.lacunarity);
         pointCloud.SetFloat("gain", ns.gain);
