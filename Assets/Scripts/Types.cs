@@ -1,8 +1,5 @@
 using System;
-using System.Collections;
-using Unity.Mathematics;
 using UnityEngine;
-using Vector4 = System.Numerics.Vector4;
 
 
 public static class Types 
@@ -13,7 +10,6 @@ public static class Types
         public int pointsPerChunkAxis;
         public int mapDivision;
         public Material meshMat;
-        public Material boundMat;
         public Transform pool;
 
         public NoiseSettings noise;

@@ -5,21 +5,20 @@ using UnityEngine;
 public class WorldGenerator : MonoBehaviour
 {
     [SerializeField] private Types.InputType mapInput;
-    
-    private Controller playerRef;
-    private Chunks[] chunks;
-    private Queue<Chunks> queue;
 
-    private Vector3[] testBlock;
-    private Queue<Vector3> testQueue;
-    private HashSet<int> generated;
+    private Controller playerRef;
     
+    private Chunks[] chunks;
+    private List<Chunks> generated;
+    private Queue<Chunks> queue;
+    private HashSet<int> bruh;
+
     // buffers
     private ComputeBuffer pointsBuffer;
     private ComputeBuffer v4Buffer;
     private ComputeBuffer triangleBuffer;
     private ComputeBuffer triCountBuffer;
-    
+
     // other properties
     private int numPoints;
     private int numVoxels;
@@ -27,27 +26,29 @@ public class WorldGenerator : MonoBehaviour
     private int numPointsPerAxis;
     private int maxTriangleCount;
 
+    private int totalVerts;
+
     private void Start()
     {
-        int d = mapInput.mapDivision; 
+        int d = mapInput.mapDivision;
         numPointsPerAxis = mapInput.pointsPerChunkAxis;
         numPoints = numPointsPerAxis * numPointsPerAxis * numPointsPerAxis;
         numVoxelsPerAxis = numPointsPerAxis - 1;
         numVoxels = numVoxelsPerAxis * numVoxelsPerAxis * numVoxelsPerAxis;
         maxTriangleCount = numVoxels * 5;
-        
+        totalVerts = 0;
+
         playerRef = FindObjectOfType<Controller>();
         chunks = new Chunks[d * d * d];
         queue = new Queue<Chunks>();
-        
-        testQueue = new Queue<Vector3>();
-        testBlock = new Vector3[d * d * d];
-        generated = new HashSet<int>();
-        
+        generated = new List<Chunks>();
+        bruh = new HashSet<int>();
+
         GenerateAllChunksConfig();
-        
+
         StartCoroutine(ChunkUpdate());
         StartCoroutine(MeshUpdate());
+        StartCoroutine(Culling());
     }
 
     private IEnumerator ChunkUpdate()
@@ -69,39 +70,36 @@ public class WorldGenerator : MonoBehaviour
                 if (!c.active)
                 {
                     c.active = true;
-                    if (!c.generated)
-                    {
-                        CreateBuffers();
-                        MakeMesh(c);
-                    }
+                    CreateBuffers();
+                    MakeMesh(c);
+                    generated.Add(c);
+                    totalVerts += c.verticies.Length;
                 }
             }
+
             yield return new WaitForFixedUpdate();
         }
     }
-
-    void GenerateAllChunksConfig()
+    
+    private IEnumerator Culling()
     {
-        int d = mapInput.mapDivision;
-        int s = mapInput.pointsPerChunkAxis;
-        for (int i = 0; i < d; i++)
+        while (true)
         {
-            for (int j = 0; j < d; j++)
+            if (totalVerts > 5000000)
             {
-                for (int k = 0; k < d; k++)
-                {
-                    float x = i - d / 2; 
-                    float y = j - d / 2; 
-                    float z = k - d / 2;
-                    // minus 1 is important
-                    Vector3 p = new Vector3(x, y, z) * (s - 1);
-                    int index = k + j * d + i * d * d;
-                    testBlock[index] = p;
-
-                    Chunks c = new Chunks(index, p);
-                    chunks[index] = c;
-                }
+                generated.Sort();
+                Chunks c = generated[generated.Count - 1];
+                generated.RemoveAt(generated.Count - 1);
+                Destroy(c.chunk);
+                totalVerts -= c.verticies.Length;
+                
+                c.active = false;
+                bruh.Remove(c.index);
+                
+                Debug.Log(totalVerts);
             }
+
+            yield return new WaitForFixedUpdate();
         }
     }
 
@@ -126,13 +124,38 @@ public class WorldGenerator : MonoBehaviour
                     int _k = z + k;
                     
                     int index = _k + _j * d + _i * d * d;
+                    Chunks c = chunks[index];
 
-                    if (index < testBlock.Length && index >= 0 && !generated.Contains(index))
+                    if (index < chunks.Length && index >= 0 && !bruh.Contains(index))
                     {
-                        testQueue.Enqueue(testBlock[index]);
-                        generated.Add(index);
-                        queue.Enqueue(chunks[index]);
+                        bruh.Add(index);
+                        queue.Enqueue(c);
                     }
+                }
+            }
+        }
+    }
+    
+    void GenerateAllChunksConfig()
+    {
+        int d = mapInput.mapDivision;
+        int s = mapInput.pointsPerChunkAxis;
+        for (int i = 0; i < d; i++)
+        {
+            for (int j = 0; j < d; j++)
+            {
+                for (int k = 0; k < d; k++)
+                {
+                    float x = i - d / 2; 
+                    float y = j - d / 2; 
+                    float z = k - d / 2;
+                    // minus 1 is important
+                    Vector3 start = new Vector3(x, y, z) * (s - 1);
+                    Vector3 center = start + new Vector3(start.x / 2, start.y / 2, start.z / 2);
+                    int index = k + j * d + i * d * d;
+
+                    Chunks c = new Chunks(index, start, center);
+                    chunks[index] = c;
                 }
             }
         }
