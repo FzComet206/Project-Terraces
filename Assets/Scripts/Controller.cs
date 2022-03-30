@@ -1,10 +1,5 @@
-using System;
-using System.Data;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
-using Vector2 = System.Numerics.Vector2;
 
 public class Controller : MonoBehaviour
 {
@@ -38,7 +33,7 @@ public class Controller : MonoBehaviour
         Vector3 rotate = new Vector3(dirX, dirY, 0).normalized;
         rotate *= rotateSpeed * 0.01f * Time.fixedDeltaTime;
 
-        Quaternion r = quaternion.Euler(rotate);
+        Quaternion r = Quaternion.Euler(rotate * 20f);
         transform.rotation *= r;
         
         Vector3 vel = transform.forward * (c * cruiseSpeed * Time.fixedDeltaTime);
