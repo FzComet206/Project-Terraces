@@ -37,7 +37,7 @@ float fbm(float3 x)
 void GeneratePoints(uint3 id : SV_DispatchThreadID)
 {
     int index = id.z * numPointsPerAxis * numPointsPerAxis + id.y * numPointsPerAxis + id.x;
-    float3 p = float3(id.x, id.y, id.z) + startPos;
+    float3 p = id + startPos;
     float n = fbm(p / scale);
 
     // n = remap(n, -1, 1, 0, 1) * 64 - (id.y + 2) + (id.y % 16) * 0.8;

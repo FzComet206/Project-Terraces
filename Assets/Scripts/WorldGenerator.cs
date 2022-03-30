@@ -93,7 +93,8 @@ public class WorldGenerator : MonoBehaviour
                     float x = i - d / 2; 
                     float y = j - d / 2; 
                     float z = k - d / 2;
-                    Vector3 p = new Vector3(x, y, z) * s;
+                    // minus 1 is important
+                    Vector3 p = new Vector3(x, y, z) * (s - 1);
                     int index = k + j * d + i * d * d;
                     testBlock[index] = p;
 
