@@ -496,8 +496,33 @@ PrefabInstance:
       objectReference: {fileID: 1718384372}
     - target: {fileID: 7660806126897602099, guid: b6c52f0fa09ac4e3389c336567105707,
         type: 3}
+      propertyPath: mapInput.noise.gain
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7660806126897602099, guid: b6c52f0fa09ac4e3389c336567105707,
+        type: 3}
       propertyPath: mapInput.mapDivision
       value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 7660806126897602099, guid: b6c52f0fa09ac4e3389c336567105707,
+        type: 3}
+      propertyPath: mapInput.noise.scale
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 7660806126897602099, guid: b6c52f0fa09ac4e3389c336567105707,
+        type: 3}
+      propertyPath: mapInput.noise.octaves
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7660806126897602099, guid: b6c52f0fa09ac4e3389c336567105707,
+        type: 3}
+      propertyPath: mapInput.noise.lacunarity
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7660806126897602099, guid: b6c52f0fa09ac4e3389c336567105707,
+        type: 3}
+      propertyPath: mapInput.pointsPerChunkAxis
+      value: 16
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b6c52f0fa09ac4e3389c336567105707, type: 3}

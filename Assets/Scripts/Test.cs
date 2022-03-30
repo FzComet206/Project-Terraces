@@ -21,6 +21,7 @@ public class Test : MonoBehaviour
         pointsBuffer = new ComputeBuffer (numPoints, sizeof (float) * 4);
         v4buffer = new ComputeBuffer(numPoints, sizeof(float) * 4);
         triangleBuffer = new ComputeBuffer (numPoints * 5, sizeof (float) * 3 * 3, ComputeBufferType.Append);
+        triCount = new ComputeBuffer(1, sizeof(int));
         
         pointCloud.SetInt("octaves", 3);
         pointCloud.SetInt("numPointsPerAxis", pointsPerAxis);
@@ -43,8 +44,6 @@ public class Test : MonoBehaviour
         marchingCubes.SetBuffer(h1, "triangles", triangleBuffer);
         marchingCubes.Dispatch(h1, pointsPerAxis / 8, pointsPerAxis / 8, pointsPerAxis / 8);
 
-
-        triCount = new ComputeBuffer(1, sizeof(int));
         ComputeBuffer.CopyCount(triangleBuffer, triCount, 0);
         int[] triC = new int[1];
         triCount.GetData(triC);

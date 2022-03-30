@@ -12,6 +12,8 @@ float lacunarity;
 float gain;
 float scale;
 
+float4 startPos;
+
 float remap(float v, float minOld, float maxOld, float minNew, float maxNew) {
     return saturate(minNew + (v-minOld) * (maxNew - minNew) / (maxOld-minOld));
 }
@@ -35,11 +37,10 @@ float fbm(float3 x)
 void GeneratePoints(uint3 id : SV_DispatchThreadID)
 {
     int index = id.z * numPointsPerAxis * numPointsPerAxis + id.y * numPointsPerAxis + id.x;
-    float3 p = float3(id.x, id.y, id.z);
+    float3 p = float3(id.x, id.y, id.z) + startPos;
     float n = fbm(p / scale);
 
-    n = remap(n, -1, 1, 0, 1) * 64 - (id.y + 2) +
-        (id.y % 4) * 0.8;
+    // n = remap(n, -1, 1, 0, 1) * 64 - (id.y + 2) + (id.y % 16) * 0.8;
     
     points[index] = float4(p, n);
 }
