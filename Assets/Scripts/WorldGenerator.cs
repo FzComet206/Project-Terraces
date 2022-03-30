@@ -9,7 +9,10 @@ public class WorldGenerator : MonoBehaviour
     private Controller playerRef;
     private Chunks[] chunks;
     private Queue<Chunks> queue;
-    private Queue<GameObject> testQueue;
+
+    private Vector3[] testBlock;
+    private Queue<Vector3> testQueue;
+    private HashSet<int> generated;
 
     private void Start()
     {
@@ -17,8 +20,11 @@ public class WorldGenerator : MonoBehaviour
         playerRef = FindObjectOfType<Controller>();
         chunks = new Chunks[d * d * d];
         queue = new Queue<Chunks>();
-        testQueue = new Queue<GameObject>();
-        InitBoundingBox();
+        
+        testQueue = new Queue<Vector3>();
+        testBlock = new Vector3[d * d * d];
+        generated = new HashSet<int>();
+        
         GenerateAllChunksConfig();
         StartCoroutine(ChunkUpdate());
         StartCoroutine(MeshUpdate());
@@ -39,8 +45,9 @@ public class WorldGenerator : MonoBehaviour
         {
             if (testQueue.Count != 0)
             {
-                GameObject c = testQueue.Dequeue();
-                c.SetActive(true);
+                GameObject g = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                Vector3 p = testQueue.Dequeue();
+                g.GetComponent<Transform>().position = p;
             }
             yield return new WaitForFixedUpdate();
         }
@@ -48,43 +55,54 @@ public class WorldGenerator : MonoBehaviour
 
     void GenerateAllChunksConfig()
     {
-        
+        int d = mapInput.mapDivision;
+        int s = mapInput.pointsPerChunkAxis;
+        for (int i = 0; i < d; i++)
+        {
+            for (int j = 0; j < d; j++)
+            {
+                for (int k = 0; k < d; k++)
+                {
+                    float x = i - d / 2; 
+                    float y = j - d / 2; 
+                    float z = k - d / 2;
+                    Vector3 p = new Vector3(x, y, z) * s;
+                    int index = k + j * d + i * d * d;
+                    testBlock[index] = p;
+                }
+            }
+        }
     }
 
     void UpdateChunks()
     {
+        int d = mapInput.mapDivision;
+        int s = mapInput.pointsPerChunkAxis;
+        Vector3 p = playerRef.transform.position;
+
+        int x = Mathf.RoundToInt(p.x / s + (d / 2f));
+        int y = Mathf.RoundToInt(p.y / s + (d / 2f));
+        int z = Mathf.RoundToInt(p.z / s + (d / 2f));
         
-    }
-
-    public void InitBoundingBox()
-    {
-        Vector3[] dirs = new Vector3[]
+        for (int i = -2; i < 3; i++)
         {
-            Vector3.up,
-            Vector3.down,
-            Vector3.left,
-            Vector3.right,
-            Vector3.forward,
-            Vector3.back
-        };
+            for (int j = -2; j < 3; j++)
+            {
+                for (int k = -2; k < 3; k++)
+                {
+                    int _i = x + i;
+                    int _j = y + j;
+                    int _k = z + k;
+                    
+                    int index = _k + _j * d + _i * d * d;
 
-        foreach (Vector3 d in dirs)
-        {
-            GameObject p = GameObject.CreatePrimitive(PrimitiveType.Plane);
-            p.transform.position = d * mapInput.mapSize;
-            p.transform.rotation = Quaternion.LookRotation(
-                new Vector3(d.z, d.x, d.y),
-                -d
-            );
-            p.transform.localScale = Vector3.one * mapInput.mapSize / 5;
-            p.GetComponent<MeshRenderer>().material = mapInput.boundMat;
+                    if (index < testBlock.Length && index >= 0 && !generated.Contains(index))
+                    {
+                        testQueue.Enqueue(testBlock[index]);
+                        generated.Add(index);
+                    }
+                }
+            }
         }
     }
-    
-    
-    
-    
-    
-    
-    
 }

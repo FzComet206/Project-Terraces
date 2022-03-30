@@ -38,8 +38,8 @@ void GeneratePoints(uint3 id : SV_DispatchThreadID)
     float3 p = float3(id.x, id.y, id.z);
     float n = fbm(p / scale);
 
-    n = remap(n, -1, 1, 0, 1) * 32 - (id.y + 2) +
-        (id.y % 16) * 1.2;
+    n = remap(n, -1, 1, 0, 1) * 64 - (id.y + 2) +
+        (id.y % 4) * 0.8;
     
     points[index] = float4(p, n);
 }

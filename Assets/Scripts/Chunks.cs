@@ -42,7 +42,7 @@ public class Chunks
         this.mat = mat;
         this.parent = parent;
 
-        numPointsPerAxis = input.mapSize / input.mapDivision;
+        numPointsPerAxis = input.pointsPerChunkAxis;
         numPoints = numPointsPerAxis * numPointsPerAxis * numPointsPerAxis;
         numVoxelsPerAxis = numPointsPerAxis - 1;
         numVoxels = numVoxelsPerAxis * numVoxelsPerAxis * numVoxelsPerAxis;

@@ -10,7 +10,7 @@ public static class Types
     [System.Serializable]
     public struct InputType
     {
-        public int mapSize;
+        public int pointsPerChunkAxis;
         public int mapDivision;
         public Material meshMat;
         public Material boundMat;
