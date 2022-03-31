@@ -59,8 +59,12 @@ void March (int3 id : SV_DispatchThreadID)
 
     // Create triangles for current cube configuration
     for (int i = 0; triangulation[cubeIndex][i] != -1; i +=3) {
-        // Get indices of corner points A and B for each of the three edges
-        // of the cube that need to be joined to form the triangle.
+
+        if (triangulation[cubeIndex][i] == -1)
+        {
+            break;
+        }
+        
         int a0 = cornerIndexAFromEdge[triangulation[cubeIndex][i]];
         int b0 = cornerIndexBFromEdge[triangulation[cubeIndex][i]];
 

@@ -96,17 +96,19 @@ public class WorldGenerator : MonoBehaviour
                 Vector3 p = playerRef.transform.position;
                 for (int i = 0; i < generated.Count; i++)
                 {
-                    if ((generated[i].centerPos - p).magnitude > (generated[farthest].centerPos - p).magnitude)
+                    float distNow = (generated[i].centerPos - p).magnitude;
+                    float distPrev = (generated[farthest].centerPos - p).magnitude;
+                    if (distNow > distPrev)
                     {
                         farthest = i;
                     }
                 }
-
+                
                 Chunks c = generated[farthest];
                 generated.RemoveAt(farthest);
                 
                 totalVerts -= c.verticies.Length;
-                Destroy(c.chunk);
+                Destroy(c.chunk.GetComponent<MeshFilter>().sharedMesh);
                 c.verticies = null;
                 c.triangles = null;
                 
@@ -124,9 +126,9 @@ public class WorldGenerator : MonoBehaviour
         int s = mapInput.pointsPerChunkAxis;
         Vector3 p = playerRef.transform.position;
 
-        int x = Mathf.FloorToInt(p.x / s + d / 2f);
-        int y = Mathf.FloorToInt(p.y / s + d / 2f);
-        int z = Mathf.FloorToInt(p.z / s + d / 2f);
+        int x = Mathf.FloorToInt(p.x / (s - 1)) + d / 2;
+        int y = Mathf.FloorToInt(p.y / (s - 1)) + d / 2;
+        int z = Mathf.FloorToInt(p.z / (s - 1)) + d / 2;
         
         for (int i = -2; i < 3; i++)
         {
@@ -139,10 +141,10 @@ public class WorldGenerator : MonoBehaviour
                     int _k = z + k;
                     
                     int index = _k + _j * d + _i * d * d;
-                    Chunks c = chunks[index];
 
                     if (index < chunks.Length && index >= 0 && !bruh.Contains(index))
                     {
+                        Chunks c = chunks[index];
                         bruh.Add(index);
                         queue.Enqueue(c);
                     }
@@ -166,7 +168,7 @@ public class WorldGenerator : MonoBehaviour
                     float z = k - d / 2;
                     // minus 1 is important
                     Vector3 start = new Vector3(x, y, z) * (s - 1);
-                    Vector3 center = start + new Vector3(start.x / 2, start.y / 2, start.z / 2);
+                    Vector3 center = start + new Vector3(s / 2f, s / 2f, s / 2f);
                     int index = k + j * d + i * d * d;
 
                     Chunks c = new Chunks(index, start, center);
@@ -229,14 +231,22 @@ public class WorldGenerator : MonoBehaviour
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
 
-        chunk.chunk = new GameObject("Chunk " + chunk.index, 
-            typeof(MeshFilter),
-            typeof(MeshRenderer),
-            typeof(MeshCollider)
-        );
+        if (chunk.chunk != null)
+        {
+            chunk.chunk.GetComponent<MeshFilter>().sharedMesh = mesh;
+            chunk.chunk.GetComponent<MeshCollider>().sharedMesh = mesh;
+        }
+        else
+        {
+            chunk.chunk = new GameObject("Chunk " + chunk.index, 
+                typeof(MeshFilter),
+                typeof(MeshRenderer),
+                typeof(MeshCollider)
+            );
+            chunk.chunk.GetComponent<MeshFilter>().sharedMesh = mesh;
+            chunk.chunk.GetComponent<MeshCollider>().sharedMesh = mesh;
+        }
         
-        chunk.chunk.GetComponent<MeshFilter>().mesh = mesh;
-        chunk.chunk.GetComponent<MeshCollider>().sharedMesh = mesh;
         chunk.chunk.GetComponent<MeshRenderer>().material = mapInput.meshMat;
         
         chunk.chunk.transform.parent = mapInput.pool;
