@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class WorldGenerator : MonoBehaviour
 {
@@ -70,15 +71,8 @@ public class WorldGenerator : MonoBehaviour
                 Chunks c = queue.Dequeue();
                 if (!c.active)
                 {
-                    if (c.chunk != null)
-                    {
-                        c.chunk.SetActive(true);
-                    }
-                    else
-                    {
-                        CreateBuffers();
-                        MakeMesh(ref c);
-                    }
+                    CreateBuffers();
+                    MakeMesh(ref c);
                     
                     c.active = true;
                     
@@ -111,14 +105,13 @@ public class WorldGenerator : MonoBehaviour
                 Chunks c = generated[farthest];
                 generated.RemoveAt(farthest);
                 
-                c.chunk.SetActive(false);
-                
                 totalVerts -= c.verticies.Length;
+                Destroy(c.chunk);
+                c.verticies = null;
+                c.triangles = null;
                 
                 c.active = false;
                 bruh.Remove(c.index);
-                
-                Debug.Log(totalVerts);
             }
 
             yield return new WaitForFixedUpdate();
@@ -131,9 +124,9 @@ public class WorldGenerator : MonoBehaviour
         int s = mapInput.pointsPerChunkAxis;
         Vector3 p = playerRef.transform.position;
 
-        int x = Mathf.RoundToInt(p.x / s + (d / 2f));
-        int y = Mathf.RoundToInt(p.y / s + (d / 2f));
-        int z = Mathf.RoundToInt(p.z / s + (d / 2f));
+        int x = Mathf.FloorToInt(p.x / s + d / 2f);
+        int y = Mathf.FloorToInt(p.y / s + d / 2f);
+        int z = Mathf.FloorToInt(p.z / s + d / 2f);
         
         for (int i = -2; i < 3; i++)
         {
@@ -229,17 +222,23 @@ public class WorldGenerator : MonoBehaviour
         
         // construct mesh
         Mesh mesh = new Mesh();
+        mesh.indexFormat = IndexFormat.UInt32;
         mesh.vertices = chunk.verticies;
         mesh.triangles = chunk.triangles;
+        
         mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
 
         chunk.chunk = new GameObject("Chunk " + chunk.index, 
             typeof(MeshFilter),
-            typeof(MeshRenderer)
+            typeof(MeshRenderer),
+            typeof(MeshCollider)
         );
         
-        chunk.chunk.GetComponent<MeshFilter>().sharedMesh = mesh;
+        chunk.chunk.GetComponent<MeshFilter>().mesh = mesh;
+        chunk.chunk.GetComponent<MeshCollider>().sharedMesh = mesh;
         chunk.chunk.GetComponent<MeshRenderer>().material = mapInput.meshMat;
+        
         chunk.chunk.transform.parent = mapInput.pool;
     }
 
