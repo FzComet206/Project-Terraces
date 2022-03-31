@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -69,9 +70,18 @@ public class WorldGenerator : MonoBehaviour
                 Chunks c = queue.Dequeue();
                 if (!c.active)
                 {
+                    if (c.chunk != null)
+                    {
+                        c.chunk.SetActive(true);
+                    }
+                    else
+                    {
+                        CreateBuffers();
+                        MakeMesh(ref c);
+                    }
+                    
                     c.active = true;
-                    CreateBuffers();
-                    MakeMesh(c);
+                    
                     generated.Add(c);
                     totalVerts += c.verticies.Length;
                 }
@@ -87,10 +97,22 @@ public class WorldGenerator : MonoBehaviour
         {
             if (totalVerts > 5000000)
             {
-                generated.Sort();
-                Chunks c = generated[generated.Count - 1];
-                generated.RemoveAt(generated.Count - 1);
-                Destroy(c.chunk);
+                // find farthest chunk 
+                int farthest = 0;
+                Vector3 p = playerRef.transform.position;
+                for (int i = 0; i < generated.Count; i++)
+                {
+                    if ((generated[i].centerPos - p).magnitude > (generated[farthest].centerPos - p).magnitude)
+                    {
+                        farthest = i;
+                    }
+                }
+
+                Chunks c = generated[farthest];
+                generated.RemoveAt(farthest);
+                
+                c.chunk.SetActive(false);
+                
                 totalVerts -= c.verticies.Length;
                 
                 c.active = false;
@@ -161,7 +183,7 @@ public class WorldGenerator : MonoBehaviour
         }
     }
 
-    public void MakeMesh(Chunks chunk)
+    public void MakeMesh(ref Chunks chunk)
     {
         ComputeHelper ch = FindObjectOfType<ComputeHelper>();
         
@@ -210,7 +232,7 @@ public class WorldGenerator : MonoBehaviour
         mesh.vertices = chunk.verticies;
         mesh.triangles = chunk.triangles;
         mesh.RecalculateNormals();
-        
+
         chunk.chunk = new GameObject("Chunk " + chunk.index, 
             typeof(MeshFilter),
             typeof(MeshRenderer)

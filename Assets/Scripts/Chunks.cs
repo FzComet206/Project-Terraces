@@ -7,6 +7,7 @@ public class Chunks: IComparable<Chunks>
     public int index;
     public Vector3 startPos;
     public Vector3 centerPos;
+    Controller playerRef;
 
     // states
     public bool active;
@@ -18,6 +19,7 @@ public class Chunks: IComparable<Chunks>
 
     public Chunks(int index, Vector3 startPos, Vector3 centerPos)
     {
+        playerRef = GameObject.FindObjectOfType<Controller>();
         this.index = index;
         this.startPos = startPos;
         this.centerPos = centerPos;
@@ -26,10 +28,13 @@ public class Chunks: IComparable<Chunks>
 
     public int CompareTo(Chunks comparePart)
     {
-        if (comparePart == null)
+        Vector3 playerPos = playerRef.transform.position;
+        float curr = (playerPos - centerPos).magnitude;
+        float next = (playerPos - comparePart.centerPos).magnitude;
+        if (curr < next)
         {
             return 1;
         }
-        return comparePart.centerPos.magnitude.CompareTo(this.centerPos.magnitude);
+        return 0;
     }
 }
