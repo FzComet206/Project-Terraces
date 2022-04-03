@@ -8,11 +8,13 @@ public static class Types
     public struct InputType
     {
         public int pointsPerChunkAxis;
+        [Range(10, 100)]
         public int mapDivision;
+        
+        public NoiseSettings noise;
+        
         public Material meshMat;
         public Transform pool;
-
-        public NoiseSettings noise;
     }
     
     [System.Serializable]
@@ -22,7 +24,7 @@ public static class Types
         public float lacunarity;
         public float gain;
         public float scale;
-        [Range(-1, 1)] public float isoLevel;
+        public float isoLevel;
     }
 
     public struct Tri{

@@ -34,6 +34,8 @@ public class WorldGenerator : MonoBehaviour
     {
         int d = mapInput.mapDivision;
         numPointsPerAxis = mapInput.pointsPerChunkAxis;
+        numPointsPerAxis = Mathf.Clamp(numPointsPerAxis, 8, 32);
+
         numPoints = numPointsPerAxis * numPointsPerAxis * numPointsPerAxis;
         numVoxelsPerAxis = numPointsPerAxis - 1;
         numVoxels = numVoxelsPerAxis * numVoxelsPerAxis * numVoxelsPerAxis;

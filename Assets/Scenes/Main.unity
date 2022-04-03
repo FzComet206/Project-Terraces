@@ -17,7 +17,7 @@ RenderSettings:
   m_Fog: 1
   m_FogColor: {r: 1, g: 1, b: 1, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.011
+  m_FogDensity: 0.008
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0, g: 0.41509432, b: 0.2354399, a: 1}
@@ -267,166 +267,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: quit.m_Id
-      value: d79f0abd-5d71-4d2e-82b8-dd6e4c532a96
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: cruiseSpeed
-      value: 1000
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: quit.m_Name
-      value: Quit
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: rotateSpeed
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_Id
-      value: 55e0984b-75b9-4f5b-99aa-ece44524d4ca
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_Name
-      value: Mouse Vector
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: quit.m_SingletonActionBindings.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.size
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: quit.m_SingletonActionBindings.Array.data[0].m_Id
-      value: 5ae4917f-7bd4-45f8-862d-32cf079a6542
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: quit.m_SingletonActionBindings.Array.data[0].m_Path
-      value: <Keyboard>/q
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: quit.m_SingletonActionBindings.Array.data[0].m_Action
-      value: Quit
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[0].m_Id
-      value: fc981316-e20a-4d28-884b-74db086b5b12
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[1].m_Id
-      value: fc38ebcc-c9e2-4718-b096-6862814ab393
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[2].m_Id
-      value: e59901b0-7bfa-4328-ab89-29f86f86da72
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[3].m_Id
-      value: 0f348ec2-1a5f-4bc5-9a7c-8a1ac435278c
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[4].m_Id
-      value: 761d44f7-f669-4b04-958b-d452a6809a5b
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[0].m_Name
-      value: 2D Vector
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[0].m_Path
-      value: 2DVector
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[1].m_Name
-      value: up
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[2].m_Name
-      value: down
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[3].m_Name
-      value: left
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[4].m_Name
-      value: right
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[0].m_Flags
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[1].m_Flags
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[2].m_Flags
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[3].m_Flags
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[4].m_Flags
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[0].m_Action
-      value: Mouse Vector
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[1].m_Action
-      value: Mouse Vector
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[2].m_Action
-      value: Mouse Vector
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[3].m_Action
-      value: Mouse Vector
-      objectReference: {fileID: 0}
-    - target: {fileID: 937510611510297874, guid: 8fe647dff5dbb4e6f848a535ade784ec,
-        type: 3}
-      propertyPath: mouseVector.m_SingletonActionBindings.Array.data[4].m_Action
-      value: Mouse Vector
-      objectReference: {fileID: 0}
     - target: {fileID: 937510611510297876, guid: 8fe647dff5dbb4e6f848a535ade784ec,
         type: 3}
       propertyPath: m_Name
@@ -647,8 +487,13 @@ PrefabInstance:
       objectReference: {fileID: 1718384372}
     - target: {fileID: 7660806126897602099, guid: b6c52f0fa09ac4e3389c336567105707,
         type: 3}
+      propertyPath: mapInput.chunkNum
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7660806126897602099, guid: b6c52f0fa09ac4e3389c336567105707,
+        type: 3}
       propertyPath: mapInput.noise.gain
-      value: 0.2
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: 7660806126897602099, guid: b6c52f0fa09ac4e3389c336567105707,
         type: 3}
@@ -663,7 +508,7 @@ PrefabInstance:
     - target: {fileID: 7660806126897602099, guid: b6c52f0fa09ac4e3389c336567105707,
         type: 3}
       propertyPath: mapInput.noise.octaves
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7660806126897602099, guid: b6c52f0fa09ac4e3389c336567105707,
         type: 3}

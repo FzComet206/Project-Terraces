@@ -1,4 +1,5 @@
 using System;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -7,6 +8,7 @@ public class Controller : MonoBehaviour
 {
     [SerializeField] private InputAction cruise;
     [SerializeField] private InputAction quit;
+    [SerializeField] private InputAction mouse;
     
     [SerializeField] private InputAction w;
     [SerializeField] private InputAction a;
@@ -16,28 +18,20 @@ public class Controller : MonoBehaviour
     [SerializeField] float cruiseSpeed;
     [SerializeField] private float rotateSpeed;
 
-    private Rigidbody rb; 
+    private Rigidbody rb;
+
+    private float xRotation = 0f;
+    private float yRotation = 0f;
     private void Start()
     {
         rb = gameObject.GetComponent<Rigidbody>();
+        Cursor.lockState = CursorLockMode.Locked;
     }
     
     void Update()
     {
+        // cruise
         float c = cruise.ReadValue<float>();
-        float _w = w.ReadValue<float>();
-        float _a = a.ReadValue<float>();
-        float _s = s.ReadValue<float>();
-        float _d = d.ReadValue<float>();
-
-        float dirX = (_s - _w);
-        float dirY = (_d - _a);
-
-        Vector3 rotate = new Vector3(dirX, dirY, 0).normalized;
-        rotate *= rotateSpeed * Time.fixedDeltaTime;
-        
-        Quaternion r = Quaternion.Euler(rotate * 20f);
-        transform.rotation *= r;
         
         Vector3 vel = transform.forward * (c * cruiseSpeed * Time.fixedDeltaTime);
         rb.velocity = vel;
@@ -48,9 +42,23 @@ public class Controller : MonoBehaviour
         }
     }
 
+    private void LateUpdate()
+    {
+        Vector2 delta = mouse.ReadValue<Vector2>();
+        float rx = delta.y * rotateSpeed * Time.fixedDeltaTime;
+        float ry = delta.x * rotateSpeed * Time.fixedDeltaTime;
+
+        xRotation -= rx;
+        xRotation = Mathf.Clamp(xRotation, -90, 90);
+        yRotation += ry;
+
+        transform.rotation = Quaternion.Euler(xRotation, yRotation, 0f).normalized;
+    }
+
     private void OnEnable()
     {
         cruise.Enable();
+        mouse.Enable();
         quit.Enable();
         w.Enable();
         a.Enable();
@@ -61,6 +69,7 @@ public class Controller : MonoBehaviour
     private void OnDisable()
     {
         cruise.Disable();
+        mouse.Disable();
         quit.Disable();
         w.Disable();
         a.Disable();
