@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -8,7 +6,10 @@ using UnityEngine.InputSystem;
 public class Controller : MonoBehaviour
 {
     [SerializeField] private InputAction modify;
+    [SerializeField] private InputAction adding;
+    [SerializeField] private InputAction subtracting;
     [SerializeField] private InputAction quit;
+    [SerializeField] private InputAction blocky;
     
     [SerializeField] private InputAction cruise;
     [SerializeField] private InputAction mouse;
@@ -19,6 +20,7 @@ public class Controller : MonoBehaviour
 
     private Rigidbody rb;
     private Camera cam;
+    private Generator generator;
 
     private float xRotation = 0f;
     private float yRotation = 0f;
@@ -29,16 +31,36 @@ public class Controller : MonoBehaviour
     private void Start()
     {
         rb = gameObject.GetComponent<Rigidbody>();
-        Cursor.lockState = CursorLockMode.Locked;
         cam = Camera.main;
+        generator = FindObjectOfType<Generator>();
+        Cursor.lockState = CursorLockMode.Locked;
     }
-    
+
+    private void FixedUpdate()
+    {
+        if (mod)
+        {
+            if (adding.ReadValue<float>() > 0.001f)
+            {
+                generator.DispatchShaderWithPoints(cursorPosition, true);
+            }
+            else if (subtracting.ReadValue<float>() > 0.001f)
+            {
+                generator.DispatchShaderWithPoints(cursorPosition, false);
+            }
+        }
+    }
+
     void Update()
     {
         // cruise
-        float c = cruise.ReadValue<float>();
+        Vector3 c = cruise.ReadValue<Vector3>();
+        Vector3 forward = c.z * transform.forward;
+        Vector3 right = c.x * transform.right;
+        Vector3 up = c.y * transform.up;
+
+        Vector3 vel = (forward + up + right).normalized * (cruiseSpeed * Time.fixedDeltaTime);
         
-        Vector3 vel = transform.forward * (c * cruiseSpeed * Time.fixedDeltaTime);
         rb.velocity = vel;
 
         if (quit.ReadValue<float>() > 0.01f)
@@ -74,7 +96,17 @@ public class Controller : MonoBehaviour
         {
             cursorHead.SetActive(false);
         }
+
+        float b = blocky.ReadValue<float>();
         
+        if (b > 0.01f)
+        {
+            generator.blocky = !generator.blocky;
+            generator.UpdateMainmesh();
+            blocky.Disable();
+            Invoke("SetBlockyTimer", 0.3f);
+        }
+
     }
     
     private void LateUpdate()
@@ -89,10 +121,17 @@ public class Controller : MonoBehaviour
 
         transform.rotation = Quaternion.Euler(xRotation, yRotation, 0f).normalized;
     }
+    
 
     IEnumerator SetModTimer()
     {
         modify.Enable();
+        return null;
+    }
+    
+    IEnumerator SetBlockyTimer()
+    {
+        blocky.Enable();
         return null;
     }
     
@@ -102,6 +141,9 @@ public class Controller : MonoBehaviour
         mouse.Enable();
         quit.Enable();
         modify.Enable();
+        adding.Enable();
+        subtracting.Enable();
+        blocky.Enable();
     }
 
     private void OnDisable()
@@ -110,5 +152,8 @@ public class Controller : MonoBehaviour
         mouse.Disable();
         quit.Disable();
         modify.Disable();
+        adding.Disable();
+        subtracting.Disable();
+        blocky.Disable();
     }
 }

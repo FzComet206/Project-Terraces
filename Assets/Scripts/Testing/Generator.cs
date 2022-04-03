@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -13,14 +11,27 @@ public class Generator : MonoBehaviour
 
     public TestInput testInput;
 
+    private int axisN;
     private int numPoints;
-    private float[] points;
+    
     private Types.Tri[] triangleArray;
+    
+    // update-able point array
+    private float[] points;
 
+    private Mesh meshRef;
+    private MeshCollider meshCollider;
+    private MeshFilter meshFilter;
     private Vector3[] verticies;
     private int[] triangles;
 
+    [Range(1, 3)]
+    public int brushSize;
+    [Range(0, 1)]
+    public float brushWeight;
     public bool startUpdate;
+
+    public bool blocky = false;
 
     private void Start()
     {
@@ -37,8 +48,11 @@ public class Generator : MonoBehaviour
 
     public void Generate()
     {
-        numPoints = testInput.axisN * testInput.axisN * testInput.axisN;
+        axisN = testInput.axisN;
+        numPoints = axisN * axisN * axisN;
         points = new float[numPoints];
+        GetMainPointsData();
+        GetMainTriangleData();
         GenerateMainMesh();
     }
 
@@ -77,6 +91,7 @@ public class Generator : MonoBehaviour
         
         marchShader.SetInt("numPointsPerAxis", testInput.axisN);
         marchShader.SetFloat("isoLevel", testInput.isoLevel);
+        marchShader.SetBool("blocky", blocky);
         
         marchShader.SetBuffer(0, "points", pointsBuffer);
         marchShader.SetBuffer(0, "triangles", triangleBuffer);
@@ -110,17 +125,35 @@ public class Generator : MonoBehaviour
 
     public void GenerateMainMesh()
     {
-        GetMainPointsData();
-        GetMainTriangleData();
         Mesh mesh = new Mesh();
         mesh.indexFormat = IndexFormat.UInt32;
         mesh.vertices = verticies;
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
-        meshObject.GetComponent<MeshFilter>().sharedMesh = mesh;
-        meshObject.GetComponent<MeshCollider>().sharedMesh = mesh;
+
+        meshFilter = meshObject.GetComponent<MeshFilter>();
+        meshCollider = meshObject.GetComponent<MeshCollider>();
+        meshFilter.mesh = mesh;
+        meshCollider.sharedMesh = mesh;
         meshObject.GetComponent<MeshRenderer>().material = meshMat;
+
+        meshRef = mesh;
+    }
+
+    public void UpdateMainmesh()
+    {
+        GetMainTriangleData();
+        meshRef.Clear();
+        meshRef.vertices = verticies;
+        meshRef.triangles = triangles;
+
+        meshFilter.mesh = meshRef;
+        meshRef.RecalculateNormals();
+        meshRef.RecalculateBounds();
+        
+        meshCollider.sharedMesh = null;
+        meshCollider.sharedMesh = meshRef;
     }
 
     public void DeleteMesh()
@@ -129,16 +162,53 @@ public class Generator : MonoBehaviour
         DestroyImmediate(meshObject.GetComponent<MeshCollider>().sharedMesh);
     }
     
-    void DispatchShaderWithPoints(float[] points)
+    public void DispatchShaderWithPoints(Vector3 pos, bool add)
     {
-        
+        int[] indexes = IndexesFromWorldPosition(pos);
+        int l = points.Length;
+        foreach (var index in indexes)
+        {
+            if (index < l && index >= 0)
+            {
+                if (add)
+                {
+                    points[index] += brushWeight;
+                }
+                else
+                {
+                    points[index] -= brushWeight;
+                }
+            }
+        }
+        UpdateMainmesh();
     }
 
-    IEnumerator CaptureModifyDispatch()
+
+    int[] IndexesFromWorldPosition(Vector3 pos)
     {
-        return null;
+        int[] indexes = new int[brushSize * brushSize * brushSize * 8];
+        int c = 0;
+        for (int i = -brushSize; i < brushSize; i++)
+        {
+            for (int j = -brushSize; j < brushSize; j++)
+            {
+                for (int k = -brushSize; k < brushSize; k++)
+                {
+                    int x = Mathf.RoundToInt(pos.x + i);
+                    int y = Mathf.RoundToInt(pos.y + j);
+                    int z = Mathf.RoundToInt(pos.z + k);
+                    
+                    indexes[c] = x + y * axisN + z * axisN * axisN;
+                    c++;
+                }
+            }
+        }
+
+        return indexes;
     }
 }
+
+
 
 [System.Serializable]
 public struct TestInput
