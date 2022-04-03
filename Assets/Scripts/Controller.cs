@@ -1,5 +1,4 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -75,7 +74,7 @@ public class Controller : MonoBehaviour
         Ray cursorRay = cam.ScreenPointToRay(screenPoint);
         RaycastHit hit = new RaycastHit();
         Physics.Raycast(cursorRay, out hit, 100f);
-        cursorPosition = hit.point;
+        cursorPosition = hit.point - Vector3.ClampMagnitude(hit.point - transform.position, 0.5f);
         
         // determine is modifying
         float m = modify.ReadValue<float>();

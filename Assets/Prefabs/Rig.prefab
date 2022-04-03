@@ -153,6 +153,24 @@ MonoBehaviour:
       m_Action: Modify
       m_Flags: 0
     m_Flags: 0
+  adding:
+    m_Name: Adding
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 57284a48-44dd-4e4f-8121-ace15c77325b
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  subtracting:
+    m_Name: Subtracting
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 6fe42466-fe7a-4310-8d9a-17fce6f38bf8
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
   quit:
     m_Name: Quit
     m_Type: 0
@@ -169,6 +187,15 @@ MonoBehaviour:
       m_Groups: 
       m_Action: Quit
       m_Flags: 0
+    m_Flags: 0
+  blocky:
+    m_Name: Blocky
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 37f9bf78-40b2-4adb-b342-07a458d25bf1
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
     m_Flags: 0
   cruise:
     m_Name: Cruise
