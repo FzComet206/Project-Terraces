@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -26,7 +27,12 @@ public class Controller : MonoBehaviour
 
     private Vector3 cursorPosition;
     private bool mod = false;
-    
+
+    private void Awake()
+    {
+        Application.targetFrameRate = 144;
+    }
+
     private void Start()
     {
         rb = gameObject.GetComponent<Rigidbody>();
@@ -74,7 +80,7 @@ public class Controller : MonoBehaviour
         Ray cursorRay = cam.ScreenPointToRay(screenPoint);
         RaycastHit hit = new RaycastHit();
         Physics.Raycast(cursorRay, out hit, 100f);
-        cursorPosition = hit.point - Vector3.ClampMagnitude(hit.point - transform.position, 0.5f);
+        cursorPosition = hit.point + Vector3.ClampMagnitude(hit.normal, 0.3f);
         
         // determine is modifying
         float m = modify.ReadValue<float>();

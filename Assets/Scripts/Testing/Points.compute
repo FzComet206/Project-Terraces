@@ -10,6 +10,7 @@ float lacunarity;
 float gain;
 
 float scale;
+float weightMultiplier;
 
 float parameterX;
 float parameterY;
@@ -24,13 +25,15 @@ float Fbm(float3 x)
     float value = 0.0;
     float amplitude = 1;
     float frequency = 1;
-    
+
     for (int i = 0; i < octaves; i++) {
         
         value += amplitude * snoise(frequency * x);
+        
         amplitude *= gain;
         frequency *= lacunarity;
     }
+    
     return value;
 }
 
@@ -48,12 +51,22 @@ float3 PositionFromCoord(int3 coord)
 void GetPoints (uint3 id : SV_DispatchThreadID)
 {
     float3 pos = PositionFromCoord(id);
-    float noise = Fbm(pos / scale);
+
+    float3 domainWrap = float3(
+        Fbm(pos / scale),
+        0,
+        Fbm(pos / scale)
+        );
+
+    float noise = Fbm(pos / scale + 0.8 * domainWrap);
+    // float noise = Fbm( pos / scale);
+
     
     float value = -(pos.y - softFloor) * softFloorWeight + noise * noiseWeight + (pos.y % parameterX) * parameterY;
-
+    
     if (pos.y < hardFloor) {
        value += hardFloorWeight;
     }
+    
     points[IndexFromCoord(id)] = value;
 }

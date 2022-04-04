@@ -63,6 +63,7 @@ public class Generator : MonoBehaviour
         pointsShader.SetFloat("lacunarity", testInput.lacunarity);
         pointsShader.SetFloat("gain", testInput.gain);
         pointsShader.SetFloat("scale", testInput.scale);
+        pointsShader.SetFloat("weightMultiplier", testInput.weightMultiplier);
         pointsShader.SetFloat("parameterX", testInput.parameterX);
         pointsShader.SetFloat("parameterY", testInput.parameterY);
         pointsShader.SetFloat("noiseWeight", testInput.noiseWeight);
@@ -224,6 +225,7 @@ public struct TestInput
         [Header("Noise Settings")]
         public float scale;
         public float isoLevel;
+        public float weightMultiplier;
         public float noiseWeight;
 
         [Header("Modification Settings")]

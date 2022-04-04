@@ -136,14 +136,6 @@ MonoBehaviour:
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings:
-    - m_Name: 1D Axis
-      m_Id: a8433fab-e5c8-4856-9fdf-0622feef23f2
-      m_Path: 1DAxis
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Modify
-      m_Flags: 4
     - m_Name: 
       m_Id: cd904d0f-ea5c-4f1e-bf65-b115611e0da6
       m_Path: <Keyboard>/f
@@ -157,19 +149,35 @@ MonoBehaviour:
     m_Name: Adding
     m_Type: 0
     m_ExpectedControlType: 
-    m_Id: 57284a48-44dd-4e4f-8121-ace15c77325b
+    m_Id: 3851405d-5500-4abc-a1d1-24c396883a94
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 6dd65c04-9d52-4c7b-b1e1-f0349bc1b99e
+      m_Path: <Mouse>/leftButton
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Adding
+      m_Flags: 0
     m_Flags: 0
   subtracting:
     m_Name: Subtracting
     m_Type: 0
     m_ExpectedControlType: 
-    m_Id: 6fe42466-fe7a-4310-8d9a-17fce6f38bf8
+    m_Id: 37dc7917-3bf1-41e9-9510-d3f6d8e51e39
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: e293a2f9-fdae-4148-bcb2-c4600d8fe758
+      m_Path: <Mouse>/rightButton
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Subtracting
+      m_Flags: 0
     m_Flags: 0
   quit:
     m_Name: Quit
@@ -192,10 +200,18 @@ MonoBehaviour:
     m_Name: Blocky
     m_Type: 0
     m_ExpectedControlType: 
-    m_Id: 37f9bf78-40b2-4adb-b342-07a458d25bf1
+    m_Id: a522e4ec-bcd2-4672-ac1a-361de2dd4750
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: fbb743a9-6e13-4bed-a06a-01e462c35c3e
+      m_Path: <Keyboard>/b
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Blocky
+      m_Flags: 0
     m_Flags: 0
   cruise:
     m_Name: Cruise
@@ -205,14 +221,62 @@ MonoBehaviour:
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings:
-    - m_Name: 
-      m_Id: c11a45fc-0b66-4af9-b110-c7b154444c75
+    - m_Name: 3D Vector
+      m_Id: d5beebe3-f122-4670-9b8d-e6a66f122907
+      m_Path: 3DVector
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Cruise
+      m_Flags: 4
+    - m_Name: up
+      m_Id: 31b9f3d4-40e1-491d-bb8b-915207be36ac
       m_Path: <Keyboard>/space
       m_Interactions: 
       m_Processors: 
       m_Groups: 
       m_Action: Cruise
-      m_Flags: 0
+      m_Flags: 8
+    - m_Name: down
+      m_Id: 4b8f4554-f3ba-4b1b-8c19-280d8f50447a
+      m_Path: <Keyboard>/shift
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Cruise
+      m_Flags: 8
+    - m_Name: left
+      m_Id: e37cc09d-3db8-4adc-9d64-fffc26d1b097
+      m_Path: <Keyboard>/a
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Cruise
+      m_Flags: 8
+    - m_Name: right
+      m_Id: 509aba88-ec49-4823-b7b4-5eea6a3bed76
+      m_Path: <Keyboard>/d
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Cruise
+      m_Flags: 8
+    - m_Name: forward
+      m_Id: 6dc4e4d1-a991-4d6b-b255-de0c1ca2e176
+      m_Path: <Keyboard>/w
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Cruise
+      m_Flags: 8
+    - m_Name: backward
+      m_Id: 2f3e4eaa-9c74-452d-87e3-d3f38faa06ad
+      m_Path: <Keyboard>/s
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Cruise
+      m_Flags: 8
     m_Flags: 0
   mouse:
     m_Name: Mouse
