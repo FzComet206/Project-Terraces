@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &373650281287501241
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 373650281287501240}
+  - component: {fileID: 373650281287501243}
+  m_Layer: 0
+  m_Name: Generator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &373650281287501240
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 373650281287501241}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &373650281287501243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 373650281287501241}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14fc4bb22fd0b467ca92146d837ff79b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshMat: {fileID: 2100000, guid: 39cf2d8557fc74ce39c113b1f567b584, type: 2}
+  meshObject: {fileID: 0}
+  pointsShader: {fileID: 7200000, guid: 36442fc067c44428c976ed66579b9197, type: 3}
+  marchShader: {fileID: 7200000, guid: 6eb6e729f90a44368b28b933d692cbd3, type: 3}
+  testInput:
+    axisN: 64
+    octaves: 3
+    lacunarity: 5
+    gain: 0.15
+    scale: 500
+    isoLevel: 0
+    weightMultiplier: 0
+    noiseWeight: 40
+    parameterX: 15
+    parameterY: 0.3
+    softFloor: 35
+    softFloorWeight: 1
+    hardFloor: 10
+    hardFloorWeight: 100
+  brushSize: 2
+  brushWeight: 1
+  startUpdate: 0
+  blocky: 0
+  widthX: 16
+  widthZ: 16
+  height: 256

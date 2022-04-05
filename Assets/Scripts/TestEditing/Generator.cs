@@ -18,7 +18,6 @@ public class Generator : MonoBehaviour
     
     // update-able point array
     private float[] points;
-
     private Mesh meshRef;
     private MeshCollider meshCollider;
     private MeshFilter meshFilter;
@@ -30,8 +29,8 @@ public class Generator : MonoBehaviour
     [Range(0, 1)]
     public float brushWeight;
     public bool startUpdate;
-
     public bool blocky = false;
+
 
     private void Start()
     {
@@ -135,7 +134,7 @@ public class Generator : MonoBehaviour
 
         meshFilter = meshObject.GetComponent<MeshFilter>();
         meshCollider = meshObject.GetComponent<MeshCollider>();
-        meshFilter.mesh = mesh;
+        meshFilter.sharedMesh = mesh;
         meshCollider.sharedMesh = mesh;
         meshObject.GetComponent<MeshRenderer>().material = meshMat;
 
@@ -146,10 +145,9 @@ public class Generator : MonoBehaviour
     {
         GetMainTriangleData();
         meshRef.Clear();
-        meshRef.vertices = verticies;
+        meshRef.SetVertices(verticies);
         meshRef.triangles = triangles;
 
-        meshFilter.mesh = meshRef;
         meshRef.RecalculateNormals();
         meshRef.RecalculateBounds();
         
