@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -28,9 +27,11 @@ public class Controller : MonoBehaviour
     private Vector3 cursorPosition;
     private bool mod = false;
 
+    private bool otherFrame = false;
+
     private void Awake()
     {
-        Application.targetFrameRate = 144;
+        Application.targetFrameRate = 300;
     }
 
     private void Start()
@@ -41,9 +42,10 @@ public class Controller : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    private void FixedUpdate()
+    void Update()
     {
-        if (mod)
+        otherFrame = !otherFrame;
+        if (mod && otherFrame)
         {
             if (adding.ReadValue<float>() > 0.001f)
             {
@@ -54,10 +56,7 @@ public class Controller : MonoBehaviour
                 generator.DispatchShaderWithPoints(cursorPosition, false);
             }
         }
-    }
-
-    void Update()
-    {
+        
         // cruise
         Vector3 c = cruise.ReadValue<Vector3>();
         Vector3 forward = c.z * transform.forward;

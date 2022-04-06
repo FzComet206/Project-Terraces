@@ -1,5 +1,8 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 [ExecuteInEditMode]
 public class Generator : MonoBehaviour
@@ -13,9 +16,14 @@ public class Generator : MonoBehaviour
 
     private int axisN;
     private int numPoints;
-    
+
     private Types.Tri[] triangleArray;
-    
+
+    // compute buffers updated per frame
+    private ComputeBuffer pointsBuffer;
+    private ComputeBuffer triangleBuffer;
+    private ComputeBuffer triCountBuffer;
+
     // update-able point array
     private float[] points;
     private Mesh meshRef;
@@ -24,24 +32,35 @@ public class Generator : MonoBehaviour
     private Vector3[] verticies;
     private int[] triangles;
 
-    [Range(1, 3)]
-    public int brushSize;
-    [Range(0, 1)]
-    public float brushWeight;
+    [Range(1, 3)] public int brushSize;
+    [Range(0, 1)] public float brushWeight;
     public bool startUpdate;
     public bool blocky = false;
 
+    private Text fps;
 
     private void Start()
     {
+        fps = FindObjectOfType<Text>();
+        StartCoroutine(DisplayFPS());
         Generate();
     }
 
     private void Update()
     {
-        if (startUpdate)
+
+        if (startUpdate && !Application.isPlaying)
         {
             Generate();
+        }
+    }
+
+    IEnumerator DisplayFPS()
+    {
+        while (true)
+        {
+            fps.text = String.Format("{0} FPS", Mathf.RoundToInt(1f / Time.deltaTime));
+            yield return new WaitForSeconds(0.5f);
         }
     }
 
@@ -50,9 +69,17 @@ public class Generator : MonoBehaviour
         axisN = testInput.axisN;
         numPoints = axisN * axisN * axisN;
         points = new float[numPoints];
+        InitBuffers();
         GetMainPointsData();
         GetMainTriangleData();
         GenerateMainMesh();
+
+        if (!Application.isPlaying)
+        {
+            pointsBuffer.Dispose();
+            triangleBuffer.Dispose();
+            triCountBuffer.Dispose();
+        }
     }
 
     void GetMainPointsData()
@@ -71,20 +98,14 @@ public class Generator : MonoBehaviour
         pointsShader.SetFloat("hardFloor", testInput.hardFloor);
         pointsShader.SetFloat("hardFloorWeight", testInput.hardFloorWeight);
 
-        ComputeBuffer cb = new ComputeBuffer(numPoints, sizeof(float));
-        pointsShader.SetBuffer(0, "points", cb);
+        pointsShader.SetBuffer(0, "points", pointsBuffer);
         int gs = testInput.axisN / 8;
         pointsShader.Dispatch(0, gs, gs, gs);
-        cb.GetData(points);
-        
-        cb.Dispose();
+        pointsBuffer.GetData(points);
     }
 
     void GetMainTriangleData()
     {
-        ComputeBuffer pointsBuffer = new ComputeBuffer(numPoints, sizeof(float));
-        ComputeBuffer triangleBuffer = new ComputeBuffer(numPoints * 5, sizeof (float) * 3 * 3, ComputeBufferType.Append);
-        ComputeBuffer triCountBuffer = new ComputeBuffer(1, sizeof(int));
         triangleBuffer.SetCounterValue(0);
         
         pointsBuffer.SetData(points);
@@ -117,10 +138,6 @@ public class Generator : MonoBehaviour
                 triangles[id] = id;
             }
         }
-        
-        pointsBuffer.Dispose();
-        triangleBuffer.Dispose();
-        triCountBuffer.Dispose();
     }
 
     public void GenerateMainMesh()
@@ -204,6 +221,29 @@ public class Generator : MonoBehaviour
         }
 
         return indexes;
+    }
+
+    private void InitBuffers()
+    {
+        pointsBuffer = new ComputeBuffer(numPoints, sizeof(float));
+        triangleBuffer = new ComputeBuffer(numPoints * 5, sizeof (float) * 3 * 3, ComputeBufferType.Append);
+        triCountBuffer = new ComputeBuffer(1, sizeof(int));
+    }
+
+    private void OnDestroy()
+    {
+        if (pointsBuffer != null)
+        {
+            pointsBuffer.Dispose();
+        }
+        if (triangleBuffer != null)
+        {
+            triangleBuffer.Dispose();
+        }
+        if (triCountBuffer != null)
+        {
+            triCountBuffer.Dispose();
+        }
     }
 }
 
