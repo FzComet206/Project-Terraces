@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 
+[ExecuteInEditMode]
 public class Generator : MonoBehaviour
 {
     public Material meshMat;
