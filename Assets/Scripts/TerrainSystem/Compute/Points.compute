@@ -1,0 +1,75 @@
+#pragma kernel GetPoints 
+#include "Noise.compute"
+
+RWStructuredBuffer<float> points;
+
+int numPointsPerAxis;
+
+int octaves;
+float lacunarity;
+float gain;
+
+float scale;
+float weightMultiplier;
+
+float parameterX;
+float parameterY;
+float noiseWeight;
+float softFloor;
+float softFloorWeight;
+float hardFloor;
+float hardFloorWeight;
+float domainWrapWeight;
+
+float seed;
+
+float Fbm(float3 x)
+{
+    float value = 0.0;
+    float amplitude = 1;
+    float frequency = 1;
+
+    for (int i = 0; i < octaves; i++) {
+        
+        value += amplitude * snoise(frequency * x);
+        
+        amplitude *= gain;
+        frequency *= lacunarity;
+    }
+    
+    return value;
+}
+
+int IndexFromCoord(int3 coord)
+{
+   return coord.z * numPointsPerAxis * numPointsPerAxis + coord.y * numPointsPerAxis + coord.x;
+}
+
+float3 PositionFromCoord(int3 coord)
+{
+    return float3((float) coord.x, (float) coord.y, (float) coord.z);
+}
+
+[numthreads(8,8,8)]
+void GetPoints (uint3 id : SV_DispatchThreadID)
+{
+    float3 pos = PositionFromCoord(id) + float3(seed, 0, seed);
+
+    float3 domainWrap = float3(
+        Fbm(pos / scale),
+        0,
+        Fbm(pos / scale)
+        );
+
+    float noise = Fbm(pos / scale + domainWrapWeight * domainWrap);
+    // float noise = Fbm( pos / scale);
+
+    
+    float value = -(pos.y - softFloor) * softFloorWeight + noise * noiseWeight + (pos.y % parameterX) * parameterY;
+    
+    if (pos.y < hardFloor) {
+       value += hardFloorWeight;
+    }
+    
+    points[IndexFromCoord(id)] = value;
+}
