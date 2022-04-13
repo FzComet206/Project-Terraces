@@ -1,5 +1,4 @@
-
-public static class BrushSystem
+public class BrushSystem
 {
     // static functions for brush indexes, brush types, brush speed and more
 }

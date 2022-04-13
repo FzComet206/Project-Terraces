@@ -1,0 +1,7 @@
+1. nLog(n), false
+
+2. three way divide and conquer
+
+3. Coin change (shortest distance problem, breadth first search, Linear time, 
+
+Use dictionary, d[v] = {v, 1}
