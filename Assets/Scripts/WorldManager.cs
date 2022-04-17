@@ -23,7 +23,8 @@ public class WorldManager : MonoBehaviour
     private NoiseSystem noiseSystem;
     private MeshSystem meshSystem;
     private FluidSystem fluidSystem;
-    
+
+    private BrushSystem brushSystem;
     private BiomeSystem biomeSystem;
     private StorageSystem storageSystem;
 
@@ -36,12 +37,22 @@ public class WorldManager : MonoBehaviour
     private void Start()
     {
         player = FindObjectOfType<PlayerControl>();
+        InitSystems();
+        
+        // init chunks array and properties
+        // update player position to chunks
+        // chunk output chunk indexes and parameters
+        // noise and mesh system triangulation
+        // start chunks coroutines triangulation 
+    }
 
-        chunkSystem = new ChunkSystem();
+    private void InitSystems()
+    {
+        chunkSystem = new ChunkSystem(chunkInput);
         noiseSystem = new NoiseSystem(noiseLayerOneInput, noiseLayerTwoInput);
         meshSystem = new MeshSystem();
         fluidSystem = new FluidSystem();
-
+        brushSystem = new BrushSystem();
         biomeSystem = new BiomeSystem();
         storageSystem = new StorageSystem();
     }

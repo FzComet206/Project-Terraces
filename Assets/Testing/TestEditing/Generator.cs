@@ -123,15 +123,17 @@ public class Generator : MonoBehaviour
         
         ComputeBuffer.CopyCount(triangleBuffer, triCountBuffer, 0);
         int[] triCount = new int[1];
+        
         triCountBuffer.GetData(triCount);
         int count = triCount[0];
 
         triangleArray = new Types.Tri[count];
-        Debug.Log("yolo no freeze buff");
+        System.Console.WriteLine("yolo no freeze buff");
         triangleBuffer.GetData(triangleArray, 0, 0, count);
 
         verticies = new Vector3[count * 3];
         triangles = new int[count * 3];
+        
         for (int i = 0; i < triangleArray.Length; i++)
         {
             for (int j = 0; j < 3; j++)
@@ -166,7 +168,7 @@ public class Generator : MonoBehaviour
         GetMainTriangleData();
         meshRef.Clear();
         meshRef.SetVertices(verticies);
-        meshRef.triangles = triangles;
+        meshRef.SetTriangles(triangles, 0);
 
         meshRef.RecalculateNormals();
         meshRef.RecalculateBounds();

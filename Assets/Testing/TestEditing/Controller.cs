@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -61,9 +62,9 @@ public class Controller : MonoBehaviour
             yield return new WaitForSeconds(0.02f);
         }
     }
-    void Update()
+
+    private void FixedUpdate()
     {
-        
         // cruise
         Vector3 c = cruise.ReadValue<Vector3>();
         Vector3 forward = c.z * transform.forward;
@@ -73,7 +74,23 @@ public class Controller : MonoBehaviour
         Vector3 vel = (forward + up + right).normalized * (cruiseSpeed * Time.fixedDeltaTime);
         
         rb.velocity = vel;
+        
+    }
 
+    void Update()
+    {
+        // rotate
+        Vector2 delta = mouse.ReadValue<Vector2>();
+        float rx = delta.y * rotateSpeed * Time.fixedDeltaTime;
+        float ry = delta.x * rotateSpeed * Time.fixedDeltaTime;
+
+        xRotation -= rx;
+        xRotation = Mathf.Clamp(xRotation, -90, 90);
+        yRotation += ry;
+
+        transform.rotation = Quaternion.Euler(xRotation, yRotation, 0f).normalized;
+        
+        // quit
         if (quit.ReadValue<float>() > 0.01f)
         {
             Application.Quit();
@@ -120,20 +137,6 @@ public class Controller : MonoBehaviour
 
     }
     
-    private void LateUpdate()
-    {
-        Vector2 delta = mouse.ReadValue<Vector2>();
-        float rx = delta.y * rotateSpeed * Time.fixedDeltaTime;
-        float ry = delta.x * rotateSpeed * Time.fixedDeltaTime;
-
-        xRotation -= rx;
-        xRotation = Mathf.Clamp(xRotation, -90, 90);
-        yRotation += ry;
-
-        transform.rotation = Quaternion.Euler(xRotation, yRotation, 0f).normalized;
-    }
-    
-
     IEnumerator SetModTimer()
     {
         modify.Enable();
