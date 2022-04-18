@@ -1,3 +1,4 @@
+using System.Web.WebPages;
 using UnityEngine;
 
 public class WorldManager : MonoBehaviour
@@ -37,6 +38,7 @@ public class WorldManager : MonoBehaviour
     private void Start()
     {
         player = FindObjectOfType<PlayerControl>();
+        player.ControllerInput = controllerInput;
         InitSystems();
         
         // init chunks array and properties
@@ -44,16 +46,22 @@ public class WorldManager : MonoBehaviour
         // chunk output chunk indexes and parameters
         // noise and mesh system triangulation
         // start chunks coroutines triangulation 
+        InitWorld();
     }
 
     private void InitSystems()
     {
         chunkSystem = new ChunkSystem(chunkInput);
         noiseSystem = new NoiseSystem(noiseLayerOneInput, noiseLayerTwoInput);
-        meshSystem = new MeshSystem();
-        fluidSystem = new FluidSystem();
+        meshSystem = new MeshSystem(meshInput);
+        fluidSystem = new FluidSystem(fluidInput);
+        
         brushSystem = new BrushSystem();
         biomeSystem = new BiomeSystem();
         storageSystem = new StorageSystem();
+    }
+
+    private void InitWorld()
+    {
     }
 }

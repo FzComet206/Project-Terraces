@@ -63,9 +63,11 @@ void GetPoints (uint3 id : SV_DispatchThreadID)
 
     float noise = Fbm(pos / scale + domainWrapWeight * domainWrap);
     // float noise = Fbm( pos / scale);
-
     
     float value = -(pos.y - softFloor) * softFloorWeight + noise * noiseWeight + (pos.y % parameterX) * parameterY;
+    value = max(-64, value);
+    value = min(64, value);
+    value = round(value);
     
     if (pos.y < hardFloor) {
        value += hardFloorWeight;
