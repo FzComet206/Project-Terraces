@@ -1,4 +1,5 @@
-using System.Web.WebPages;
+using System;
+using System.Collections;
 using UnityEngine;
 
 public class WorldManager : MonoBehaviour
@@ -24,7 +25,6 @@ public class WorldManager : MonoBehaviour
     private NoiseSystem noiseSystem;
     private MeshSystem meshSystem;
     private FluidSystem fluidSystem;
-
     private BrushSystem brushSystem;
     private BiomeSystem biomeSystem;
     private StorageSystem storageSystem;
@@ -40,13 +40,12 @@ public class WorldManager : MonoBehaviour
         player = FindObjectOfType<PlayerControl>();
         player.ControllerInput = controllerInput;
         InitSystems();
-        
+        StartWorld();
         // init chunks array and properties
         // update player position to chunks
         // chunk output chunk indexes and parameters
         // noise and mesh system triangulation
         // start chunks coroutines triangulation 
-        InitWorld();
     }
 
     private void InitSystems()
@@ -55,13 +54,53 @@ public class WorldManager : MonoBehaviour
         noiseSystem = new NoiseSystem(noiseLayerOneInput, noiseLayerTwoInput);
         meshSystem = new MeshSystem(meshInput);
         fluidSystem = new FluidSystem(fluidInput);
-        
         brushSystem = new BrushSystem();
         biomeSystem = new BiomeSystem();
         storageSystem = new StorageSystem();
     }
 
-    private void InitWorld()
+    public void StartWorld()
     {
+        StartCoroutine(StartAllCoroutine());
+    }
+
+    private IEnumerator StartAllCoroutine()
+    {
+        // start coroutines in order
+        StartCoroutine(WorldGenCoroutine());
+        yield return new WaitForFixedUpdate();
+        StartCoroutine(WorldCullCoroutine());
+        yield return new WaitForFixedUpdate();
+        StartCoroutine(BrushCoroutine());
+        yield return new WaitForFixedUpdate();
+        StartCoroutine(FluidCoroutine());
+        yield return null;
+    }
+
+    private IEnumerator WorldGenCoroutine()
+    {
+        // generate GetConfig
+        
+        // update Chunk with data and reference
+        // update generated dictionary
+        
+        throw new NotImplementedException();
+    }
+
+    private IEnumerator WorldCullCoroutine()
+    {
+        // delete GetCull
+        throw new NotImplementedException();
+    }
+
+    private IEnumerator BrushCoroutine()
+    {
+        // input cursor position if held or if clicked
+        throw new NotImplementedException();
+    }
+    
+    private IEnumerator FluidCoroutine()
+    {
+        throw new NotImplementedException();
     }
 }

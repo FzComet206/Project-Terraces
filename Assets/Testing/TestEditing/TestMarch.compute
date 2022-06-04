@@ -28,6 +28,7 @@ float3 interpolateVerts(float4 v1, float4 v2) {
 int indexFromCoord(int x, int y, int z) {
     return z * numPointsPerAxis * numPointsPerAxis + y * numPointsPerAxis + x;
 }
+
 [numthreads(numThreads,numThreads,numThreads)]
 void March (int3 id : SV_DispatchThreadID)
 {   
@@ -68,6 +69,7 @@ void March (int3 id : SV_DispatchThreadID)
         int index0 = triangulation[cubeIndex][i];
         int index1 = triangulation[cubeIndex][i + 1];
         int index2 = triangulation[cubeIndex][i + 2];
+        
         if (index0 == -1 || index1 == -1 || index2 == -1)
         {
             break;

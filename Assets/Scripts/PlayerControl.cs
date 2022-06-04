@@ -13,6 +13,7 @@ public class PlayerControl : MonoBehaviour
         get => controllerInput;
         set => controllerInput = value;
     }
+    
     private void Start()
     {
         throw new NotImplementedException();

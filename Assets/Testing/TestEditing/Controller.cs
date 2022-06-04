@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -69,7 +68,7 @@ public class Controller : MonoBehaviour
         Vector3 c = cruise.ReadValue<Vector3>();
         Vector3 forward = c.z * transform.forward;
         Vector3 right = c.x * transform.right;
-        Vector3 up = c.y * transform.up;
+        Vector3 up = c.y * Vector3.up;
 
         Vector3 vel = (forward + up + right).normalized * (cruiseSpeed * Time.fixedDeltaTime);
         

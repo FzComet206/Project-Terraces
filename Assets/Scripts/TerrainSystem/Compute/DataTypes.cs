@@ -1,4 +1,3 @@
-using System;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -19,7 +18,7 @@ public static class DataTypes
         [Range(100, 1000)]
         public int scale;
         [Range(1, 6)]
-        public int Octaves;
+        public int octaves;
         [Range(1, 6)]
         public float lacunarity;
         [Range(1, 2)]
@@ -67,18 +66,17 @@ public static class DataTypes
 
 public class Chunk
 {
-    private int3 startPosition;
-    public int3 StartPosition
+    private double startPositionX;
+    private double startPositionZ;
+    private int coordX;
+    private int coordZ;
+
+    public Chunk(double startPositionX, double startPositionZ, int coordX, int coordZ)
     {
-        get => startPosition;
-        set => startPosition = value;
-    }
-    
-    private int2 coord;
-    public int2 Coord
-    {
-        get => coord;
-        set => coord = value;
+        this.startPositionX = startPositionX;
+        this.startPositionZ = startPositionZ;
+        this.coordX = coordX;
+        this.coordZ = coordZ;
     }
 
     private Chunk posX;
@@ -130,12 +128,13 @@ public class Chunk
         set => data = value;
     }
 
-    private byte[] objects;
-    public byte[] Objects
+    private Texture2D shaderInput;
+    public Texture2D ShaderInput
     {
-        get => objects;
-        set => objects = value;
+        get => shaderInput;
+        set => shaderInput = value;
     }
+    
     public byte[] SerializeSelf()
     {
         return new byte[1];

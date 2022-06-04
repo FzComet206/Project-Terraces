@@ -196,14 +196,13 @@ public class Generator : MonoBehaviour
                 if (!blockyBrush)
                 {
                     // stable brush
-                    float diff = Mathf.Abs(points[index] - testInput.isoLevel);
                     if (add)
                     {
-                        points[index] += (diff + 1) * 0.1f * brushWeight;
+                        points[index] = 1;
                     }
                     else
                     {
-                        points[index] -= (diff + 1) * 0.1f * brushWeight;
+                        points[index] = -1;
                     }
                 }
                 else
