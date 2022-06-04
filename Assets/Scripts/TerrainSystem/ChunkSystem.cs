@@ -49,7 +49,6 @@ public class ChunkSystem
                         z);
 
                     inQueue.Add(coord);
-                        
                     queue.Enqueue(c);
                 }
             }

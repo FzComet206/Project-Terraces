@@ -18,6 +18,10 @@ public class WorldManager : MonoBehaviour
     [SerializeField] private GameObject playerRig;
     private PlayerControl player;
     
+    // compute shaders
+    [SerializeField] private ComputeShader pointsCompute;
+    [SerializeField] private ComputeShader marchingCubes;
+    
     // systems
     private ChunkSystem chunkSystem;
     private NoiseSystem noiseSystem;
@@ -66,6 +70,9 @@ public class WorldManager : MonoBehaviour
         brushSystem = new BrushSystem();
         biomeSystem = new BiomeSystem();
         storageSystem = new StorageSystem();
+
+        noiseSystem.PointsCompute = pointsCompute;
+        meshSystem.MarchingCubes = marchingCubes;
     }
 
     public void StartWorld()

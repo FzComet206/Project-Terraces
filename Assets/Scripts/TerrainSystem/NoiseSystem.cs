@@ -5,6 +5,11 @@ public class NoiseSystem
     private DataTypes.NoiseLayerInput noiseOne;
 
     private ComputeBuffer points;
+    private ComputeShader pointsCompute;
+    public ComputeShader PointsCompute
+    {
+        set => pointsCompute = value;
+    }
     
     public NoiseSystem(DataTypes.NoiseLayerInput noiseOne)
     {
