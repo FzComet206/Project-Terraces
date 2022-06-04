@@ -44,35 +44,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0cf69713ae874bdabcaf76b210dfd42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  noiseLayerOneInput:
+  noiseInput:
     scale: 600
     octaves: 5
     lacunarity: 5
     gain: 1
-    parameterX: 15
+    noiseWeight: 128
+    parameterX: 20
     parameterY: 1
-    softFloorHeight: 85
+    softFloorHeight: 70
     softFloorWeight: 2
-    hardFloorHeight: 80
+    hardFloorHeight: 1
     hardFloorWeight: 64
-  noiseLayerTwoInput:
-    scale: 600
-    octaves: 5
-    lacunarity: 5
-    gain: 1
-    parameterX: 15
-    parameterY: 1
-    softFloorHeight: 85
-    softFloorWeight: 2
-    hardFloorHeight: 80
-    hardFloorWeight: 64
+    domainWrapWeight: 0.5
+    seed: 1314
   controllerInput:
     walkSpeed: 3000
     rotateSpeed: 20
     sprintFactor: 2
     jumpStrength: 1
   chunkInput:
-    maxViewDistance: 8
+    renderDistance: 10
     chunksPerFrame: 1
     meshMaterial: {fileID: 2100000, guid: 3fba86fe5658943caa9bd8c0af78d856, type: 2}
     meshParent: {fileID: 0}
+  playerRig: {fileID: 1709310827449926998, guid: d8bec0aa4e1794609b5395fcd3c72d08, type: 3}
+  pointsCompute: {fileID: 7200000, guid: 35ebdf0f5f6014df08e7b7e198db8bc3, type: 3}
+  marchingCubes: {fileID: 7200000, guid: 24ee5eaf14e624ba5928a710ff884ba4, type: 3}

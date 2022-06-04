@@ -1,9 +1,10 @@
-#pragma kernel GetPoints 
+#pragma kernel GenerateDensity 
 #include "Noise.compute"
 
-RWStructuredBuffer<float> points;
+RWStructuredBuffer<int> points;
 
-int numPointsPerAxis;
+double startX;
+double startZ;
 
 int octaves;
 float lacunarity;
@@ -21,7 +22,11 @@ float hardFloor;
 float hardFloorWeight;
 float domainWrapWeight;
 
-float seed;
+int seed;
+
+float remap(float v, float minOld, float maxOld, float minNew, float maxNew) {
+    return minNew + (v-minOld) * (maxNew - minNew) / (maxOld-minOld);
+}
 
 float Fbm(float3 x)
 {
@@ -42,7 +47,7 @@ float Fbm(float3 x)
 
 int IndexFromCoord(int3 coord)
 {
-   return coord.z * numPointsPerAxis * numPointsPerAxis + coord.y * numPointsPerAxis + coord.x;
+    return coord.y * 16 * 16 + coord.x * 16 + coord.z;
 }
 
 float3 PositionFromCoord(int3 coord)
@@ -50,30 +55,42 @@ float3 PositionFromCoord(int3 coord)
     return float3((float) coord.x, (float) coord.y, (float) coord.z);
 }
 
-[numthreads(8,8,8)]
-void GetPoints (uint3 id : SV_DispatchThreadID)
+[numthreads(4,16,4)]
+void GenerateDensity (uint3 id : SV_DispatchThreadID)
 {
-    float3 pos = PositionFromCoord(id) + float3(seed, 0, seed);
+    float3 pos = PositionFromCoord(id) + double3(startX, 0, startZ) + float3(seed, 0, seed);
 
     float3 domainWrap = float3(
-        Fbm(pos / scale),
+        Fbm((pos + float3(123, 653, 15)) / scale),
         0,
-        Fbm(pos / scale)
+        Fbm((pos + float3(683, 103, 69)) / scale)
         );
 
-    float noise = Fbm(pos / scale + domainWrapWeight * domainWrap);
-    // float noise = Fbm( pos / scale);
+    float3 domainInput = pos / scale + domainWrapWeight * domainWrap;
+    float noise = Fbm(domainInput);
     
-    float value = -(pos.y - softFloor) * softFloorWeight + noise * noiseWeight + (pos.y % parameterX) * parameterY;
+    // heightWrap
+    float heightWrap = Fbm((pos + float3(123, 653, 15)) / 200) * 5;
+
+    // moduloWrap
+    parameterX += Fbm((pos + float3(653, 103, 913)) / 200) * 2;
+
+    // edgeWrap
+    parameterY += Fbm((pos + float3(84, 999, 8)) / 200) * 1.5;
+
+    // change pos y to a noise value with x and z component
+    float yOffset = pos.y + heightWrap;
     
-    if (pos.y < hardFloor) {
+    float value = -(yOffset - softFloor) * softFloorWeight + noise * noiseWeight + (yOffset % parameterX) * parameterY;
+
+    if (yOffset < hardFloor) {
        value += hardFloorWeight;
     }
 
-    // mvb can now be ocean mask when write to byte
-    // offset + 64 when encoded, -64 when decoded
-    float v2 = round(value);
+    value = round(value * 16);
+    value = (int) max(-32, min(31, value));
     
+    // right here is the value output that should be stored
     
-    points[IndexFromCoord(id)] = v2;
+    points[IndexFromCoord(id)] = value;
 }

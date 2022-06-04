@@ -22,6 +22,8 @@ public static class DataTypes
         public float lacunarity;
         [Range(1, 2)]
         public float gain;
+        [Range(1, 256)] 
+        public int noiseWeight;
         [Range(1, 100)]
         public float parameterX;
         [Range(0.0001f, 5)]
@@ -34,6 +36,9 @@ public static class DataTypes
         public float hardFloorHeight;
         [Range(0.0001f, 64)]
         public float hardFloorWeight;
+        [Range(0f, 1f)] 
+        public float domainWrapWeight;
+        public int seed;
     }
     
     [System.Serializable]
@@ -60,12 +65,12 @@ public static class DataTypes
 
 public class Chunk
 {
-    private double startPositionX;
-    private double startPositionZ;
-    private int coordX;
-    private int coordZ;
+    public float startPositionX;
+    public float startPositionZ;
+    public int coordX;
+    public int coordZ;
 
-    public Chunk(double startPositionX, double startPositionZ, int coordX, int coordZ)
+    public Chunk(float startPositionX, float startPositionZ, int coordX, int coordZ)
     {
         this.startPositionX = startPositionX;
         this.startPositionZ = startPositionZ;

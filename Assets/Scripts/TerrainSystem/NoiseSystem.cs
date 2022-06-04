@@ -14,12 +14,39 @@ public class NoiseSystem
     public NoiseSystem(DataTypes.NoiseLayerInput noiseOne)
     {
         this.noiseOne = noiseOne;
-        points = new ComputeBuffer(16 * 16 * 256, sizeof(byte));
+        points = new ComputeBuffer(16 * 16 * 256, sizeof(int));
     }
 
-    public byte[] DispatchPointBuffer(Vector3 startPosition)
+    public int[] DispatchPointBuffer(Chunk c)
     {
-        return new byte[1];
+        int[] pointsArray = new int[16 * 16 * 256];
+        
+        float startX = c.startPositionX;
+        float startZ = c.startPositionZ;
+        
+        pointsCompute.SetFloat("startX", startX);
+        pointsCompute.SetFloat("startZ", startZ);
+
+        pointsCompute.SetInt("octaves", noiseOne.octaves);
+        pointsCompute.SetFloat("lacunarity", noiseOne.lacunarity);
+        pointsCompute.SetFloat("gain", noiseOne.gain);
+        pointsCompute.SetFloat("scale", noiseOne.scale);
+        pointsCompute.SetFloat("parameterX", noiseOne.parameterX);
+        pointsCompute.SetFloat("parameterY", noiseOne.parameterY);
+        pointsCompute.SetFloat("noiseWeight", noiseOne.noiseWeight);
+        pointsCompute.SetFloat("softFloor", noiseOne.softFloorHeight);
+        pointsCompute.SetFloat("softFloorWeight", noiseOne.softFloorWeight);
+        pointsCompute.SetFloat("hardFloor", noiseOne.hardFloorHeight);
+        pointsCompute.SetFloat("hardFloorWeight", noiseOne.hardFloorWeight);
+        pointsCompute.SetFloat("domainWrapWeight", noiseOne.domainWrapWeight);
+        pointsCompute.SetInt("seed", noiseOne.seed);
+
+        int index = pointsCompute.FindKernel("GenerateDensity");
+        pointsCompute.SetBuffer(index, "points", points);
+        pointsCompute.Dispatch(index, 4, 4, 4);
+        points.GetData(pointsArray);
+
+        return pointsArray;
     }
 
     public void Destroy()

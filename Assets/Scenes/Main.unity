@@ -325,24 +325,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
-      propertyPath: playerRig
-      value: 
-      objectReference: {fileID: 1709310827449926998, guid: d8bec0aa4e1794609b5395fcd3c72d08, type: 3}
-    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
-      propertyPath: marchingCubes
-      value: 
-      objectReference: {fileID: 7200000, guid: 24ee5eaf14e624ba5928a710ff884ba4, type: 3}
-    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
-      propertyPath: pointsCompute
-      value: 
-      objectReference: {fileID: 7200000, guid: 35ebdf0f5f6014df08e7b7e198db8bc3, type: 3}
-    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
       propertyPath: chunkInput.meshParent
       value: 
       objectReference: {fileID: 1601801603}
-    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
-      propertyPath: chunkInput.renderDistance
-      value: 10
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}

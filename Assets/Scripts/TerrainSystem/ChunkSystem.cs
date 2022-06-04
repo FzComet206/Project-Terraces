@@ -5,11 +5,6 @@ using UnityEngine;
 
 public class ChunkSystem
 {
-    // generated set
-    // mesh queue
-    // define coroutines for updates
-    // culling
-
     private int renderDistance;
     public int RenderDistance
     {
@@ -17,11 +12,13 @@ public class ChunkSystem
         set => renderDistance = value;
     }
 
+    public Dictionary<int2, GameObject> chunksDict;
     public HashSet<int2> inQueue;
     public HashSet<int2> generated;
     public Queue<Chunk> queue;
     public ChunkSystem()
     {
+        this.chunksDict = new Dictionary<int2, GameObject>();
         this.inQueue = new HashSet<int2>();
         this.generated = new HashSet<int2>(); 
         this.queue = new Queue<Chunk>();
@@ -35,16 +32,16 @@ public class ChunkSystem
             for (int j = -renderDistance; j <= renderDistance; j++)
             {
                 // round to actual coordinate
-                int x = (int) (position.x / 15) + i;
-                int z = (int) (position.z / 15) + j;
+                int x = (int) (position.x / 15f) + i;
+                int z = (int) (position.z / 15f) + j;
                 
                 int2 coord = new int2(x, z);
 
                 if (!inQueue.Contains(coord) && !generated.Contains(coord))
                 {
                     Chunk c = new Chunk(
-                        (double) (x * 15f),
-                        (double) (z * 15f),
+                        (x * 15f),
+                        (z * 15f),
                         x,
                         z);
 

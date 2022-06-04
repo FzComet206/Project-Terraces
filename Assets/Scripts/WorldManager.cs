@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class WorldManager : MonoBehaviour
@@ -55,7 +56,6 @@ public class WorldManager : MonoBehaviour
     private void Update()
     {
         player.ControllerInput = controllerInput;
-
         chunkSystem.RenderDistance = chunkInput.renderDistance;
     }
 
@@ -85,12 +85,8 @@ public class WorldManager : MonoBehaviour
         // start coroutines in order
         StartCoroutine(WorldGenCoroutine());
         yield return new WaitForFixedUpdate();
-        StartCoroutine(WorldCullCoroutine());
+        StartCoroutine(ChunkGenCoroutine());
         yield return new WaitForFixedUpdate();
-        StartCoroutine(BrushCoroutine());
-        yield return new WaitForFixedUpdate();
-        StartCoroutine(FluidCoroutine());
-        yield return null;
     }
 
     private IEnumerator WorldGenCoroutine()
@@ -110,10 +106,33 @@ public class WorldManager : MonoBehaviour
         {
             for (int i = 0; i < chunkInput.chunksPerFrame; i++)
             {
-                Chunk c = chunkSystem.queue.Dequeue();
-                // generate points
-                // generate vert and tris
-                // generate gameobjects
+                if (chunkSystem.queue.Count > chunkInput.chunksPerFrame)
+                {
+                    Chunk c = chunkSystem.queue.Dequeue();
+                    int[] points = noiseSystem.DispatchPointBuffer(c); 
+                    (Vector3[] verts, int[] tris)= meshSystem.GenerateMeshData(points);
+
+                    Mesh mesh = new Mesh();
+                    mesh.vertices = verts;
+                    mesh.triangles = tris;
+                    mesh.RecalculateNormals();
+                    mesh.RecalculateBounds();
+
+                    GameObject chunk = new GameObject("chunk " + c.coordX + " " + c.coordZ, 
+                        typeof(MeshFilter), typeof(MeshCollider), typeof(MeshRenderer));
+                    chunk.transform.parent = chunkInput.meshParent;
+                    
+                    MeshFilter meshFilter = chunk.GetComponent<MeshFilter>();
+                    MeshCollider meshCollider = chunk.GetComponent<MeshCollider>();
+                    meshFilter.sharedMesh = mesh;
+                    meshCollider.sharedMesh = mesh;
+                    chunk.GetComponent<MeshRenderer>().material = chunkInput.meshMaterial;
+
+                    int2 coord = new int2(c.coordX, c.coordZ);
+                    chunkSystem.generated.Add(coord);
+                    chunkSystem.inQueue.Remove(coord);
+                    chunkSystem.chunksDict[coord] = chunk;
+                }
             }
             yield return new WaitForEndOfFrame();
         }

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
@@ -16,6 +15,5 @@ public class PlayerControl : MonoBehaviour
     
     private void Start()
     {
-        throw new NotImplementedException();
     }
 }
