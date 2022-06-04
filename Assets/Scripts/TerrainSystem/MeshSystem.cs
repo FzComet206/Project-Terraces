@@ -1,10 +1,16 @@
+using UnityEngine;
+
 public class MeshSystem
 {
-    // get triangles and verticies
-    // evaluate terrain functions
-    private DataTypes.MeshInput meshInput;
-    public MeshSystem(DataTypes.MeshInput meshInput)
+    private ComputeShader triangleBuffer;
+    private ComputeShader triangleCountBuffer;
+
+    public MeshSystem()
     {
-        meshInput = this.meshInput;
+    }
+
+    public void GenerateMeshData(Chunk config)
+    {
+        
     }
 }

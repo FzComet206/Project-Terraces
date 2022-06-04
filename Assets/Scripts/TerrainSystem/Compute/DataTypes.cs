@@ -1,4 +1,3 @@
-using Unity.Mathematics;
 using UnityEngine;
 
 public static class DataTypes 
@@ -38,11 +37,6 @@ public static class DataTypes
     }
     
     [System.Serializable]
-    public struct MeshInput 
-    {
-    }
-    
-    [System.Serializable]
     public struct FluidInput 
     {
     }
@@ -50,7 +44,7 @@ public static class DataTypes
     [System.Serializable]
     public struct ChunkInput
     {
-        public int maxViewDistance;
+        public int renderDistance;
         public int chunksPerFrame;
         public Material meshMaterial;
         public Transform meshParent;

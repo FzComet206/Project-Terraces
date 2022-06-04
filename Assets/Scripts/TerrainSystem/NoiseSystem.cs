@@ -1,23 +1,20 @@
-using Unity.Mathematics;
 using UnityEngine;
 
 public class NoiseSystem
 {
     private DataTypes.NoiseLayerInput noiseOne;
-    private DataTypes.NoiseLayerInput noiseTwo;
 
     private ComputeBuffer points;
     
-    public NoiseSystem(DataTypes.NoiseLayerInput noiseOne, DataTypes.NoiseLayerInput noiseTwo)
+    public NoiseSystem(DataTypes.NoiseLayerInput noiseOne)
     {
         this.noiseOne = noiseOne;
-        this.noiseTwo = noiseTwo;
-        points = new ComputeBuffer(16 * 16 * 256, sizeof(float) / 2);
+        points = new ComputeBuffer(16 * 16 * 256, sizeof(byte));
     }
 
-    public half[] DispatchPointBuffer(Vector3 startPosition)
+    public byte[] DispatchPointBuffer(Vector3 startPosition)
     {
-        return new half[1];
+        return new byte[1];
     }
 
     public void Destroy()
