@@ -121,6 +121,7 @@ public class WorldManager : MonoBehaviour
                     GameObject chunk = new GameObject("chunk " + c.coordX + " " + c.coordZ, 
                         typeof(MeshFilter), typeof(MeshCollider), typeof(MeshRenderer));
                     chunk.transform.parent = chunkInput.meshParent;
+                    chunk.transform.position = chunk.transform.position + new Vector3(c.startPositionX, 0, c.startPositionZ);
                     
                     MeshFilter meshFilter = chunk.GetComponent<MeshFilter>();
                     MeshCollider meshCollider = chunk.GetComponent<MeshCollider>();
@@ -153,5 +154,11 @@ public class WorldManager : MonoBehaviour
     private IEnumerator FluidCoroutine()
     {
         throw new NotImplementedException();
+    }
+
+    private void OnDestroy()
+    {
+        noiseSystem.Destroy();
+        meshSystem.Destroy();
     }
 }

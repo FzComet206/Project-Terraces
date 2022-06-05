@@ -3,8 +3,8 @@
 
 RWStructuredBuffer<int> points;
 
-double startX;
-double startZ;
+float startX;
+float startZ;
 
 int octaves;
 float lacunarity;
@@ -50,7 +50,7 @@ int IndexFromCoord(int3 coord)
     return coord.y * 16 * 16 + coord.x * 16 + coord.z;
 }
 
-float3 PositionFromCoord(int3 coord)
+float3 PositionFromCoord(float3 coord)
 {
     return float3((float) coord.x, (float) coord.y, (float) coord.z);
 }
@@ -58,7 +58,7 @@ float3 PositionFromCoord(int3 coord)
 [numthreads(4,16,4)]
 void GenerateDensity (uint3 id : SV_DispatchThreadID)
 {
-    float3 pos = PositionFromCoord(id) + double3(startX, 0, startZ) + float3(seed, 0, seed);
+    float3 pos = PositionFromCoord(id) + float3(seed, 0, seed);
 
     float3 domainWrap = float3(
         Fbm((pos + float3(123, 653, 15)) / scale),
@@ -88,7 +88,7 @@ void GenerateDensity (uint3 id : SV_DispatchThreadID)
     }
 
     value = round(value * 16);
-    value = (int) max(-32, min(31, value));
+    value = (int) max(-32, min(31, value ));
     
     // right here is the value output that should be stored
     

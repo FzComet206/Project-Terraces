@@ -8,7 +8,7 @@ struct Triangle {
 };
 
 AppendStructuredBuffer<Triangle> triangles;
-RWStructuredBuffer<float> points;
+RWStructuredBuffer<int> points;
 
 static const float isoLevel = 0;
 bool blocky;

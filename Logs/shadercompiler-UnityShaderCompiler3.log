@@ -2,25 +2,8 @@ Base path: '/Applications/Unity/Hub/Editor/2021.2.16f1/Unity.app/Contents', plug
 Cmd: initializeCompiler
 
 Cmd: compileComputeKernel
-  insize=2296 file=Assets/Scripts/TerrainSystem/Compute/Points.compute kernel=GenerateDensity cachingPP=1 ppOnly=0 stripLineD=0 buildPlatform=2 km=<UNITY_VERSION=202129> pKW=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_RGBM_ENCODING uKW=SHADER_STAGE_COMPUTE platform=metal flags=4096 reqs=16385 forceDXC=0 forceFXC=0
-Crashed!
-=======================================
- #0 GetStacktrace(int)
- #1 CrashHandler(int)
- #2 _sigtramp
- #3 ShaderInfo::GetShaderVarIndexedFullName(ShaderVarType const*, std::__1::vector<unsigned int, std::__1::allocator<unsigned int> > const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, bool, bool)
- #4 ShaderInfo::GetShaderVarIndexedFullName(ShaderVarType const*, std::__1::vector<unsigned int, std::__1::allocator<unsigned int> > const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, bool, bool)
- #5 ToMetal::TranslateVariableName(Operand const*, unsigned int, unsigned int*, unsigned int, int*)
- #6 ToMetal::TranslateOperand(Operand const*, unsigned int, unsigned int)
- #7 ToMetal::CallBinaryOp(char const*, Instruction*, int, int, int, _SHADER_VARIABLE_TYPE)
- #8 ToMetal::TranslateInstruction(Instruction*)
- #9 ToMetal::Translate()
- #10 TranslateHLSLFromMem
- #11 TranslateComputeKernelImpl(ShaderCompileInputInterface const*, ShaderCompileOutputData*, std::__1::map<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, REFLECT_RESOURCE_PRECISION, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, REFLECT_RESOURCE_PRECISION> > >&, ComputeShaderBinary*)
- #12 InvokeComputeCompilerHLSLcc(ShaderCompileInputInterface const*)
- #13 CgBatchCompileComputeKernel(core::basic_string<char, core::StringStorageDefault<char> >&, core::basic_string<char, core::StringStorageDefault<char> > const&, core::basic_string<char, core::StringStorageDefault<char> > const&, dynamic_array<core::pair<core::basic_string<char, core::StringStorageDefault<char> >, core::basic_string<char, core::StringStorageDefault<char> >, true>, 0ul> const&, dynamic_array<core::basic_string<char, core::StringStorageDefault<char> >, 0ul> const&, dynamic_array<core::basic_string<char, core::StringStorageDefault<char> >, 0ul> const&, BuildTargetPlatform, bool, bool, bool, std::__1::vector<unsigned char, std::__1::allocator<unsigned char> >&, ShaderCompilerPlatform, ShaderCompilationFlags, ShaderRequirements, unsigned int, unsigned int, void (*)(void*, CgBatchErrorType, int, int, char const*, char const*), void*)
- #14 DispatchCommand(ShaderCompilerConnection&, core::basic_string<char, core::StringStorageDefault<char> > const&)
- #15 main
- #16 ???
+  insize=2298 file=Assets/Scripts/TerrainSystem/Compute/DensityFields.compute kernel=GenerateDensity cachingPP=0 ppOnly=0 stripLineD=0 buildPlatform=2 km=<UNITY_VERSION=202129> pKW=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_RGBM_ENCODING uKW=SHADER_STAGE_COMPUTE platform=metal flags=4096 reqs=16385 forceDXC=0 forceFXC=0 ok=1 outsize=45382
 
-=======================================
+Cmd: shutdown
+
+Quitting shader compiler process

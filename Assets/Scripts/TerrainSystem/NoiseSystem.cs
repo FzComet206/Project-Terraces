@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class NoiseSystem
+public class NoiseSystem 
 {
     private DataTypes.NoiseLayerInput noiseOne;
 
@@ -45,6 +45,7 @@ public class NoiseSystem
         pointsCompute.SetBuffer(index, "points", points);
         pointsCompute.Dispatch(index, 4, 4, 4);
         points.GetData(pointsArray);
+        
 
         return pointsArray;
     }
