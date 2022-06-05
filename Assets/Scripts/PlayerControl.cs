@@ -1,4 +1,6 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerControl : MonoBehaviour
 {
@@ -13,7 +15,114 @@ public class PlayerControl : MonoBehaviour
         set => controllerInput = value;
     }
     
+    [SerializeField] private InputAction modify;
+    [SerializeField] private InputAction adding;
+    [SerializeField] private InputAction subtracting;
+    
+    [SerializeField] private InputAction cruise;
+    [SerializeField] private InputAction mouse;
+
+    [SerializeField] float cruiseSpeed;
+    [SerializeField] float rotateSpeed;
+    [SerializeField] GameObject cursorHead;
+
+    private Rigidbody rb;
+    private Camera cam;
+    private Generator generator;
+
+    private float xRotation = 0f;
+    private float yRotation = 0f;
+
+    private Vector3 cursorPosition;
+    private bool mod = false;
+
     private void Start()
     {
+        rb = gameObject.GetComponent<Rigidbody>();
+        cam = Camera.main;
+        generator = FindObjectOfType<Generator>();
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    private void FixedUpdate()
+    {
+        // cruise
+        Vector3 c = cruise.ReadValue<Vector3>();
+        Vector3 forward = c.z * transform.forward;
+        Vector3 right = c.x * transform.right;
+        Vector3 up = c.y * Vector3.up;
+
+        Vector3 vel = (forward + up + right).normalized * (cruiseSpeed * Time.fixedDeltaTime);
+        
+        rb.velocity = vel;
+        
+    }
+
+    void Update()
+    {
+        // rotate
+        Vector2 delta = mouse.ReadValue<Vector2>();
+        float rx = delta.y * rotateSpeed * Time.fixedDeltaTime;
+        float ry = delta.x * rotateSpeed * Time.fixedDeltaTime;
+
+        xRotation -= rx;
+        xRotation = Mathf.Clamp(xRotation, -90, 90);
+        yRotation += ry;
+
+        transform.rotation = Quaternion.Euler(xRotation, yRotation, 0f).normalized;
+        
+        // raycast to point
+        float midX = Screen.width / 2f;
+        float midY = Screen.height / 2f;
+        Vector3 screenPoint = new Vector3(midX, midY, 1);
+        Ray cursorRay = cam.ScreenPointToRay(screenPoint);
+        RaycastHit hit = new RaycastHit();
+        Physics.Raycast(cursorRay, out hit, 100f);
+        cursorPosition = hit.point + Vector3.ClampMagnitude(hit.normal, 0.3f);
+        
+        // determine is modifying
+        float m = modify.ReadValue<float>();
+        if (m > 0.01f)
+        {
+            mod = !mod;
+            modify.Disable();
+            Invoke("SetModTimer", 0.3f);
+        }
+
+        // cursor
+        if (mod)
+        {
+            cursorHead.SetActive(true);
+            cursorHead.transform.position = cursorPosition;
+        }
+        else
+        {
+            cursorHead.SetActive(false);
+        }
+
+    }
+    
+    IEnumerator SetModTimer()
+    {
+        modify.Enable();
+        return null;
+    }
+    
+    private void OnEnable()
+    {
+        cruise.Enable();
+        mouse.Enable();
+        modify.Enable();
+        adding.Enable();
+        subtracting.Enable();
+    }
+
+    private void OnDisable()
+    {
+        cruise.Disable();
+        mouse.Disable();
+        modify.Disable();
+        adding.Disable();
+        subtracting.Disable();
     }
 }

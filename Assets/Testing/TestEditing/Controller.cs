@@ -27,12 +27,6 @@ public class Controller : MonoBehaviour
     private Vector3 cursorPosition;
     private bool mod = false;
 
-    private void Awake()
-    {
-        Application.targetFrameRate = -1;
-        Screen.SetResolution(1920, 1080, false);
-    }
-
     private void Start()
     {
         rb = gameObject.GetComponent<Rigidbody>();

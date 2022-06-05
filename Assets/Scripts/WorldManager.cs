@@ -104,35 +104,19 @@ public class WorldManager : MonoBehaviour
         // generate chunks
         while (true)
         {
-            for (int i = 0; i < chunkInput.chunksPerFrame; i++)
+            int c = chunkSystem.queue.Count;
+            if (c >= chunkInput.chunksPerFrame)
             {
-                if (chunkSystem.queue.Count >= chunkInput.chunksPerFrame)
+                for (int i = 0; i < chunkInput.chunksPerFrame; i++)
                 {
-                    Chunk c = chunkSystem.queue.Dequeue();
-                    int[] points = noiseSystem.DispatchPointBuffer(c); 
-                    (Vector3[] verts, int[] tris)= meshSystem.GenerateMeshData(points);
-
-                    Mesh mesh = new Mesh();
-                    mesh.SetVertices(verts);
-                    mesh.SetTriangles(tris, 0);
-                    mesh.RecalculateNormals();
-                    mesh.RecalculateBounds();
-
-                    GameObject chunk = new GameObject("chunk " + c.coordX + " " + c.coordZ, 
-                        typeof(MeshFilter), typeof(MeshCollider), typeof(MeshRenderer));
-                    chunk.transform.parent = chunkInput.meshParent;
-                    chunk.transform.position = chunk.transform.position + new Vector3(c.startPositionX, 0, c.startPositionZ);
-                    
-                    MeshFilter meshFilter = chunk.GetComponent<MeshFilter>();
-                    MeshCollider meshCollider = chunk.GetComponent<MeshCollider>();
-                    meshFilter.sharedMesh = mesh;
-                    meshCollider.sharedMesh = mesh;
-                    chunk.GetComponent<MeshRenderer>().material = chunkInput.meshMaterial;
-
-                    int2 coord = new int2(c.coordX, c.coordZ);
-                    chunkSystem.generated.Add(coord);
-                    chunkSystem.inQueue.Remove(coord);
-                    chunkSystem.chunksDict[coord] = chunk;
+                    GetNewChunk();
+                }
+            }
+            else
+            {
+                for (int i = 0; i < c; i++)
+                {
+                    GetNewChunk();
                 }
             }
             yield return new WaitForEndOfFrame();
@@ -154,6 +138,35 @@ public class WorldManager : MonoBehaviour
     private IEnumerator FluidCoroutine()
     {
         throw new NotImplementedException();
+    }
+    
+    private void GetNewChunk()
+    {
+        Chunk c = chunkSystem.queue.Dequeue();
+        int[] points = noiseSystem.DispatchPointBuffer(c);
+        (Vector3[] verts, int[] tris) = meshSystem.GenerateMeshData(points);
+
+        Mesh mesh = new Mesh();
+        mesh.SetVertices(verts);
+        mesh.SetTriangles(tris, 0);
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+
+        GameObject chunk = new GameObject("chunk " + c.coordX + " " + c.coordZ,
+            typeof(MeshFilter), typeof(MeshCollider), typeof(MeshRenderer));
+        chunk.transform.parent = chunkInput.meshParent;
+        chunk.transform.position = chunk.transform.position + new Vector3(c.startPositionX, 0, c.startPositionZ);
+
+        MeshFilter meshFilter = chunk.GetComponent<MeshFilter>();
+        MeshCollider meshCollider = chunk.GetComponent<MeshCollider>();
+        meshFilter.sharedMesh = mesh;
+        meshCollider.sharedMesh = mesh;
+        chunk.GetComponent<MeshRenderer>().material = chunkInput.meshMaterial;
+
+        int2 coord = new int2(c.coordX, c.coordZ);
+        chunkSystem.generated.Add(coord);
+        chunkSystem.inQueue.Remove(coord);
+        chunkSystem.chunksDict[coord] = chunk;
     }
 
     private void OnDestroy()

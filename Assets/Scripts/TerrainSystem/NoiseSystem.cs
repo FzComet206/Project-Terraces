@@ -43,7 +43,11 @@ public class NoiseSystem
 
         pointsCompute.SetBuffer(0, "points", points);
         pointsCompute.Dispatch(0, 2, 32, 2);
+        System.Console.WriteLine("yolo no freeze buff");
+        Debug.Log("No freeze");
         points.GetData(pointsArray);
+        System.Console.WriteLine("yolo no freeze buff");
+        Debug.Log("No freeze");
         
         return pointsArray;
     }
