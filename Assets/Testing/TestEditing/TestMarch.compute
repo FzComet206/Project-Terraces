@@ -1,8 +1,6 @@
 ﻿#pragma kernel March
 #include "MarchTables.compute"
 
-static const int numThreads = 8;
-
 struct Triangle {
     float3 vertexC;
     float3 vertexB;
@@ -12,8 +10,7 @@ struct Triangle {
 AppendStructuredBuffer<Triangle> triangles;
 RWStructuredBuffer<float> points;
 
-int numPointsPerAxis;
-float isoLevel;
+static const float isoLevel = 0;
 bool blocky;
 
 float3 interpolateVerts(float4 v1, float4 v2) {

@@ -333,6 +333,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 7200000, guid: 35ebdf0f5f6014df08e7b7e198db8bc3, type: 3}
     - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
+      propertyPath: noiseInput.gain
+      value: 0.14
+      objectReference: {fileID: 0}
+    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
       propertyPath: noiseInput.scale
       value: 600
       objectReference: {fileID: 0}
@@ -345,8 +349,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: 39cf2d8557fc74ce39c113b1f567b584, type: 2}
     - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
+      propertyPath: chunkInput.chunksPerFrame
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
       propertyPath: chunkInput.renderDistance
-      value: 1
+      value: 20
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}

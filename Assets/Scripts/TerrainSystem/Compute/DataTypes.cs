@@ -20,7 +20,7 @@ public static class DataTypes
         public int octaves;
         [Range(1, 6)]
         public float lacunarity;
-        [Range(1, 2)]
+        [Range(0, 1)]
         public float gain;
         [Range(1, 256)] 
         public int noiseWeight;

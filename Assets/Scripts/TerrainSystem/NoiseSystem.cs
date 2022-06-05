@@ -41,9 +41,8 @@ public class NoiseSystem
         pointsCompute.SetFloat("domainWrapWeight", noiseOne.domainWrapWeight);
         pointsCompute.SetInt("seed", noiseOne.seed);
 
-        int index = pointsCompute.FindKernel("GenerateDensity");
-        pointsCompute.SetBuffer(index, "points", points);
-        pointsCompute.Dispatch(index, 2, 32, 2);
+        pointsCompute.SetBuffer(0, "points", points);
+        pointsCompute.Dispatch(0, 2, 32, 2);
         points.GetData(pointsArray);
         
         return pointsArray;

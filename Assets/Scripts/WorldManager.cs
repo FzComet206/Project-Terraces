@@ -106,15 +106,15 @@ public class WorldManager : MonoBehaviour
         {
             for (int i = 0; i < chunkInput.chunksPerFrame; i++)
             {
-                if (chunkSystem.queue.Count > chunkInput.chunksPerFrame)
+                if (chunkSystem.queue.Count >= chunkInput.chunksPerFrame)
                 {
                     Chunk c = chunkSystem.queue.Dequeue();
                     int[] points = noiseSystem.DispatchPointBuffer(c); 
                     (Vector3[] verts, int[] tris)= meshSystem.GenerateMeshData(points);
 
                     Mesh mesh = new Mesh();
-                    mesh.vertices = verts;
-                    mesh.triangles = tris;
+                    mesh.SetVertices(verts);
+                    mesh.SetTriangles(tris, 0);
                     mesh.RecalculateNormals();
                     mesh.RecalculateBounds();
 

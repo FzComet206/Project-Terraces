@@ -58,7 +58,7 @@ float3 PositionFromCoord(float3 coord)
 [numthreads(8,8,8)]
 void GenerateDensity (uint3 id : SV_DispatchThreadID)
 {
-    float3 pos = PositionFromCoord(id) + float3(seed, 0, seed);
+    float3 pos = PositionFromCoord(id + float3(startX, 0, startZ)) + float3(seed, 0, seed);
 
     float3 domainWrap = float3(
         Fbm((pos + float3(123, 653, 15)) / scale),
