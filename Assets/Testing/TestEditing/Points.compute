@@ -46,7 +46,7 @@ float Fbm(float3 x)
 
 int IndexFromCoord(int3 coord)
 {
-   return coord.z * numPointsPerAxis * numPointsPerAxis + coord.y * numPointsPerAxis + coord.x;
+   return coord.z * 16 * 256 + coord.y * 16 + coord.x;
 }
 
 float3 PositionFromCoord(int3 coord)

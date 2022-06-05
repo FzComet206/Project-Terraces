@@ -26,14 +26,14 @@ float3 interpolateVerts(float4 v1, float4 v2) {
 }
 
 int indexFromCoord(int x, int y, int z) {
-    return z * numPointsPerAxis * numPointsPerAxis + y * numPointsPerAxis + x;
+    return z * 16 * 256 + y * 16 + x;
 }
 
-[numthreads(numThreads,numThreads,numThreads)]
+[numthreads(8,8,8)]
 void March (int3 id : SV_DispatchThreadID)
 {   
     // Stop one point before the end because voxel includes neighbouring points
-    if (id.x >= numPointsPerAxis-1 || id.y >= numPointsPerAxis-1 || id.z >= numPointsPerAxis-1) {
+    if (id.x >= 15 || id.y >= 255 || id.z >= 15) {
         return;
     }
 

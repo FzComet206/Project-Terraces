@@ -49,7 +49,6 @@ public class Generator : MonoBehaviour
 
     private void Update()
     {
-
         if (startUpdate && !Application.isPlaying)
         {
             Generate();
@@ -68,7 +67,7 @@ public class Generator : MonoBehaviour
     public void Generate()
     {
         axisN = testInput.axisN;
-        numPoints = axisN * axisN * axisN;
+        numPoints = axisN * axisN * 256;
         points = new float[numPoints];
         InitBuffers();
         GetMainPointsData();
@@ -102,7 +101,7 @@ public class Generator : MonoBehaviour
 
         pointsShader.SetBuffer(0, "points", pointsBuffer);
         int gs = testInput.axisN / 8;
-        pointsShader.Dispatch(0, gs, gs, gs);
+        pointsShader.Dispatch(0, 2, 32, 2);
         pointsBuffer.GetData(points);
     }
 
@@ -119,7 +118,7 @@ public class Generator : MonoBehaviour
         marchShader.SetBuffer(0, "points", pointsBuffer);
         marchShader.SetBuffer(0, "triangles", triangleBuffer);
         int gs = testInput.axisN / 8;
-        marchShader.Dispatch(0, gs, gs, gs);
+        marchShader.Dispatch(0, 2, 32, 2);
         
         ComputeBuffer.CopyCount(triangleBuffer, triCountBuffer, 0);
         int[] triCount = new int[1];
@@ -230,7 +229,7 @@ public class Generator : MonoBehaviour
                     int y = Mathf.RoundToInt(pos.y) + j;
                     int z = Mathf.RoundToInt(pos.z) + k;
                     
-                    indexes[c] = x + y * axisN + z * axisN * axisN;
+                    indexes[c] = x + y * 16+ z * 256 * 16;
                     c++;
                 }
             }

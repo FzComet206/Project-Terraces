@@ -43,10 +43,9 @@ public class NoiseSystem
 
         int index = pointsCompute.FindKernel("GenerateDensity");
         pointsCompute.SetBuffer(index, "points", points);
-        pointsCompute.Dispatch(index, 4, 4, 4);
+        pointsCompute.Dispatch(index, 2, 32, 2);
         points.GetData(pointsArray);
         
-
         return pointsArray;
     }
 

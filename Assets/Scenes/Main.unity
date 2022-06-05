@@ -340,5 +340,13 @@ PrefabInstance:
       propertyPath: chunkInput.meshParent
       value: 
       objectReference: {fileID: 1601801603}
+    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
+      propertyPath: chunkInput.meshMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 39cf2d8557fc74ce39c113b1f567b584, type: 2}
+    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
+      propertyPath: chunkInput.renderDistance
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}

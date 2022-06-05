@@ -2,8 +2,9 @@ Base path: '/Applications/Unity/Hub/Editor/2021.2.16f1/Unity.app/Contents', plug
 Cmd: initializeCompiler
 
 Cmd: compileComputeKernel
-  insize=2270 file=Assets/Scripts/TerrainSystem/Compute/DensityFields.compute kernel=GenerateDensity cachingPP=0 ppOnly=0 stripLineD=0 buildPlatform=2 km=<UNITY_VERSION=202129> pKW=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_RGBM_ENCODING uKW=SHADER_STAGE_COMPUTE platform=metal flags=4096 reqs=16385 forceDXC=0 forceFXC=0 ok=1 outsize=45216
+  insize=3329 file=Assets/Testing/TestEditing/TestMarch.compute kernel=March cachingPP=0 ppOnly=0 stripLineD=0 buildPlatform=2 km=<UNITY_VERSION=202129> pKW=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_RGBM_ENCODING uKW=SHADER_STAGE_COMPUTE platform=metal flags=4096 reqs=16385 forceDXC=0 forceFXC=0  error: 2 plat 14 at TestMarch.compute(32): the product of the arguments of numthreads(8,32,8) must be less than or equal to 1024
+ ok=0 outsize=0
 
-Cmd: shutdown
+Cmd: compileComputeKernel
+  insize=3286 file=Assets/Testing/TestEditing/TestMarch.compute kernel=March cachingPP=0 ppOnly=0 stripLineD=0 buildPlatform=2 km=<UNITY_VERSION=202129> pKW=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_RGBM_ENCODING uKW=SHADER_STAGE_COMPUTE platform=metal flags=4096 reqs=16385 forceDXC=0 forceFXC=0 ok=1 outsize=191044
 
-Quitting shader compiler process

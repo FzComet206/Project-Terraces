@@ -47,7 +47,7 @@ float Fbm(float3 x)
 
 int IndexFromCoord(int3 coord)
 {
-    return coord.y * 16 * 16 + coord.x * 16 + coord.z;
+    return coord.z * 16 * 256 + coord.y * 16 + coord.x;
 }
 
 float3 PositionFromCoord(float3 coord)
@@ -55,7 +55,7 @@ float3 PositionFromCoord(float3 coord)
     return float3((float) coord.x, (float) coord.y, (float) coord.z);
 }
 
-[numthreads(4,16,4)]
+[numthreads(8,8,8)]
 void GenerateDensity (uint3 id : SV_DispatchThreadID)
 {
     float3 pos = PositionFromCoord(id) + float3(seed, 0, seed);
