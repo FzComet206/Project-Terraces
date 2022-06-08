@@ -12,13 +12,13 @@ public class ChunkSystem
         set => renderDistance = value;
     }
 
-    public Dictionary<int2, GameObject> chunksDict;
+    public Dictionary<int2, (GameObject, Chunk)> chunksDict;
     public HashSet<int2> inQueue;
     public HashSet<int2> generated;
     public Queue<Chunk> queue;
     public ChunkSystem()
     {
-        this.chunksDict = new Dictionary<int2, GameObject>();
+        this.chunksDict = new Dictionary<int2, (GameObject, Chunk)>();
         this.inQueue = new HashSet<int2>();
         this.generated = new HashSet<int2>(); 
         this.queue = new Queue<Chunk>();

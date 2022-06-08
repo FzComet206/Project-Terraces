@@ -25,13 +25,13 @@ public class WorldManager : MonoBehaviour
     [SerializeField] private ComputeShader marchingCubes;
     
     // systems
-    private ChunkSystem chunkSystem;
-    private NoiseSystem noiseSystem;
-    private MeshSystem meshSystem;
-    private FluidSystem fluidSystem;
-    private BrushSystem brushSystem;
-    private BiomeSystem biomeSystem;
-    private StorageSystem storageSystem;
+    public ChunkSystem chunkSystem;
+    public NoiseSystem noiseSystem;
+    public MeshSystem meshSystem;
+    public FluidSystem fluidSystem;
+    public BrushSystem brushSystem;
+    public BiomeSystem biomeSystem;
+    public StorageSystem storageSystem;
     
     // Utils
     private Text fps;
@@ -135,12 +135,6 @@ public class WorldManager : MonoBehaviour
         // delete GetCull
         throw new NotImplementedException();
     }
-
-    private IEnumerator BrushCoroutine()
-    {
-        // input cursor position if held or if clicked
-        throw new NotImplementedException();
-    }
     
     private IEnumerator FluidCoroutine()
     {
@@ -149,9 +143,12 @@ public class WorldManager : MonoBehaviour
     
     private void GetNewChunk()
     {
-        Chunk c = chunkSystem.queue.Dequeue();
-        int[] points = noiseSystem.DispatchPointBuffer(c);
+        Chunk chunk= chunkSystem.queue.Dequeue();
+        int[] points = noiseSystem.DispatchPointBuffer(chunk);
         (Vector3[] verts, int[] tris) = meshSystem.GenerateMeshData(points);
+
+        // data array
+        chunk.Data = points;
 
         Mesh mesh = new Mesh();
         mesh.SetVertices(verts);
@@ -159,21 +156,21 @@ public class WorldManager : MonoBehaviour
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
 
-        GameObject chunk = new GameObject("chunk " + c.coordX + " " + c.coordZ,
+        GameObject chunkObj= new GameObject("chunk " + chunk.coordX + " " + chunk.coordZ,
             typeof(MeshFilter), typeof(MeshCollider), typeof(MeshRenderer));
-        chunk.transform.parent = chunkInput.meshParent;
-        chunk.transform.position = chunk.transform.position + new Vector3(c.startPositionX, 0, c.startPositionZ);
+        chunkObj.transform.parent = chunkInput.meshParent;
+        chunkObj.transform.position = chunkObj.transform.position + new Vector3(chunk.startPositionX, 0, chunk.startPositionZ);
 
-        MeshFilter meshFilter = chunk.GetComponent<MeshFilter>();
-        MeshCollider meshCollider = chunk.GetComponent<MeshCollider>();
+        MeshFilter meshFilter = chunkObj.GetComponent<MeshFilter>();
+        MeshCollider meshCollider = chunkObj.GetComponent<MeshCollider>();
         meshFilter.sharedMesh = mesh;
         meshCollider.sharedMesh = mesh;
-        chunk.GetComponent<MeshRenderer>().material = chunkInput.meshMaterial;
+        chunkObj.GetComponent<MeshRenderer>().material = chunkInput.meshMaterial;
 
-        int2 coord = new int2(c.coordX, c.coordZ);
+        int2 coord = new int2(chunk.coordX, chunk.coordZ);
         chunkSystem.generated.Add(coord);
         chunkSystem.inQueue.Remove(coord);
-        chunkSystem.chunksDict[coord] = chunk;
+        chunkSystem.chunksDict[coord] = (chunkObj, chunk);
     }
     
     IEnumerator DisplayFPS()

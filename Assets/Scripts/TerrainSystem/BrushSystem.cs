@@ -1,8 +1,6 @@
 using System;
-using System.Drawing.Drawing2D;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.SocialPlatforms;
 
 public class BrushSystem
 {
@@ -11,14 +9,16 @@ public class BrushSystem
         SmallSquare
     }
     
-    public struct IndexsAndChunk
+    public struct VoxelOperation
     {
         public int2 coord;
-        public int3 local;
-        public IndexsAndChunk(int2 coord, int3 local)
+        public int localIndex;
+        public int densityOperation;
+        public VoxelOperation(int2 coord, int localIndex, int densityOperation)
         {
             this.coord = coord;
-            this.local = local;
+            this.localIndex = localIndex;
+            this.densityOperation = densityOperation;
         }
     }
 
@@ -30,16 +30,14 @@ public class BrushSystem
         brushType = BrushType.SmallSquare;
     }
 
-    public IndexsAndChunk[] EvaluateBrush(Vector3 position)
+    public VoxelOperation[] EvaluateBrush(Vector3 position)
     {
         switch (brushType)
         {
             case BrushType.SmallSquare:
 
-                IndexsAndChunk[] indexsAndChunksArray = new IndexsAndChunk[27];
+                VoxelOperation[] indexsAndChunksArray = new VoxelOperation[27];
 
-                position /= 15;
-                
                 int x = Mathf.RoundToInt(position.x);
                 int y = Mathf.RoundToInt(position.y);
                 int z = Mathf.RoundToInt(position.z);
@@ -54,18 +52,35 @@ public class BrushSystem
                         {
                             int _x = x + i;
                             int _y = y + j;
-                            int _z = k + k;
+                            int _z = z + k;
                             
                             // find the coord
                             // check if outside of bound
                             // find local coord of index to the chunk
                             // duplicate coord if necessary
+                            int coordX = Mathf.RoundToInt(_x / 15f);
+                            int localX = _x % 16;
 
-                            IndexsAndChunk indexsAndChunk = new IndexsAndChunk(
-                                new int2(-1, -1),
-                                new int3(-1, -1, -1)
+                            int coordZ = Mathf.RoundToInt(_z / 15f);
+                            int localZ = _z % 16;
+                            
+                            // if _y = 16 and 0, edge case
+
+                            int2 coord = new int2(coordX, coordZ);
+
+                            _y = Math.Clamp(_y, 0, 256);
+                            localZ = Math.Clamp(localZ, 0, 16);
+                            localX = Math.Clamp(localX, 0, 16);
+                            
+                            int localIndex = localZ * 16 * 256 + _y * 16 + localX;
+
+                            VoxelOperation voxelOperation = new VoxelOperation(
+                                coord,
+                                localIndex,
+                                1
                                 );
-                            indexsAndChunksArray[counter] = indexsAndChunk;
+                            
+                            indexsAndChunksArray[counter] = voxelOperation;
                             counter++;
                             // find all corresponding chunks and which set of x y z belongs to which chunk
                         }
@@ -75,7 +90,7 @@ public class BrushSystem
                 return indexsAndChunksArray;
                 
             default:
-                return new IndexsAndChunk[1];
+                throw new IndexOutOfRangeException("????????????????");
         }
         // find corresponding int2 and get chunk from dictionary
         // subtract position from chunk position

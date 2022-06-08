@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -38,12 +39,16 @@ public class PlayerControl : MonoBehaviour
     private Vector3 cursorPosition;
     private bool mod = false;
 
+    private WorldManager worldManager;
+
     private void Start()
     {
+        worldManager = FindObjectOfType<WorldManager>();
         rb = gameObject.GetComponent<Rigidbody>();
         cam = Camera.main;
         generator = FindObjectOfType<Generator>();
         Cursor.lockState = CursorLockMode.Locked;
+        StartCoroutine(BrushCoroutine());
     }
 
     private void FixedUpdate()
@@ -80,7 +85,7 @@ public class PlayerControl : MonoBehaviour
         Ray cursorRay = cam.ScreenPointToRay(screenPoint);
         RaycastHit hit = new RaycastHit();
         Physics.Raycast(cursorRay, out hit, 100f);
-        cursorPosition = hit.point + Vector3.ClampMagnitude(hit.normal, 0.3f);
+        cursorPosition = hit.point + Vector3.ClampMagnitude(hit.normal, 0.15f);
         
         // determine is modifying
         float m = modify.ReadValue<float>();
@@ -105,6 +110,34 @@ public class PlayerControl : MonoBehaviour
         if (quit.ReadValue<float>() > 0f)
         {
             Application.Quit();
+        }
+    }
+
+    IEnumerator BrushCoroutine()
+    {
+        while (true)
+        {
+            if (adding.ReadValue<float>() > 0f && mod)
+            {
+                BrushSystem.VoxelOperation[] ops = worldManager.brushSystem.EvaluateBrush(cursorPosition);
+                for (int i = 0; i < ops.Length; i++)
+                {
+                    Debug.Log(cursorPosition);
+                    Debug.Log(ops[i].coord);
+                    int2 coord = ops[i].coord;
+                    int localIndex = ops[i].localIndex;
+                    int op = ops[i].densityOperation;
+                    (GameObject gameObject, Chunk chunk) = worldManager.chunkSystem.chunksDict[coord];
+
+                    chunk.Data[localIndex] += op;
+                    (Vector3[] verts, int[] tris) = worldManager.meshSystem.GenerateMeshData(chunk.Data);
+                    MeshFilter mf = gameObject.GetComponent<MeshFilter>();
+
+                    mf.sharedMesh.SetVertices(verts);
+                    mf.sharedMesh.SetTriangles(tris, 0);
+                }
+            }
+            yield return new WaitForSecondsRealtime(0.1f);
         }
     }
     

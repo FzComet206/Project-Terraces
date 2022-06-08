@@ -120,8 +120,8 @@ public class Chunk
         set => water = value;
     }
 
-    private byte[] data;
-    public byte[] Data
+    private int[] data;
+    public int[] Data
     {
         get => data;
         set => data = value;

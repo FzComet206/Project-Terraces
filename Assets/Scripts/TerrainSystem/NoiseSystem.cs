@@ -43,6 +43,7 @@ public class NoiseSystem
 
         pointsCompute.SetBuffer(0, "points", points);
         pointsCompute.Dispatch(0, 2, 32, 2);
+        Debug.Log("ye");
         points.GetData(pointsArray);
         
         return pointsArray;

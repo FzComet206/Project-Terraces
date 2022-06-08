@@ -39,8 +39,7 @@ public class MeshSystem
         int count = triCount[0];
 
         Types.Tri[] triangleArray = new Types.Tri[count];
-        System.Console.WriteLine("no freeze");
-        Debug.Log("no freeze");
+        Debug.Log("ye");
         triangleBuffer.GetData(triangleArray, 0, 0, count);
 
         Vector3[] verticies = new Vector3[count * 3];
