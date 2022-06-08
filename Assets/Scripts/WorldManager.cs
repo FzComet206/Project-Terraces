@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class WorldManager : MonoBehaviour
 {
@@ -31,11 +32,14 @@ public class WorldManager : MonoBehaviour
     private BrushSystem brushSystem;
     private BiomeSystem biomeSystem;
     private StorageSystem storageSystem;
+    
+    // Utils
+    private Text fps;
 
     private void Awake()
     {
-        Application.targetFrameRate = 300;
-        Screen.SetResolution(1080, 1440, false);
+        Application.targetFrameRate = 144;
+        Screen.SetResolution(1920, 1080, false);
     }
 
     private void Start()
@@ -45,6 +49,9 @@ public class WorldManager : MonoBehaviour
         player.ControllerInput = controllerInput;
         InitSystems();
         StartWorld();
+        
+        fps = FindObjectOfType<Text>();
+        StartCoroutine(DisplayFPS());
 
         // init chunks array and properties
         // update player position to chunks
@@ -167,6 +174,15 @@ public class WorldManager : MonoBehaviour
         chunkSystem.generated.Add(coord);
         chunkSystem.inQueue.Remove(coord);
         chunkSystem.chunksDict[coord] = chunk;
+    }
+    
+    IEnumerator DisplayFPS()
+    {
+        while (true)
+        {
+            fps.text = String.Format("{0} FPS", Mathf.RoundToInt(1f / Time.deltaTime));
+            yield return new WaitForSeconds(0.5f);
+        }
     }
 
     private void OnDestroy()

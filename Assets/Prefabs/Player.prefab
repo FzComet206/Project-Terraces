@@ -315,6 +315,23 @@ MonoBehaviour:
       m_Action: Mouse
       m_Flags: 0
     m_Flags: 0
+  quit:
+    m_Name: Quit
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 66791ed7-d810-465c-bd71-7e7e0909b5f1
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 2d9ad88b-73a5-4523-9e87-b27baa686ea8
+      m_Path: <Keyboard>/q
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Quit
+      m_Flags: 0
+    m_Flags: 0
   cruiseSpeed: 3000
   rotateSpeed: 30
   cursorHead: {fileID: 1925858161143433088}

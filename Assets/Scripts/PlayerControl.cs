@@ -21,6 +21,8 @@ public class PlayerControl : MonoBehaviour
     
     [SerializeField] private InputAction cruise;
     [SerializeField] private InputAction mouse;
+    
+    [SerializeField] private InputAction quit;
 
     [SerializeField] float cruiseSpeed;
     [SerializeField] float rotateSpeed;
@@ -100,6 +102,10 @@ public class PlayerControl : MonoBehaviour
             cursorHead.SetActive(false);
         }
 
+        if (quit.ReadValue<float>() > 0f)
+        {
+            Application.Quit();
+        }
     }
     
     IEnumerator SetModTimer()
@@ -115,6 +121,7 @@ public class PlayerControl : MonoBehaviour
         modify.Enable();
         adding.Enable();
         subtracting.Enable();
+        quit.Enable();
     }
 
     private void OnDisable()
@@ -124,5 +131,6 @@ public class PlayerControl : MonoBehaviour
         modify.Disable();
         adding.Disable();
         subtracting.Disable();
+        quit.Disable();
     }
 }
