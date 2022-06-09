@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -120,23 +121,33 @@ public class PlayerControl : MonoBehaviour
             if (adding.ReadValue<float>() > 0f && mod)
             {
                 BrushSystem.VoxelOperation[] ops = worldManager.brushSystem.EvaluateBrush(cursorPosition);
+                HashSet<int2> coords = new HashSet<int2>();
                 for (int i = 0; i < ops.Length; i++)
                 {
-                    Debug.Log(cursorPosition);
-                    Debug.Log(ops[i].coord);
                     int2 coord = ops[i].coord;
+                    if (!coords.Contains(coord))
+                    {
+                        coords.Add(coord);
+                    }
+                    
                     int localIndex = ops[i].localIndex;
                     int op = ops[i].densityOperation;
-                    (GameObject gameObject, Chunk chunk) = worldManager.chunkSystem.chunksDict[coord];
-
+                    
+                    (_, Chunk chunk) = worldManager.chunkSystem.chunksDict[coord];
                     chunk.Data[localIndex] += op;
+                }
+
+                foreach (var coord in coords)
+                {
+                    (GameObject chunkObject, Chunk chunk) = worldManager.chunkSystem.chunksDict[coord];
                     (Vector3[] verts, int[] tris) = worldManager.meshSystem.GenerateMeshData(chunk.Data);
-                    MeshFilter mf = gameObject.GetComponent<MeshFilter>();
+                    MeshFilter mf = chunkObject.GetComponent<MeshFilter>();
 
                     mf.sharedMesh.SetVertices(verts);
                     mf.sharedMesh.SetTriangles(tris, 0);
                 }
             }
+            
             yield return new WaitForSecondsRealtime(0.1f);
         }
     }

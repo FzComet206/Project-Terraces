@@ -59,18 +59,18 @@ public class BrushSystem
                             // find local coord of index to the chunk
                             // duplicate coord if necessary
                             int coordX = Mathf.RoundToInt(_x / 15f);
-                            int localX = _x % 16;
+                            int localX = _x % 15;
 
                             int coordZ = Mathf.RoundToInt(_z / 15f);
-                            int localZ = _z % 16;
+                            int localZ = _z % 15;
                             
-                            // if _y = 16 and 0, edge case
+                            // if _x, _z = 16 and 0, edge case
 
                             int2 coord = new int2(coordX, coordZ);
 
-                            _y = Math.Clamp(_y, 0, 256);
-                            localZ = Math.Clamp(localZ, 0, 16);
-                            localX = Math.Clamp(localX, 0, 16);
+                            _y = Math.Clamp(_y, 0, 255);
+                            localZ = Math.Clamp(localZ, 0, 15);
+                            localX = Math.Clamp(localX, 0, 15);
                             
                             int localIndex = localZ * 16 * 256 + _y * 16 + localX;
 
