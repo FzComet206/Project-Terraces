@@ -69,6 +69,8 @@ public class Chunk
     public float startPositionZ;
     public int coordX;
     public int coordZ;
+    
+    public int[] data;
 
     public Chunk(float startPositionX, float startPositionZ, int coordX, int coordZ)
     {
@@ -118,13 +120,6 @@ public class Chunk
     {
         get => water;
         set => water = value;
-    }
-
-    private int[] data;
-    public int[] Data
-    {
-        get => data;
-        set => data = value;
     }
 
     private Texture2D shaderInput;

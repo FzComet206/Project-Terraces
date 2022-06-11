@@ -1,4 +1,6 @@
+using System;
 using System.Drawing;
+using System.Runtime.ConstrainedExecution;
 using UnityEngine;
 
 public class MeshSystem
@@ -24,22 +26,20 @@ public class MeshSystem
     public (Vector3[], int[]) GenerateMeshData(int[] points)
     {
         triangleBuffer.SetCounterValue(0);
-        pointsBuffer.SetData(points);
         
+        pointsBuffer.SetData(points);
         marchingCubes.SetBool("blocky", false);
         marchingCubes.SetBuffer(0, "points", pointsBuffer);
         marchingCubes.SetBuffer(0, "triangles", triangleBuffer);
-        
         marchingCubes.Dispatch(0, 2, 32, 2);
         
         ComputeBuffer.CopyCount(triangleBuffer, triangleCountBuffer, 0);
         int[] triCount = new int[1];
-        
         triangleCountBuffer.GetData(triCount);
         int count = triCount[0];
 
         Types.Tri[] triangleArray = new Types.Tri[count];
-        Debug.Log("ye");
+        Console.WriteLine("ye");
         triangleBuffer.GetData(triangleArray, 0, 0, count);
 
         Vector3[] verticies = new Vector3[count * 3];

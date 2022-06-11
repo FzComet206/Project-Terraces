@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
@@ -86,7 +87,7 @@ public class PlayerControl : MonoBehaviour
         Ray cursorRay = cam.ScreenPointToRay(screenPoint);
         RaycastHit hit = new RaycastHit();
         Physics.Raycast(cursorRay, out hit, 100f);
-        cursorPosition = hit.point + Vector3.ClampMagnitude(hit.normal, 0.15f);
+        cursorPosition = hit.point + Vector3.ClampMagnitude(hit.normal, 0.3f);
         
         // determine is modifying
         float m = modify.ReadValue<float>();
@@ -134,17 +135,24 @@ public class PlayerControl : MonoBehaviour
                     int op = ops[i].densityOperation;
                     
                     (_, Chunk chunk) = worldManager.chunkSystem.chunksDict[coord];
-                    chunk.Data[localIndex] += op;
+                    chunk.data[localIndex] = 100;
                 }
 
                 foreach (var coord in coords)
                 {
                     (GameObject chunkObject, Chunk chunk) = worldManager.chunkSystem.chunksDict[coord];
-                    (Vector3[] verts, int[] tris) = worldManager.meshSystem.GenerateMeshData(chunk.Data);
+                    (Vector3[] verts, int[] tris) = worldManager.meshSystem.GenerateMeshData(chunk.data);
                     MeshFilter mf = chunkObject.GetComponent<MeshFilter>();
+                    MeshCollider mc = chunkObject.GetComponent<MeshCollider>();
 
+                    mf.sharedMesh.Clear();
                     mf.sharedMesh.SetVertices(verts);
                     mf.sharedMesh.SetTriangles(tris, 0);
+                    mf.sharedMesh.RecalculateNormals();
+                    mf.sharedMesh.RecalculateBounds();
+
+                    mc.sharedMesh = null;
+                    mc.sharedMesh = mf.sharedMesh;
                 }
             }
             

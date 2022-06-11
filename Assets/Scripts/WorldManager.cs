@@ -148,7 +148,7 @@ public class WorldManager : MonoBehaviour
         (Vector3[] verts, int[] tris) = meshSystem.GenerateMeshData(points);
 
         // data array
-        chunk.Data = points;
+        chunk.data = points;
 
         Mesh mesh = new Mesh();
         mesh.SetVertices(verts);

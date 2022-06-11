@@ -229,7 +229,7 @@ public class Generator : MonoBehaviour
                     int y = Mathf.RoundToInt(pos.y) + j;
                     int z = Mathf.RoundToInt(pos.z) + k;
                     
-                    indexes[c] = x + y * 16+ z * 256 * 16;
+                    indexes[c] = x + y * 16 + z * 256 * 16;
                     c++;
                 }
             }

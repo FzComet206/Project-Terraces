@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class NoiseSystem 
@@ -43,7 +44,7 @@ public class NoiseSystem
 
         pointsCompute.SetBuffer(0, "points", points);
         pointsCompute.Dispatch(0, 2, 32, 2);
-        Debug.Log("ye");
+        Console.WriteLine("ye");
         points.GetData(pointsArray);
         
         return pointsArray;

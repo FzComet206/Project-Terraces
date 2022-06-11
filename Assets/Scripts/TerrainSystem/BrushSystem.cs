@@ -1,6 +1,7 @@
 using System;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 public class BrushSystem
 {
@@ -36,56 +37,36 @@ public class BrushSystem
         {
             case BrushType.SmallSquare:
 
-                VoxelOperation[] indexsAndChunksArray = new VoxelOperation[27];
+                VoxelOperation[] indexsAndChunksArray = new VoxelOperation[1];
 
+                
                 int x = Mathf.RoundToInt(position.x);
                 int y = Mathf.RoundToInt(position.y);
                 int z = Mathf.RoundToInt(position.z);
 
-                int counter = 0;
+                // find the coord
+                // check if outside of bound
+                // find local coord of index to the chunk
+                // duplicate coord if necessary
+                int coordX = Mathf.RoundToInt(x / 15f);
+                int coordZ = Mathf.RoundToInt(z / 15f);
+                int2 coord = new int2(coordX, coordZ);
                 
-                for (int i = -1; i < 2; i++)
-                {
-                    for (int j = -1; j < 2; j++)
-                    {
-                        for (int k = -1; k < 2; k++)
-                        {
-                            int _x = x + i;
-                            int _y = y + j;
-                            int _z = z + k;
-                            
-                            // find the coord
-                            // check if outside of bound
-                            // find local coord of index to the chunk
-                            // duplicate coord if necessary
-                            int coordX = Mathf.RoundToInt(_x / 15f);
-                            int localX = _x % 15;
+                int localX = Mathf.Abs(x % 15);
+                int localZ = Mathf.Abs(z % 15);
+                
+                int localIndex = localZ * 16 * 256 + y * 16 + localX;
 
-                            int coordZ = Mathf.RoundToInt(_z / 15f);
-                            int localZ = _z % 15;
-                            
-                            // if _x, _z = 16 and 0, edge case
+                string str = $"localZ: {localZ}, localX: {localX}, localY: {y}, localIndex: {localIndex} ===== on coord: {coordZ}, {coordX}";
+                Debug.Log(str);
 
-                            int2 coord = new int2(coordX, coordZ);
-
-                            _y = Math.Clamp(_y, 0, 255);
-                            localZ = Math.Clamp(localZ, 0, 15);
-                            localX = Math.Clamp(localX, 0, 15);
-                            
-                            int localIndex = localZ * 16 * 256 + _y * 16 + localX;
-
-                            VoxelOperation voxelOperation = new VoxelOperation(
-                                coord,
-                                localIndex,
-                                1
-                                );
-                            
-                            indexsAndChunksArray[counter] = voxelOperation;
-                            counter++;
-                            // find all corresponding chunks and which set of x y z belongs to which chunk
-                        }
-                    }
-                }
+                VoxelOperation voxelOperation = new VoxelOperation(
+                    coord,
+                    localIndex,
+                    0
+                    );
+                
+                indexsAndChunksArray[0] = voxelOperation;
 
                 return indexsAndChunksArray;
                 
