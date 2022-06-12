@@ -55,7 +55,7 @@ float3 PositionFromCoord(float3 coord)
     return float3((float) coord.x, (float) coord.y, (float) coord.z);
 }
 
-[numthreads(8,8,8)]
+[numthreads(4,4,4)]
 void GenerateDensity (uint3 id : SV_DispatchThreadID)
 {
     float3 pos = PositionFromCoord(id + float3(startX, 0, startZ)) + float3(seed, 0, seed);

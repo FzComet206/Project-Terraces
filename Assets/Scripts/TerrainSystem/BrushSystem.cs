@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
@@ -6,8 +7,8 @@ using UnityEngine.SocialPlatforms;
 public class BrushSystem
 {
     // debug parameters
-    public int localX;
-    public int localZ;
+    public int localXDebug;
+    public int localZDebug;
     public enum BrushType
     {
         SmallSquare
@@ -34,32 +35,30 @@ public class BrushSystem
         brushType = BrushType.SmallSquare;
     }
 
-    public VoxelOperation[] EvaluateBrush(Vector3 position)
+    public List<VoxelOperation> EvaluateBrush(Vector3 position)
     {
         switch (brushType)
         {
             case BrushType.SmallSquare:
 
-                VoxelOperation[] indexsAndChunksArray = new VoxelOperation[64];
+                List<VoxelOperation> indexsAndChunksArray = new List<VoxelOperation>();
                 // find the coord
                 // check if outside of bound
                 // find local coord of index to the chunk
                 // duplicate coord if necessary
-                int counter = 0;
-
-                for (int i = -2; i < 2; i++)
+                for (int i = -1; i < 2; i++)
                 {
-                    for (int j = -2; j < 2; j++)
+                    for (int j = -1; j < 2; j++)
                     {
-                        for (int k = -2; k < 2; k++)
+                        for (int k = -1; k < 2; k++)
                         {
                             int coordX = Mathf.FloorToInt((position.x + i) / 15f);
                             int coordZ = Mathf.FloorToInt((position.z + k) / 15f);
                             int2 coord = new int2(coordX, coordZ);
                             
-                            int x = Mathf.RoundToInt(position.x) + i;
-                            int y = Mathf.RoundToInt(position.y) + j;
-                            int z = Mathf.RoundToInt(position.z) + k;
+                            int x = Mathf.FloorToInt(position.x) + i;
+                            int y = Mathf.FloorToInt(position.y) + j;
+                            int z = Mathf.FloorToInt(position.z) + k;
 
                             if (y > 255 || y < 0)
                             {
@@ -79,13 +78,12 @@ public class BrushSystem
                                 localZ = 15 - Math.Abs(localZ);
                             }
 
-                            this.localX = localX;
-                            this.localZ = localZ;
+                            this.localXDebug = localX;
+                            this.localZDebug = localZ;
                             
                             int localIndex = localZ * 16 * 256 + y * 16 + localX;
 
                             string str = $"localZ: {localZ}, localX: {localX}, localY: {y}, localIndex: {localIndex} ===== on coord: {coordZ}, {coordX}";
-                            Debug.Log(str);
 
                             VoxelOperation voxelOperation = new VoxelOperation(
                                 coord,
@@ -93,8 +91,50 @@ public class BrushSystem
                                 10
                                 );
                             
-                            indexsAndChunksArray[counter] = voxelOperation;
-                            counter++;
+                            indexsAndChunksArray.Add(voxelOperation);
+                            
+                            // edge cases
+                            int2 edgeCoord = coord;
+                            int edgeLocalX = 0;
+                            int edgeLocalZ = 0;
+                            
+                            // handle x edge
+                            if (localX == 0)
+                            {
+                                edgeCoord = new int2(coord.x - 1, coord.y);
+                                edgeLocalX = 15;
+                                edgeLocalZ = localZ;
+                            } else if (localX == 15)
+                            {
+                                edgeCoord = new int2(coord.x + 1, coord.y);
+                                edgeLocalX = 0;
+                                edgeLocalZ = localZ;
+                            }
+                            
+                            // handle z edge
+                            if (localZ == 0)
+                            {
+                                edgeCoord = new int2(coord.x, coord.y - 1);
+                                edgeLocalZ = 15;
+                            } else if (localZ == 15)
+                            {
+                                edgeCoord = new int2(coord.x, coord.y + 1);
+                                edgeLocalZ = 0;
+                            }
+                            
+                            // if it happens;
+                            if (localX == 0 || localX == 15 || localZ == 0 || localZ == 15)
+                            {
+                                int edgeLocalIndex = edgeLocalZ * 16 * 256 + y * 16 + edgeLocalX;
+                                VoxelOperation edgeVoxelOperation = new VoxelOperation(
+                                    edgeCoord,
+                                    edgeLocalIndex,
+                                    10
+                                    );
+                                
+                                indexsAndChunksArray.Add(edgeVoxelOperation);
+                            }
+                                
                         }
                     }
                 }

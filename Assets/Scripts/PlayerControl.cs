@@ -125,9 +125,9 @@ public class PlayerControl : MonoBehaviour
             {
                 updating = true;
                 
-                BrushSystem.VoxelOperation[] ops = worldManager.brushSystem.EvaluateBrush(cursorPosition);
+                List<BrushSystem.VoxelOperation> ops = worldManager.brushSystem.EvaluateBrush(cursorPosition);
                 HashSet<int2> coords = new HashSet<int2>();
-                for (int i = 0; i < ops.Length; i++)
+                for (int i = 0; i < ops.Count; i++)
                 {
                     int2 coord = ops[i].coord;
                     if (!coords.Contains(coord))

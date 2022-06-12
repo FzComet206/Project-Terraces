@@ -25,7 +25,7 @@ float3 interpolateVerts(float4 v1, float4 v2) {
 int indexFromCoord(int x, int y, int z) {
     return z * 16 * 256 + y * 16 + x;
 }
-[numthreads(8,8,8)]
+[numthreads(4,4,4)]
 void March (int3 id : SV_DispatchThreadID)
 {   
     // Stop one point before the end because voxel includes neighbouring points

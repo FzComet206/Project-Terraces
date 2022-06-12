@@ -31,7 +31,7 @@ public class MeshSystem
         marchingCubes.SetBool("blocky", false);
         marchingCubes.SetBuffer(0, "points", pointsBuffer);
         marchingCubes.SetBuffer(0, "triangles", triangleBuffer);
-        marchingCubes.Dispatch(0, 2, 32, 2);
+        marchingCubes.Dispatch(0, 4, 64, 4);
         
         ComputeBuffer.CopyCount(triangleBuffer, triangleCountBuffer, 0);
         int[] triCount = new int[1];
