@@ -5,6 +5,9 @@ using UnityEngine.SocialPlatforms;
 
 public class BrushSystem
 {
+    // debug parameters
+    public int localX;
+    public int localZ;
     public enum BrushType
     {
         SmallSquare
@@ -58,13 +61,26 @@ public class BrushSystem
                             int y = Mathf.RoundToInt(position.y) + j;
                             int z = Mathf.RoundToInt(position.z) + k;
 
-                            if (y > 255)
+                            if (y > 255 || y < 0)
                             {
                                 continue;
                             }
-                            
-                            int localX = Mathf.Abs(x % 15);
-                            int localZ = Mathf.Abs(z % 15);
+
+                            int localX = x % 15;
+                            int localZ = z % 15;
+
+                            if (x < 0)
+                            {
+                                localX = 15 - Math.Abs(localX);
+                            }
+
+                            if (z < 0)
+                            {
+                                localZ = 15 - Math.Abs(localZ);
+                            }
+
+                            this.localX = localX;
+                            this.localZ = localZ;
                             
                             int localIndex = localZ * 16 * 256 + y * 16 + localX;
 
@@ -74,7 +90,7 @@ public class BrushSystem
                             VoxelOperation voxelOperation = new VoxelOperation(
                                 coord,
                                 localIndex,
-                                5
+                                10
                                 );
                             
                             indexsAndChunksArray[counter] = voxelOperation;

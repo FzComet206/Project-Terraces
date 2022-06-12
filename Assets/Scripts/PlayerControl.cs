@@ -43,6 +43,8 @@ public class PlayerControl : MonoBehaviour
 
     private WorldManager worldManager;
 
+    public bool updating;
+
     private void Start()
     {
         worldManager = FindObjectOfType<WorldManager>();
@@ -121,6 +123,8 @@ public class PlayerControl : MonoBehaviour
         {
             if (adding.ReadValue<float>() > 0f && mod)
             {
+                updating = true;
+                
                 BrushSystem.VoxelOperation[] ops = worldManager.brushSystem.EvaluateBrush(cursorPosition);
                 HashSet<int2> coords = new HashSet<int2>();
                 for (int i = 0; i < ops.Length; i++)
@@ -135,6 +139,7 @@ public class PlayerControl : MonoBehaviour
                     int op = ops[i].densityOperation;
                     
                     (_, Chunk chunk) = worldManager.chunkSystem.chunksDict[coord];
+
                     chunk.data[localIndex] += op;
                 }
 
@@ -155,8 +160,12 @@ public class PlayerControl : MonoBehaviour
                     mc.sharedMesh = mf.sharedMesh;
                 }
             }
+            else
+            {
+                updating = false;
+            }
             
-            yield return new WaitForSecondsRealtime(0.02f);
+            yield return new WaitForSecondsRealtime(0.05f);
         }
     }
 

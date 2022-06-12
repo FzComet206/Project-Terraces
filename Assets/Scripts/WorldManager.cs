@@ -111,19 +111,22 @@ public class WorldManager : MonoBehaviour
         // generate chunks
         while (true)
         {
-            int c = chunkSystem.queue.Count;
-            if (c >= chunkInput.chunksPerFrame)
+            if (!player.updating)
             {
-                for (int i = 0; i < chunkInput.chunksPerFrame; i++)
+                int c = chunkSystem.queue.Count;
+                if (c >= chunkInput.chunksPerFrame)
                 {
-                    GetNewChunk();
+                    for (int i = 0; i < chunkInput.chunksPerFrame; i++)
+                    {
+                        GetNewChunk();
+                    }
                 }
-            }
-            else
-            {
-                for (int i = 0; i < c; i++)
+                else
                 {
-                    GetNewChunk();
+                    for (int i = 0; i < c; i++)
+                    {
+                        GetNewChunk();
+                    }
                 }
             }
             yield return new WaitForEndOfFrame();
