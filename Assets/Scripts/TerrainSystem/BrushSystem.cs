@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
@@ -65,9 +66,11 @@ public class BrushSystem
                                 continue;
                             }
 
+                            // this has to be mod 15 for correct alignment
                             int localX = x % 15;
                             int localZ = z % 15;
-
+                            
+                            // invert negative coords
                             if (x < 0)
                             {
                                 localX = 15 - Math.Abs(localX);
@@ -93,48 +96,58 @@ public class BrushSystem
                             
                             indexsAndChunksArray.Add(voxelOperation);
                             
-                            // edge cases
-                            int2 edgeCoord = coord;
-                            int edgeLocalX = 0;
-                            int edgeLocalZ = 0;
+                            // ===================================================================
+                            // if x == 15, then localX will be 0, thus ignoring index 15
+                            // we do this by checking if localx == 0, the add index 15 to last chunk
+
+                            int2 edgeCoord;
+                            int edgeLocalIndex;
+
+                            int xFix = 15;
+                            int zFIx = 15;
+
+                            int xCond = 0;
+                            int zCond = 0;
+
+                            int xCoordFix = -1;
+                            int zCoordFix = -1;
                             
-                            // handle x edge
-                            if (localX == 0)
+                            // check edge
+                            if (localX == xCond && localZ == zCond)
                             {
-                                edgeCoord = new int2(coord.x - 1, coord.y);
-                                edgeLocalX = 15;
-                                edgeLocalZ = localZ;
-                            } else if (localX == 15)
+                                Debug.Log("edge X + Z");
+
+                                edgeCoord = new int2(coord.x + xCoordFix, coord.y + zCoordFix);
+                                
+                                edgeLocalIndex = zFIx * 16 * 256 + y * 16 + xFix;
+                                
+                            } else if (localX == xCond)
                             {
-                                edgeCoord = new int2(coord.x + 1, coord.y);
-                                edgeLocalX = 0;
-                                edgeLocalZ = localZ;
+                                Debug.Log("edge X");
+
+                                edgeCoord = new int2(coord.x + xCoordFix, coord.y);
+                                edgeLocalIndex = localZ * 16 * 256 + y * 16 + xFix;
+                                
+                            }
+                            else if (localZ == zCond)
+                            {
+                                Debug.Log("edge Z");
+
+                                edgeCoord = new int2(coord.x, coord.y + zCoordFix);
+                                edgeLocalIndex = zFIx * 16 * 256 + y * 16 + localX;
+                            }
+                            else
+                            {
+                                continue;
                             }
                             
-                            // handle z edge
-                            if (localZ == 0)
-                            {
-                                edgeCoord = new int2(coord.x, coord.y - 1);
-                                edgeLocalZ = 15;
-                            } else if (localZ == 15)
-                            {
-                                edgeCoord = new int2(coord.x, coord.y + 1);
-                                edgeLocalZ = 0;
-                            }
-                            
-                            // if it happens;
-                            if (localX == 0 || localX == 15 || localZ == 0 || localZ == 15)
-                            {
-                                int edgeLocalIndex = edgeLocalZ * 16 * 256 + y * 16 + edgeLocalX;
-                                VoxelOperation edgeVoxelOperation = new VoxelOperation(
+                            VoxelOperation edgeVoxelOperation = new VoxelOperation(
                                     edgeCoord,
                                     edgeLocalIndex,
                                     10
                                     );
-                                
-                                indexsAndChunksArray.Add(edgeVoxelOperation);
-                            }
-                                
+                            
+                            indexsAndChunksArray.Add(edgeVoxelOperation);
                         }
                     }
                 }

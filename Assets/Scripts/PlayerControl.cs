@@ -164,8 +164,7 @@ public class PlayerControl : MonoBehaviour
             {
                 updating = false;
             }
-            
-            yield return new WaitForSecondsRealtime(0.05f);
+            yield return new WaitForSecondsRealtime(0.02f);
         }
     }
 
