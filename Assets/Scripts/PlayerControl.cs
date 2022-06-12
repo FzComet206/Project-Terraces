@@ -135,7 +135,7 @@ public class PlayerControl : MonoBehaviour
                     int op = ops[i].densityOperation;
                     
                     (_, Chunk chunk) = worldManager.chunkSystem.chunksDict[coord];
-                    chunk.data[localIndex] = 100;
+                    chunk.data[localIndex] += op;
                 }
 
                 foreach (var coord in coords)
@@ -156,10 +156,20 @@ public class PlayerControl : MonoBehaviour
                 }
             }
             
-            yield return new WaitForSecondsRealtime(0.1f);
+            yield return new WaitForSecondsRealtime(0.02f);
         }
     }
-    
+
+    IEnumerator TestCoord(GameObject go)
+    {
+        Vector3 b = go.transform.position;
+        Vector3 p = go.transform.position;
+        p.y += 5;
+        go.transform.position = p;
+        yield return new WaitForSecondsRealtime(0.1f);
+        go.transform.position = b;
+    }
+
     IEnumerator SetModTimer()
     {
         modify.Enable();

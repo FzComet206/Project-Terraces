@@ -37,36 +37,51 @@ public class BrushSystem
         {
             case BrushType.SmallSquare:
 
-                VoxelOperation[] indexsAndChunksArray = new VoxelOperation[1];
-
-                
-                int x = Mathf.RoundToInt(position.x);
-                int y = Mathf.RoundToInt(position.y);
-                int z = Mathf.RoundToInt(position.z);
-
+                VoxelOperation[] indexsAndChunksArray = new VoxelOperation[64];
                 // find the coord
                 // check if outside of bound
                 // find local coord of index to the chunk
                 // duplicate coord if necessary
-                int coordX = Mathf.RoundToInt(x / 15f);
-                int coordZ = Mathf.RoundToInt(z / 15f);
-                int2 coord = new int2(coordX, coordZ);
-                
-                int localX = Mathf.Abs(x % 15);
-                int localZ = Mathf.Abs(z % 15);
-                
-                int localIndex = localZ * 16 * 256 + y * 16 + localX;
+                int counter = 0;
 
-                string str = $"localZ: {localZ}, localX: {localX}, localY: {y}, localIndex: {localIndex} ===== on coord: {coordZ}, {coordX}";
-                Debug.Log(str);
+                for (int i = -2; i < 2; i++)
+                {
+                    for (int j = -2; j < 2; j++)
+                    {
+                        for (int k = -2; k < 2; k++)
+                        {
+                            int coordX = Mathf.FloorToInt((position.x + i) / 15f);
+                            int coordZ = Mathf.FloorToInt((position.z + k) / 15f);
+                            int2 coord = new int2(coordX, coordZ);
+                            
+                            int x = Mathf.RoundToInt(position.x) + i;
+                            int y = Mathf.RoundToInt(position.y) + j;
+                            int z = Mathf.RoundToInt(position.z) + k;
 
-                VoxelOperation voxelOperation = new VoxelOperation(
-                    coord,
-                    localIndex,
-                    0
-                    );
-                
-                indexsAndChunksArray[0] = voxelOperation;
+                            if (y > 255)
+                            {
+                                continue;
+                            }
+                            
+                            int localX = Mathf.Abs(x % 15);
+                            int localZ = Mathf.Abs(z % 15);
+                            
+                            int localIndex = localZ * 16 * 256 + y * 16 + localX;
+
+                            string str = $"localZ: {localZ}, localX: {localX}, localY: {y}, localIndex: {localIndex} ===== on coord: {coordZ}, {coordX}";
+                            Debug.Log(str);
+
+                            VoxelOperation voxelOperation = new VoxelOperation(
+                                coord,
+                                localIndex,
+                                5
+                                );
+                            
+                            indexsAndChunksArray[counter] = voxelOperation;
+                            counter++;
+                        }
+                    }
+                }
 
                 return indexsAndChunksArray;
                 
