@@ -137,10 +137,17 @@ public class PlayerControl : MonoBehaviour
                     
                     int localIndex = ops[i].localIndex;
                     int op = ops[i].densityOperation;
-                    
-                    (_, Chunk chunk) = worldManager.chunkSystem.chunksDict[coord];
 
-                    chunk.data[localIndex] += op;
+                    try
+                    {
+                        (_, Chunk chunk) = worldManager.chunkSystem.chunksDict[coord];
+                        chunk.data[localIndex] = op;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+
                 }
 
                 foreach (var coord in coords)

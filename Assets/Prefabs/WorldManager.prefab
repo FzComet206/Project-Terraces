@@ -48,15 +48,15 @@ MonoBehaviour:
     scale: 600
     octaves: 5
     lacunarity: 5
-    gain: 1
+    gain: 0.14
     noiseWeight: 128
-    parameterX: 20
-    parameterY: 1
+    parameterX: 30
+    parameterY: 0.6
     softFloorHeight: 70
     softFloorWeight: 2
     hardFloorHeight: 1
     hardFloorWeight: 64
-    domainWrapWeight: 0.5
+    domainWrapWeight: 0.8
     seed: 1314
   controllerInput:
     walkSpeed: 3000
@@ -64,9 +64,9 @@ MonoBehaviour:
     sprintFactor: 2
     jumpStrength: 1
   chunkInput:
-    renderDistance: 10
-    chunksPerFrame: 1
-    meshMaterial: {fileID: 2100000, guid: 3fba86fe5658943caa9bd8c0af78d856, type: 2}
+    renderDistance: 8
+    chunksPerFrame: 2
+    meshMaterial: {fileID: 2100000, guid: 39cf2d8557fc74ce39c113b1f567b584, type: 2}
     meshParent: {fileID: 0}
   playerRig: {fileID: 1709310827449926998, guid: d8bec0aa4e1794609b5395fcd3c72d08, type: 3}
   pointsCompute: {fileID: 7200000, guid: 35ebdf0f5f6014df08e7b7e198db8bc3, type: 3}
