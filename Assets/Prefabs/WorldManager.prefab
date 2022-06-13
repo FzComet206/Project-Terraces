@@ -64,7 +64,7 @@ MonoBehaviour:
     sprintFactor: 2
     jumpStrength: 1
   chunkInput:
-    renderDistance: 8
+    renderDistance: 12
     chunksPerFrame: 2
     meshMaterial: {fileID: 2100000, guid: 39cf2d8557fc74ce39c113b1f567b584, type: 2}
     meshParent: {fileID: 0}

@@ -88,7 +88,7 @@ public class PlayerControl : MonoBehaviour
         Vector3 screenPoint = new Vector3(midX, midY, 1);
         Ray cursorRay = cam.ScreenPointToRay(screenPoint);
         RaycastHit hit = new RaycastHit();
-        Physics.Raycast(cursorRay, out hit, 100f);
+        Physics.Raycast(cursorRay, out hit, 300f);
         cursorPosition = hit.point + Vector3.ClampMagnitude(hit.normal, 0.3f);
         
         // determine is modifying
@@ -121,57 +121,74 @@ public class PlayerControl : MonoBehaviour
     {
         while (true)
         {
-            if (adding.ReadValue<float>() > 0f && mod)
+            if (mod)
             {
-                updating = true;
-                
-                List<BrushSystem.VoxelOperation> ops = worldManager.brushSystem.EvaluateBrush(cursorPosition);
-                HashSet<int2> coords = new HashSet<int2>();
-                for (int i = 0; i < ops.Count; i++)
+                if (adding.ReadValue<float>() > 0f)
                 {
-                    int2 coord = ops[i].coord;
-                    if (!coords.Contains(coord))
-                    {
-                        coords.Add(coord);
-                    }
-                    
-                    int localIndex = ops[i].localIndex;
-                    int op = ops[i].densityOperation;
-
-                    try
-                    {
-                        (_, Chunk chunk) = worldManager.chunkSystem.chunksDict[coord];
-                        chunk.data[localIndex] = op;
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-
-                }
-
-                foreach (var coord in coords)
+                    updating = true;
+                    ProcessOps(true);
+                } else if (subtracting.ReadValue<float>() > 0f)
                 {
-                    (GameObject chunkObject, Chunk chunk) = worldManager.chunkSystem.chunksDict[coord];
-                    (Vector3[] verts, int[] tris) = worldManager.meshSystem.GenerateMeshData(chunk.data);
-                    MeshFilter mf = chunkObject.GetComponent<MeshFilter>();
-                    MeshCollider mc = chunkObject.GetComponent<MeshCollider>();
-
-                    mf.sharedMesh.Clear();
-                    mf.sharedMesh.SetVertices(verts);
-                    mf.sharedMesh.SetTriangles(tris, 0);
-                    mf.sharedMesh.RecalculateNormals();
-                    mf.sharedMesh.RecalculateBounds();
-
-                    mc.sharedMesh = null;
-                    mc.sharedMesh = mf.sharedMesh;
+                    updating = true;
+                    ProcessOps(false);
                 }
-            }
-            else
-            {
-                updating = false;
+                else
+                {
+                    updating = false;
+                }
             }
             yield return new WaitForSecondsRealtime(0.02f);
+        }
+    }
+
+    private void ProcessOps(bool add)
+    {
+        List<BrushSystem.VoxelOperation> ops = worldManager.brushSystem.EvaluateBrush(cursorPosition);
+        HashSet<int2> coords = new HashSet<int2>();
+        for (int i = 0; i < ops.Count; i++)
+        {
+            int2 coord = ops[i].coord;
+            if (!coords.Contains(coord))
+            {
+                coords.Add(coord);
+            }
+
+            int localIndex = ops[i].localIndex;
+            int op = ops[i].densityOperation;
+
+            try
+            {
+                (_, Chunk chunk) = worldManager.chunkSystem.chunksDict[coord];
+                if (add)
+                {
+                    chunk.data[localIndex] = op;
+                }
+                else
+                {
+                    chunk.data[localIndex] = -op;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+
+        foreach (var coord in coords)
+        {
+            (GameObject chunkObject, Chunk chunk) = worldManager.chunkSystem.chunksDict[coord];
+            (Vector3[] verts, int[] tris) = worldManager.meshSystem.GenerateMeshData(chunk.data);
+            MeshFilter mf = chunkObject.GetComponent<MeshFilter>();
+            MeshCollider mc = chunkObject.GetComponent<MeshCollider>();
+
+            mf.sharedMesh.Clear();
+            mf.sharedMesh.SetVertices(verts);
+            mf.sharedMesh.SetTriangles(tris, 0);
+            mf.sharedMesh.RecalculateNormals();
+            mf.sharedMesh.RecalculateBounds();
+
+            mc.sharedMesh = null;
+            mc.sharedMesh = mf.sharedMesh;
         }
     }
 

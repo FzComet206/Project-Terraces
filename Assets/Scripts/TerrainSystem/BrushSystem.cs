@@ -47,11 +47,11 @@ public class BrushSystem
                 // check if outside of bound
                 // find local coord of index to the chunk
                 // duplicate coord if necessary
-                for (int i = -1; i < 2; i++)
+                for (int i = -3; i < 4; i++)
                 {
-                    for (int j = -1; j < 2; j++)
+                    for (int j = -3; j < 4; j++)
                     {
-                        for (int k = -1; k < 2; k++)
+                        for (int k = -3; k < 4; k++)
                         {
                             int coordX = Mathf.FloorToInt((position.x + i) / 15f);
                             int coordZ = Mathf.FloorToInt((position.z + k) / 15f);
@@ -81,20 +81,9 @@ public class BrushSystem
                                 localZ = 14 - Math.Abs((z + 1) % 15);
                             }
 
-                            this.localXDebug = localX;
-                            this.localZDebug = localZ;
-                            
                             int localIndex = localZ * 16 * 256 + y * 16 + localX;
 
-                            string str = $"localZ: {localZ}, localX: {localX}, localY: {y}, localIndex: {localIndex} ===== on coord: {coordZ}, {coordX}";
-
-                            VoxelOperation voxelOperation = new VoxelOperation(
-                                coord,
-                                localIndex,
-                                10
-                                );
-                            
-                            indexsAndChunksArray.Add(voxelOperation);
+                            AddOp(coord, localIndex, indexsAndChunksArray);
                             
                             // ===================================================================
                             // if x == 15, then localX will be 0, thus ignoring index 15
@@ -103,48 +92,33 @@ public class BrushSystem
                             int2 edgeCoord;
                             int edgeLocalIndex;
 
-                            int xFix = 15;
-                            int zFIx = 15;
-
-                            int xCond = 0;
-                            int zCond = 0;
-
                             // check edge
-                            if (localX == xCond && localZ == zCond)
+                            if (localX == 0 && localZ == 0)
                             {
-                                Debug.Log("edge X + Z");
-
                                 edgeCoord = new int2(coord.x - 1, coord.y - 1);
-                                
-                                edgeLocalIndex = zFIx * 16 * 256 + y * 16 + xFix;
-                                
-                            } else if (localX == xCond)
-                            {
-                                Debug.Log("edge X");
+                                edgeLocalIndex = 15 * 16 * 256 + y * 16 + 15 ;
+                                AddOp(edgeCoord, edgeLocalIndex, indexsAndChunksArray);
 
                                 edgeCoord = new int2(coord.x - 1, coord.y);
-                                edgeLocalIndex = localZ * 16 * 256 + y * 16 + xFix;
+                                edgeLocalIndex = localZ * 16 * 256 + y * 16 + 15 ;
+                                AddOp(edgeCoord, edgeLocalIndex, indexsAndChunksArray);
                                 
-                            }
-                            else if (localZ == zCond)
-                            {
-                                Debug.Log("edge Z");
-
                                 edgeCoord = new int2(coord.x, coord.y - 1);
-                                edgeLocalIndex = zFIx * 16 * 256 + y * 16 + localX;
-                            }
-                            else
+                                edgeLocalIndex = 15 * 16 * 256 + y * 16 + localX;
+                                AddOp(edgeCoord, edgeLocalIndex, indexsAndChunksArray);
+                            } 
+                            else if (localX == 0 )
                             {
-                                continue;
+                                edgeCoord = new int2(coord.x - 1, coord.y);
+                                edgeLocalIndex = localZ * 16 * 256 + y * 16 + 15 ;
+                                AddOp(edgeCoord, edgeLocalIndex, indexsAndChunksArray);
                             }
-                            
-                            VoxelOperation edgeVoxelOperation = new VoxelOperation(
-                                    edgeCoord,
-                                    edgeLocalIndex,
-                                    10
-                                    );
-                            
-                            indexsAndChunksArray.Add(edgeVoxelOperation);
+                            else if (localZ == 0 )
+                            {
+                                edgeCoord = new int2(coord.x, coord.y - 1);
+                                edgeLocalIndex = 15 * 16 * 256 + y * 16 + localX;
+                                AddOp(edgeCoord, edgeLocalIndex, indexsAndChunksArray);
+                            }
                         }
                     }
                 }
@@ -163,5 +137,16 @@ public class BrushSystem
         
         // update data for each chunk
         // call compute shader to triangulate for each chunk
+    }
+
+    private static void AddOp(int2 edgeCoord, int edgeLocalIndex, List<VoxelOperation> indexsAndChunksArray)
+    {
+        VoxelOperation edgeVoxelOperation = new VoxelOperation(
+            edgeCoord,
+            edgeLocalIndex,
+            10
+        );
+
+        indexsAndChunksArray.Add(edgeVoxelOperation);
     }
 }
