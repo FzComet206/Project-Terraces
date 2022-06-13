@@ -73,12 +73,12 @@ public class BrushSystem
                             // invert negative coords
                             if (x < 0)
                             {
-                                localX = 15 - Math.Abs(localX);
+                                localX = 14 - Math.Abs((x + 1) % 15);
                             }
 
                             if (z < 0)
                             {
-                                localZ = 15 - Math.Abs(localZ);
+                                localZ = 14 - Math.Abs((z + 1) % 15);
                             }
 
                             this.localXDebug = localX;
@@ -109,15 +109,12 @@ public class BrushSystem
                             int xCond = 0;
                             int zCond = 0;
 
-                            int xCoordFix = -1;
-                            int zCoordFix = -1;
-                            
                             // check edge
                             if (localX == xCond && localZ == zCond)
                             {
                                 Debug.Log("edge X + Z");
 
-                                edgeCoord = new int2(coord.x + xCoordFix, coord.y + zCoordFix);
+                                edgeCoord = new int2(coord.x - 1, coord.y - 1);
                                 
                                 edgeLocalIndex = zFIx * 16 * 256 + y * 16 + xFix;
                                 
@@ -125,7 +122,7 @@ public class BrushSystem
                             {
                                 Debug.Log("edge X");
 
-                                edgeCoord = new int2(coord.x + xCoordFix, coord.y);
+                                edgeCoord = new int2(coord.x - 1, coord.y);
                                 edgeLocalIndex = localZ * 16 * 256 + y * 16 + xFix;
                                 
                             }
@@ -133,7 +130,7 @@ public class BrushSystem
                             {
                                 Debug.Log("edge Z");
 
-                                edgeCoord = new int2(coord.x, coord.y + zCoordFix);
+                                edgeCoord = new int2(coord.x, coord.y - 1);
                                 edgeLocalIndex = zFIx * 16 * 256 + y * 16 + localX;
                             }
                             else
