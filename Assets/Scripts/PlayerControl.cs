@@ -85,7 +85,7 @@ public class PlayerControl : MonoBehaviour
         Ray cursorRay = cam.ScreenPointToRay(screenPoint);
         RaycastHit hit = new RaycastHit();
         Physics.Raycast(cursorRay, out hit, 300f);
-        cursorPosition = hit.point + Vector3.ClampMagnitude(hit.normal, 0.3f);
+        cursorPosition = hit.point;
         
         // determine is modifying
         float m = modify.ReadValue<float>();
@@ -139,34 +139,52 @@ public class PlayerControl : MonoBehaviour
 
     private void ProcessOps(bool add)
     {
-        List<BrushSystem.VoxelOperation> ops = worldManager.brushSystem.EvaluateBrush(cursorPosition);
+        List<VoxelOperation> ops = worldManager.brushSystem.EvaluateBrush(cursorPosition);
         HashSet<int2> coords = new HashSet<int2>();
         for (int i = 0; i < ops.Count; i++)
         {
-            int2 coord = ops[i].coord;
+            VoxelOperation voxelOperation = ops[i];
+            
+            int2 coord = voxelOperation.coord;
             if (!coords.Contains(coord))
             {
                 coords.Add(coord);
             }
 
-            int localIndex = ops[i].localIndex;
-            int op = ops[i].densityOperation;
+            int localIndex = voxelOperation.localIndex;
+            int op = voxelOperation.densityOperation;
+            OperationType opType = voxelOperation.opType;
+            
+            (_, Chunk chunk) = worldManager.chunkSystem.chunksDict[coord];
 
-            try
+            switch (opType)
             {
-                (_, Chunk chunk) = worldManager.chunkSystem.chunksDict[coord];
-                if (add)
-                {
-                    chunk.data[localIndex] = op;
-                }
-                else
-                {
-                    chunk.data[localIndex] = -op;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
+                case OperationType.add:
+                    if (add)
+                    {
+                        chunk.data[localIndex] += op;
+                    }
+                    else
+                    {
+                        chunk.data[localIndex] -= op;
+                    }
+                    break;
+                case OperationType.set:
+                    
+                    if (add)
+                    {
+                        chunk.data[localIndex] = op;
+                    }
+                    else
+                    {
+                        chunk.data[localIndex] = -op;
+                    }
+                    break;
+                case OperationType.special:
+
+                    int diff = Math.Abs(Math.Clamp(chunk.data[localIndex], -32, 31));
+                    chunk.data[localIndex] -= diff;
+                    break;
             }
         }
 
@@ -186,16 +204,6 @@ public class PlayerControl : MonoBehaviour
             mc.sharedMesh = null;
             mc.sharedMesh = mf.sharedMesh;
         }
-    }
-
-    IEnumerator TestCoord(GameObject go)
-    {
-        Vector3 b = go.transform.position;
-        Vector3 p = go.transform.position;
-        p.y += 5;
-        go.transform.position = p;
-        yield return new WaitForSecondsRealtime(0.1f);
-        go.transform.position = b;
     }
 
     IEnumerator SetModTimer()

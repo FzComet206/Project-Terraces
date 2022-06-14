@@ -80,34 +80,6 @@ public class Chunk
         this.coordZ = coordZ;
     }
 
-    private Chunk posX;
-    public Chunk PosX
-    {
-        get => posX;
-        set => posX = value;
-    }
-    
-    private Chunk negX;
-    public Chunk NegX
-    {
-        get => negX;
-        set => negX = value;
-    }
-    
-    private Chunk posZ;
-    public Chunk PosZ
-    {
-        get => posZ;
-        set => posZ = value;
-    }
-    
-    private Chunk negZ;
-    public Chunk NegZ
-    {
-        get => negZ;
-        set => negZ = value;
-    }
-
     private bool active;
     public bool Active
     {
