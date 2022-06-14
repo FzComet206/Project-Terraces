@@ -44,7 +44,6 @@ public class NoiseSystem
 
         pointsCompute.SetBuffer(0, "points", points);
         pointsCompute.Dispatch(0, 4, 64, 4);
-        Console.WriteLine("ye");
         points.GetData(pointsArray);
         
         return pointsArray;

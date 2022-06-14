@@ -333,8 +333,9 @@ MonoBehaviour:
       m_Flags: 0
     m_Flags: 0
   cruiseSpeed: 3000
-  rotateSpeed: 30
+  rotateSpeed: 5
   cursorHead: {fileID: 1925858161143433088}
+  updating: 0
 --- !u!1 &1925858161143433088
 GameObject:
   m_ObjectHideFlags: 0

@@ -44,7 +44,7 @@ public class WorldManager : MonoBehaviour
 
     private void Start()
     {
-        Instantiate(playerRig, Vector3.zero, Quaternion.Euler(Vector3.zero));
+        Instantiate(playerRig, new Vector3(0, 200, 0), Quaternion.Euler(Vector3.zero));
         player = FindObjectOfType<PlayerControl>();
         player.ControllerInput = controllerInput;
         InitSystems();

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
@@ -8,8 +7,6 @@ using UnityEngine.SocialPlatforms;
 public class BrushSystem
 {
     // debug parameters
-    public int localXDebug;
-    public int localZDebug;
     public enum BrushType
     {
         SmallSquare
@@ -47,11 +44,11 @@ public class BrushSystem
                 // check if outside of bound
                 // find local coord of index to the chunk
                 // duplicate coord if necessary
-                for (int i = -3; i < 4; i++)
+                for (int i = -2; i < 3; i++)
                 {
-                    for (int j = -3; j < 4; j++)
+                    for (int j = -2; j < 3; j++)
                     {
-                        for (int k = -3; k < 4; k++)
+                        for (int k = -2; k < 3; k++)
                         {
                             int coordX = Mathf.FloorToInt((position.x + i) / 15f);
                             int coordZ = Mathf.FloorToInt((position.z + k) / 15f);

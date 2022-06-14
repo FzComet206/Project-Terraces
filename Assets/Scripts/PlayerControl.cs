@@ -55,7 +55,8 @@ public class PlayerControl : MonoBehaviour
         StartCoroutine(BrushCoroutine());
     }
 
-    private void FixedUpdate()
+
+    void FixedUpdate()
     {
         // cruise
         Vector3 c = cruise.ReadValue<Vector3>();
@@ -66,11 +67,6 @@ public class PlayerControl : MonoBehaviour
         Vector3 vel = (forward + up + right).normalized * (cruiseSpeed * Time.fixedDeltaTime);
         
         rb.velocity = vel;
-        
-    }
-
-    void Update()
-    {
         // rotate
         Vector2 delta = mouse.ReadValue<Vector2>();
         float rx = delta.y * rotateSpeed * Time.fixedDeltaTime;
@@ -137,7 +133,7 @@ public class PlayerControl : MonoBehaviour
                     updating = false;
                 }
             }
-            yield return new WaitForSecondsRealtime(0.02f);
+            yield return new WaitForSecondsRealtime(0.05f);
         }
     }
 

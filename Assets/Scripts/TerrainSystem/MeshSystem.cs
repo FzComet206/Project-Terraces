@@ -20,7 +20,7 @@ public class MeshSystem
         int numPoints = 16 * 16 * 256;
         pointsBuffer = new ComputeBuffer(numPoints, sizeof(int));
         triangleBuffer = new ComputeBuffer(numPoints * 5, sizeof (float) * 3 * 3, ComputeBufferType.Append);
-        triangleCountBuffer = new ComputeBuffer(1, sizeof(int));
+        triangleCountBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.Raw);
     }
 
     public (Vector3[], int[]) GenerateMeshData(int[] points)
@@ -39,8 +39,6 @@ public class MeshSystem
         int count = triCount[0];
 
         Types.Tri[] triangleArray = new Types.Tri[count];
-        Console.WriteLine("ye");
-        Debug.Log("ye");
         triangleBuffer.GetData(triangleArray, 0, 0, count);
 
         Vector3[] verticies = new Vector3[count * 3];
