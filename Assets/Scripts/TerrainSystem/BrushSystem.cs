@@ -35,9 +35,8 @@ public class BrushSystem
 {
     // debug parameters
 
-    public int brushSize = 50;
-    public int brushMultiplier = 1;
-    
+    public int brushSize = 5;
+    public int brushMultiplier = 5;
 
     public BrushShape brushShape;
     public OperationType opType;
@@ -163,7 +162,12 @@ public class BrushSystem
                 float mag = (curr - center).magnitude;
                 float value = brushSize - mag;
 
-                return (int) Mathf.Clamp(value, 0, brushSize) * brushMultiplier;
+                if (value < 0)
+                {
+                    value = 0;
+                }
+                
+                return (int)value * brushMultiplier;
                 
             default:
                 return -1;

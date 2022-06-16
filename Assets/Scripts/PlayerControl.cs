@@ -26,6 +26,8 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private InputAction mouse;
     
     [SerializeField] private InputAction quit;
+    
+    public bool deleted = false;
 
     [SerializeField] float cruiseSpeed;
     [SerializeField] float rotateSpeed;
@@ -109,6 +111,8 @@ public class PlayerControl : MonoBehaviour
 
         if (quit.ReadValue<float>() > 0f)
         {
+            Debug.Log("application quitting");
+            // save data then quit
             Application.Quit();
         }
     }
@@ -154,8 +158,16 @@ public class PlayerControl : MonoBehaviour
             int localIndex = voxelOperation.localIndex;
             int op = voxelOperation.densityOperation;
             OperationType opType = voxelOperation.opType;
-            
-            (_, Chunk chunk) = worldManager.chunkSystem.chunksDict[coord];
+
+            ChunkMemory chunkMemory;
+            bool contains = worldManager.chunkSystem.chunksDict.TryGetValue(coord, out chunkMemory);
+
+            if (!contains)
+            {
+                continue;
+            }
+
+            Chunk chunk = chunkMemory.chunk;
 
             switch (opType)
             {
@@ -190,7 +202,17 @@ public class PlayerControl : MonoBehaviour
 
         foreach (var coord in coords)
         {
-            (GameObject chunkObject, Chunk chunk) = worldManager.chunkSystem.chunksDict[coord];
+            ChunkMemory chunkMemory;
+            bool contains = worldManager.chunkSystem.chunksDict.TryGetValue(coord, out chunkMemory);
+            
+            if (!contains)
+            {
+                continue;
+            }
+
+            GameObject chunkObject = chunkMemory.gameObject;
+            Chunk chunk = chunkMemory.chunk;
+            
             (Vector3[] verts, int[] tris) = worldManager.meshSystem.GenerateMeshData(chunk.data);
             MeshFilter mf = chunkObject.GetComponent<MeshFilter>();
             MeshCollider mc = chunkObject.GetComponent<MeshCollider>();

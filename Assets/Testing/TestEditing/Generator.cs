@@ -242,7 +242,7 @@ public class Generator : MonoBehaviour
     {
         pointsBuffer = new ComputeBuffer(numPoints, sizeof(float));
         triangleBuffer = new ComputeBuffer(numPoints * 5, sizeof (float) * 3 * 3, ComputeBufferType.Append);
-        triCountBuffer = new ComputeBuffer(1, sizeof(int));
+        triCountBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.Raw);
     }
 
     private void OnDestroy()

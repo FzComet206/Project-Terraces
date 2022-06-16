@@ -51,6 +51,7 @@ public static class DataTypes
     {
         public int renderDistance;
         public int chunksPerFrame;
+        public int maxChunksBeforeCull;
         public Material meshMaterial;
         public Transform meshParent;
     }
@@ -85,6 +86,13 @@ public class Chunk
     {
         get => active;
         set => active = value;
+    }
+    
+    private bool generated;
+    public bool Generated 
+    {
+        get => generated;
+        set => generated = value;
     }
     
     private bool water;

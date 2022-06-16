@@ -50,7 +50,7 @@ MonoBehaviour:
     lacunarity: 5
     gain: 0.14
     noiseWeight: 128
-    parameterX: 30
+    parameterX: 20
     parameterY: 0.6
     softFloorHeight: 70
     softFloorWeight: 2
@@ -66,8 +66,10 @@ MonoBehaviour:
   chunkInput:
     renderDistance: 12
     chunksPerFrame: 2
+    maxChunksBeforeCull: 2500
     meshMaterial: {fileID: 2100000, guid: 39cf2d8557fc74ce39c113b1f567b584, type: 2}
     meshParent: {fileID: 0}
   playerRig: {fileID: 1709310827449926998, guid: d8bec0aa4e1794609b5395fcd3c72d08, type: 3}
   pointsCompute: {fileID: 7200000, guid: 35ebdf0f5f6014df08e7b7e198db8bc3, type: 3}
   marchingCubes: {fileID: 7200000, guid: 24ee5eaf14e624ba5928a710ff884ba4, type: 3}
+  coroutinePause: 0

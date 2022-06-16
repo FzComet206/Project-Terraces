@@ -3,6 +3,17 @@ using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 
+public class ChunkMemory
+{
+    public GameObject gameObject;
+    public Chunk chunk;
+
+    public ChunkMemory(GameObject obj, Chunk chk)
+    {
+        gameObject = obj;
+        chunk = chk;
+    }
+}
 public class ChunkSystem
 {
     private int renderDistance;
@@ -12,13 +23,13 @@ public class ChunkSystem
         set => renderDistance = value;
     }
 
-    public Dictionary<int2, (GameObject, Chunk)> chunksDict;
+    public Dictionary<int2, ChunkMemory> chunksDict;
     public HashSet<int2> inQueue;
     public HashSet<int2> generated;
     public Queue<Chunk> queue;
     public ChunkSystem()
     {
-        this.chunksDict = new Dictionary<int2, (GameObject, Chunk)>();
+        this.chunksDict = new Dictionary<int2, ChunkMemory>(); 
         this.inQueue = new HashSet<int2>();
         this.generated = new HashSet<int2>(); 
         this.queue = new Queue<Chunk>();
@@ -52,9 +63,26 @@ public class ChunkSystem
         }
     }
 
-    public Chunk GetCull(Vector3 position)
+    public int2 GetCull(Vector3 position)
     {
         // find the farthest chunk in generated and return it
-        throw new NotImplementedException();
+        int x = (int)(position.x / 15f);
+        int y = (int)(position.z / 15f);
+
+        int2 farthest = new int2(0, 0);
+        float distanceMax = 0;
+        foreach (var key in chunksDict.Keys)
+        {
+            float dx = key.x - x;
+            float dy = key.y - y;
+
+            float distance = Mathf.Sqrt(dx * dx + dy * dy);
+            if (distance > distanceMax)
+            {
+                distanceMax = distance;
+                farthest = key;
+            }
+        }
+        return farthest;
     }
 }

@@ -32,6 +32,8 @@ public class WorldManager : MonoBehaviour
     public BrushSystem brushSystem;
     public BiomeSystem biomeSystem;
     public StorageSystem storageSystem;
+
+    public bool coroutinePause;
     
     // Utils
     private Text fps;
@@ -94,23 +96,64 @@ public class WorldManager : MonoBehaviour
         yield return new WaitForFixedUpdate();
         StartCoroutine(ChunkGenCoroutine());
         yield return new WaitForFixedUpdate();
+        StartCoroutine(WorldCullCoroutine());
     }
 
-    private IEnumerator WorldGenCoroutine()
+    public IEnumerator WorldGenCoroutine()
     {
         // check nearby chunks
         while (true)
         {
+            if (coroutinePause)
+            {
+                yield break;
+            }
+            
             chunkSystem.UpdateNearbyChunks(player.transform.position);
             yield return new WaitForSecondsRealtime(0.5f);
         }
     }
     
-    private IEnumerator ChunkGenCoroutine()
+    public IEnumerator WorldCullCoroutine()
+    {
+        // delete GetCull
+        while (true)
+        {
+            if (coroutinePause)
+            {
+                yield break;
+            }
+            
+            if (chunkSystem.generated.Count > chunkInput.maxChunksBeforeCull)
+            {
+                int2 coord = chunkSystem.GetCull(player.transform.position);
+                ChunkMemory chunkMemory = chunkSystem.chunksDict[coord];
+                
+                chunkSystem.chunksDict.Remove(coord);
+                chunkSystem.generated.Remove(coord);
+                
+                chunkMemory.chunk.Active = false;
+                chunkMemory.chunk.data = null;
+
+                Destroy(chunkMemory.gameObject.GetComponent<MeshFilter>().sharedMesh);
+                Destroy(chunkMemory.gameObject.GetComponent<MeshCollider>().sharedMesh);
+                Destroy(chunkMemory.gameObject);
+            }
+            
+            yield return new WaitForEndOfFrame();
+        }
+    }
+    
+    public IEnumerator ChunkGenCoroutine()
     {
         // generate chunks
         while (true)
         {
+            if (coroutinePause)
+            {
+                yield break;
+            }
+            
             if (!player.updating)
             {
                 int c = chunkSystem.queue.Count;
@@ -133,47 +176,44 @@ public class WorldManager : MonoBehaviour
         }
     }
 
-    private IEnumerator WorldCullCoroutine()
-    {
-        // delete GetCull
-        throw new NotImplementedException();
-    }
-    
     private IEnumerator FluidCoroutine()
     {
         throw new NotImplementedException();
     }
     
+    // ReSharper disable Unity.PerformanceAnalysis
     private void GetNewChunk()
     {
         Chunk chunk= chunkSystem.queue.Dequeue();
         int[] points = noiseSystem.DispatchPointBuffer(chunk);
         (Vector3[] verts, int[] tris) = meshSystem.GenerateMeshData(points);
 
-        // data array
         chunk.data = points;
+        chunk.Active = true;
+        chunk.Generated = true;
 
         Mesh mesh = new Mesh();
         mesh.SetVertices(verts);
         mesh.SetTriangles(tris, 0);
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
-
-        GameObject chunkObj= new GameObject("chunk " + chunk.coordX + " " + chunk.coordZ,
+        
+        GameObject chunkObj = new GameObject("chunk " + chunk.coordX + " " + chunk.coordZ,
             typeof(MeshFilter), typeof(MeshCollider), typeof(MeshRenderer));
         chunkObj.transform.parent = chunkInput.meshParent;
-        chunkObj.transform.position = chunkObj.transform.position + new Vector3(chunk.startPositionX, 0, chunk.startPositionZ);
+        chunkObj.transform.position = new Vector3(chunk.startPositionX, 0, chunk.startPositionZ);
 
         MeshFilter meshFilter = chunkObj.GetComponent<MeshFilter>();
         MeshCollider meshCollider = chunkObj.GetComponent<MeshCollider>();
         meshFilter.sharedMesh = mesh;
         meshCollider.sharedMesh = mesh;
-        chunkObj.GetComponent<MeshRenderer>().material = chunkInput.meshMaterial;
+        chunkObj.GetComponent<MeshRenderer>().sharedMaterial = chunkInput.meshMaterial;
 
+        // update ds
         int2 coord = new int2(chunk.coordX, chunk.coordZ);
         chunkSystem.generated.Add(coord);
         chunkSystem.inQueue.Remove(coord);
-        chunkSystem.chunksDict[coord] = (chunkObj, chunk);
+        chunkSystem.chunksDict[coord] = new ChunkMemory(chunkObj, chunk);
     }
     
     IEnumerator DisplayFPS()
