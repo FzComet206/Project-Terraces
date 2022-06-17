@@ -36,7 +36,7 @@ public class BrushSystem
     // debug parameters
 
     public int brushSize = 5;
-    public int brushMultiplier = 5;
+    public int brushMultiplier = 2;
 
     public BrushShape brushShape;
     public OperationType opType;
@@ -45,7 +45,7 @@ public class BrushSystem
     {
         // init brush system
         brushShape = BrushShape.Sphere;
-        opType = OperationType.add;
+        opType = OperationType.set;
 
         // when the brush type changes, set brush shape, op type, and multiplier
     }
@@ -167,7 +167,7 @@ public class BrushSystem
                     value = 0;
                 }
                 
-                return (int)value * brushMultiplier;
+                return (int) value * brushMultiplier;
                 
             default:
                 return -1;

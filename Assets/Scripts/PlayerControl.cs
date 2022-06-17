@@ -57,31 +57,11 @@ public class PlayerControl : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         
         StartCoroutine(BrushCoroutine());
+        StartCoroutine(MoveAndRotate());
     }
-
 
     void FixedUpdate()
     {
-        // cruise
-        Vector3 c = cruise.ReadValue<Vector3>();
-        Vector3 forward = c.z * transform.forward;
-        Vector3 right = c.x * transform.right;
-        Vector3 up = c.y * Vector3.up;
-
-        Vector3 vel = (forward + up + right).normalized * (cruiseSpeed * Time.fixedDeltaTime);
-        
-        rb.velocity = vel;
-        // rotate
-        Vector2 delta = mouse.ReadValue<Vector2>();
-        float rx = delta.y * rotateSpeed * Time.fixedDeltaTime;
-        float ry = delta.x * rotateSpeed * Time.fixedDeltaTime;
-
-        xRotation -= rx;
-        xRotation = Mathf.Clamp(xRotation, -90, 90);
-        yRotation += ry;
-
-        transform.rotation = Quaternion.Euler(xRotation, yRotation, 0f).normalized;
-        
         // raycast to point
         float midX = Screen.width / 2f;
         float midY = Screen.height / 2f;
@@ -119,6 +99,30 @@ public class PlayerControl : MonoBehaviour
         }
     }
 
+    IEnumerator MoveAndRotate()
+    {
+        while (true)
+        {
+            // movement
+            Vector3 c = cruise.ReadValue<Vector3>();
+            Vector3 forward = c.z * transform.forward;
+            Vector3 right = c.x * transform.right;
+            Vector3 up = c.y * Vector3.up;
+            Vector3 vel = (forward + up + right).normalized * (cruiseSpeed * Time.fixedDeltaTime);
+            rb.velocity = vel;
+            
+            // rotation
+            Vector2 delta = mouse.ReadValue<Vector2>();
+            float rx = delta.y * rotateSpeed * Time.deltaTime;
+            float ry = delta.x * rotateSpeed * Time.deltaTime;
+            xRotation -= rx;
+            xRotation = Mathf.Clamp(xRotation, -90, 90);
+            yRotation += ry;
+            transform.rotation = Quaternion.Euler(xRotation, yRotation, 0f).normalized;
+            yield return new WaitForFixedUpdate();
+        }
+    }
+
     IEnumerator BrushCoroutine()
     {
         while (true)
@@ -139,7 +143,7 @@ public class PlayerControl : MonoBehaviour
                     updating = false;
                 }
             }
-            yield return new WaitForSecondsRealtime(0.05f);
+            yield return new WaitForSecondsRealtime(0.02f);
         }
     }
 
@@ -187,11 +191,17 @@ public class PlayerControl : MonoBehaviour
                     
                     if (add)
                     {
-                        chunk.data[localIndex] = op;
+                        if (op > 0)
+                        {
+                            chunk.data[localIndex] = op;
+                        }
                     }
                     else
                     {
-                        chunk.data[localIndex] = -op;
+                        if (op > 0)
+                        {
+                            chunk.data[localIndex] = -op;
+                        }
                     }
                     break;
                 case OperationType.special:
