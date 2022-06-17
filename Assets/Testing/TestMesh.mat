@@ -15,14 +15,15 @@ MonoBehaviour:
   version: 5
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: TestMesh
   m_Shader: {fileID: -6465566751694194690, guid: 99693237554604628b18e9c00e06a6b5, type: 3}
-  m_ShaderKeywords: 
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -90,7 +91,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - Vector1_5dd3804041f6499791127d88f0969247: 50
+    - Vector1_5dd3804041f6499791127d88f0969247: 35
     - Vector1_cf48f7475f924403889840cbf65f3e91: 120
     - _AlphaClip: 0
     - _Blend: 0

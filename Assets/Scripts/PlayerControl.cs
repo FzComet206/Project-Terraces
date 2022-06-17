@@ -60,7 +60,7 @@ public class PlayerControl : MonoBehaviour
         StartCoroutine(MoveAndRotate());
     }
 
-    void FixedUpdate()
+    void Update()
     {
         // raycast to point
         float midX = Screen.width / 2f;
@@ -69,7 +69,7 @@ public class PlayerControl : MonoBehaviour
         Ray cursorRay = cam.ScreenPointToRay(screenPoint);
         RaycastHit hit = new RaycastHit();
         Physics.Raycast(cursorRay, out hit, 300f);
-        cursorPosition = hit.point;
+        cursorPosition = hit.point + Vector3.ClampMagnitude(hit.normal, 0.2f);
         
         // determine is modifying
         float m = modify.ReadValue<float>();
