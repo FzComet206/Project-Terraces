@@ -51,9 +51,11 @@ public class PlayerControl : MonoBehaviour
     {
         worldManager = FindObjectOfType<WorldManager>();
         rb = gameObject.GetComponent<Rigidbody>();
-        cam = Camera.main;
+        cam = GetComponentInChildren<Camera>();
         generator = FindObjectOfType<Generator>();
+        
         Cursor.lockState = CursorLockMode.Locked;
+        
         StartCoroutine(BrushCoroutine());
     }
 

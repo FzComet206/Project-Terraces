@@ -41,7 +41,7 @@ public class WorldManager : MonoBehaviour
     private void Awake()
     {
         Application.targetFrameRate = 144;
-        Screen.SetResolution(1920, 1080, false);
+        Screen.SetResolution(2560, 1440, true);
     }
 
     private void Start()
