@@ -92,7 +92,7 @@ void GenerateDensity (uint3 id : SV_DispatchThreadID)
     value = ceil(value * 16);
     int final = (int) max(-32, min(31, value ));
 
-    if (id.y < 40 && final > 0) {
+    if (id.y < 45 && final > 0) {
         fluids[IndexFromCoord(id)] = 1;
     }
     // right here is the value output that should be stored

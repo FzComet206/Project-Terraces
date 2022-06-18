@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public class WorldManager : MonoBehaviour
@@ -178,6 +179,7 @@ public class WorldManager : MonoBehaviour
 
     private IEnumerator FluidCoroutine()
     {
+        // update fluid mesh per 0.5 secs
         throw new NotImplementedException();
     }
     
@@ -215,23 +217,21 @@ public class WorldManager : MonoBehaviour
         chunkObj.GetComponent<MeshRenderer>().sharedMaterial = chunkInput.meshMaterial;
         
         // fluid generation
-        
-        // bug many verts have nan and -infinity values
         Mesh fluidMesh = new Mesh();
         fluidMesh.SetVertices(vertsfluid);
         fluidMesh.SetTriangles(trisfluid, 0);
         fluidMesh.RecalculateNormals();
-        fluidMesh.RecalculateBounds();
-        
+
         GameObject fluidObj = new GameObject("fluidChunk " + chunk.coordX + " " + chunk.coordZ,
-            typeof(MeshFilter), typeof(MeshCollider), typeof(MeshRenderer));
+            typeof(MeshFilter), typeof(MeshRenderer));
         fluidObj.transform.parent = chunkInput.meshParent;
         fluidObj.transform.position = new Vector3(chunk.startPositionX, 0, chunk.startPositionZ);
         
         MeshFilter meshFilterFluid = fluidObj.GetComponent<MeshFilter>();
         meshFilterFluid.sharedMesh = fluidMesh;
         fluidObj.GetComponent<MeshRenderer>().sharedMaterial = chunkInput.fluidMaterial;
-
+        Debug.Log("idk");
+        
         // update ds
         int2 coord = new int2(chunk.coordX, chunk.coordZ);
         chunkSystem.generated.Add(coord);
