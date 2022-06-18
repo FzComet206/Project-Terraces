@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -24,6 +25,7 @@ public class WorldManager : MonoBehaviour
     // compute shaders
     [SerializeField] private ComputeShader pointsCompute;
     [SerializeField] private ComputeShader marchingCubes;
+    [SerializeField] private ComputeShader fluidSim;
     
     // systems
     public ChunkSystem chunkSystem;
@@ -33,8 +35,12 @@ public class WorldManager : MonoBehaviour
     public BiomeSystem biomeSystem;
     public StorageSystem storageSystem;
 
+    // properties
     public bool coroutinePause;
     
+    // runtimes
+    public Queue<int2> simulationQueue;
+
     // Utils
     private Text fps;
 
@@ -46,20 +52,17 @@ public class WorldManager : MonoBehaviour
 
     private void Start()
     {
+        // todo make instantiate after init chuks are generated
         Instantiate(playerRig, new Vector3(0, 200, 0), Quaternion.Euler(Vector3.zero));
+        
         player = FindObjectOfType<PlayerControl>();
         player.ControllerInput = controllerInput;
+        
         InitSystems();
         StartWorld();
         
         fps = FindObjectOfType<Text>();
         StartCoroutine(DisplayFPS());
-
-        // init chunks array and properties
-        // update player position to chunks
-        // chunk output chunk indexes and parameters
-        // noise and mesh system triangulation
-        // start chunks coroutines triangulation 
     }
 
     private void Update()
@@ -71,16 +74,17 @@ public class WorldManager : MonoBehaviour
     private void InitSystems()
     {
         chunkSystem = new ChunkSystem();
-        
         noiseSystem = new NoiseSystem(noiseInput);
         meshSystem = new MeshSystem();
-        
         brushSystem = new BrushSystem();
         biomeSystem = new BiomeSystem();
         storageSystem = new StorageSystem();
 
         noiseSystem.PointsCompute = pointsCompute;
         meshSystem.MarchingCubes = marchingCubes;
+        meshSystem.FluidSim = fluidSim;
+
+        simulationQueue = new Queue<int2>();
     }
 
     public void StartWorld()
@@ -181,19 +185,27 @@ public class WorldManager : MonoBehaviour
 
     private IEnumerator FluidCoroutine()
     {
-        // simulate fluid mesh for nearby 25 chunks, every 1 seconds
-        // have a queue so only 2 shader is dispatched per frame, use coroutine
+        // simulate fluid mesh for nearby 25 chunks, every 0.5 seconds
         // when chunk is removed from queue and player is not with radius, dont simulate
-        
-        // is the queue is not empty when next check start, empty the previous queue
-        
-        throw new NotImplementedException();
+    
+        while (true)
+        {
+            chunkSystem.GetNearbyChunks(player.transform.position, ref simulationQueue);
+            while (simulationQueue.Count > 0)
+            {
+                int2 coord = simulationQueue.Dequeue();
+                
+                yield return new WaitForEndOfFrame();
+            }
+
+            yield return new WaitForSeconds(0.5f);
+        }
     }
     
     // ReSharper disable Unity.PerformanceAnalysis
     private void GetNewChunk()
     {
-        Chunk chunk= chunkSystem.queue.Dequeue();
+        Chunk chunk = chunkSystem.queue.Dequeue();
         int[] points;
         int[] fluids;
         (points, fluids) = noiseSystem.DispatchPointBuffer(chunk);

@@ -1,5 +1,5 @@
 #pragma kernel GenerateDensity 
-#include "Noise.compute"
+#include "helpers/Noise.compute"
 
 RWStructuredBuffer<int> points;
 RWStructuredBuffer<int> fluids;

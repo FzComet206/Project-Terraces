@@ -1,7 +1,7 @@
 ﻿#pragma kernel March
 #pragma kernel Fluid
 
-#include "MarchTables.compute"
+#include "helpers/MarchTables.compute"
 
 struct Triangle {
     float3 vertexC;

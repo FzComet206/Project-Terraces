@@ -546,6 +546,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
+      propertyPath: fluidSim
+      value: 
+      objectReference: {fileID: 7200000, guid: a6d7912892c1d8848b34c87b5c297f3d, type: 3}
+    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
       propertyPath: waterVolume
       value: 
       objectReference: {fileID: 11400000, guid: 38ef6d84744a78c4cbb7d6ab958cb42b, type: 2}

@@ -65,6 +65,21 @@ public class ChunkSystem
         }
     }
 
+    public void GetNearbyChunks(Vector3 position, ref Queue<int2> fluidUpdateQueue)
+    {
+        for (int i = -2; i <= 2; i++)
+        {
+            for (int j = - 2; j <= 2; j++)
+            {
+                // round to actual coordinate
+                int x = (int) (position.x / 15f) + i;
+                int z = (int) (position.z / 15f) + j;
+                
+                fluidUpdateQueue.Enqueue(new int2(x, z));
+            }
+        }
+    }
+
     public int2 GetCull(Vector3 position)
     {
         // find the farthest chunk in generated and return it

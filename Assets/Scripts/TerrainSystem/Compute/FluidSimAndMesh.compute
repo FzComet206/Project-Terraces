@@ -1,0 +1,21 @@
+#pragma kernel FluidSim 
+
+StructuredBuffer<int> points;
+RWStructuredBuffer<int> fluids;
+RWStructuredBuffer<int> counter;
+
+const float isoLevel = 0;
+float3 interpolateVertsFluid(float4 v2, float4 v1) {
+    float t = (isoLevel - v1.w) / (v2.w - v1.w);
+    t = saturate(t);
+    return v1.xyz + t * (v2.xyz-v1.xyz);
+}
+
+int indexFromCoord(int x, int y, int z) {
+    return z * 16 * 256 + y * 16 + x;
+}
+
+[numthreads(4,4,4)]
+void FluidSim(uint3 id : SV_DispatchThreadID)
+{
+}

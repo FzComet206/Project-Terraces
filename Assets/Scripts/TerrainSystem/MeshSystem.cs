@@ -1,14 +1,14 @@
 using System;
-using System.Drawing;
-using System.Runtime.ConstrainedExecution;
 using UnityEngine;
 
 public class MeshSystem
 {
     private ComputeBuffer pointsBuffer;
-    private ComputeBuffer fluidBuffer;
     private ComputeBuffer triangleBuffer;
     private ComputeBuffer triangleCountBuffer;
+    
+    private ComputeBuffer fluidBuffer;
+    private ComputeBuffer simulationCounter;
     
     private ComputeShader marchingCubes;
     public ComputeShader MarchingCubes
@@ -16,13 +16,21 @@ public class MeshSystem
         set => marchingCubes = value;
     }
     
+    private ComputeShader fluidSim;
+    public ComputeShader FluidSim
+    {
+        set => fluidSim = value;
+    }
+
     public MeshSystem()
     {
         int numPoints = 16 * 16 * 256;
         pointsBuffer = new ComputeBuffer(numPoints, sizeof(int));
-        fluidBuffer = new ComputeBuffer(numPoints, sizeof(int));
         triangleBuffer = new ComputeBuffer(numPoints * 5, sizeof (float) * 3 * 3, ComputeBufferType.Append);
         triangleCountBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.Raw);
+        
+        fluidBuffer = new ComputeBuffer(numPoints, sizeof(int));
+        simulationCounter = new ComputeBuffer(1, sizeof(int), ComputeBufferType.Counter);
     }
 
     public (Vector3[], int[]) GenerateMeshData(int[] points)
@@ -97,21 +105,39 @@ public class MeshSystem
         return (verticies, triangles);
     }
 
-    public bool SimulateFluidChunks(int[] fluids, int[] points, out Vector3[] verts, out int[] tris)
+    public bool SimulateFluidChunks(ref int[] fluids, int[] points)
     {
         // get a count buffer, is the count is 0, return false. Buffers counts the number of change in simulation
+        simulationCounter.SetCounterValue(0);
         
-        // inside shader, simulate water mask for 1 iteration. vertical first, then 8 horizontal directions
+        int kernel = fluidSim.FindKernel("FluidSim");
+        pointsBuffer.SetData(points);
+        fluidBuffer.SetData(fluids);
+        marchingCubes.SetBuffer(kernel, "points", pointsBuffer);
+        marchingCubes.SetBuffer(kernel, "fluids", fluidBuffer);
+        marchingCubes.SetBuffer(kernel, "counter", simulationCounter);
+        marchingCubes.Dispatch(kernel, 4, 64, 4);
         
-        // return the new verts and tris, but only make mesh if count buffer is > 0;
+        // get count of the buffer
+        int[] _count = new int[1];
+        simulationCounter.GetData(_count);
+        int count = _count[0];
+
+        if (count == 0)
+        {
+            return false;
+        }
         
-        throw new NotImplementedException();
+        fluidBuffer.GetData(fluids);
+        return true;
     }
     public void Destroy()
     {
         pointsBuffer.Dispose();
         fluidBuffer.Dispose();
         triangleBuffer.Dispose();
+        
         triangleCountBuffer.Dispose();
+        simulationCounter.Dispose();
     }
 }
