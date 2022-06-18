@@ -5,12 +5,14 @@ using UnityEngine;
 
 public class ChunkMemory
 {
-    public GameObject gameObject;
+    public GameObject meshChunk;
+    public GameObject waterChunk;
     public Chunk chunk;
 
-    public ChunkMemory(GameObject obj, Chunk chk)
+    public ChunkMemory(GameObject meshChunk, GameObject waterChunk, Chunk chk)
     {
-        gameObject = obj;
+        this.meshChunk = meshChunk;
+        this.waterChunk= waterChunk;
         chunk = chk;
     }
 }

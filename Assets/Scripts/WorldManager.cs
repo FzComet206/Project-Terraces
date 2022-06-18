@@ -29,7 +29,6 @@ public class WorldManager : MonoBehaviour
     public ChunkSystem chunkSystem;
     public NoiseSystem noiseSystem;
     public MeshSystem meshSystem;
-    public FluidSystem fluidSystem;
     public BrushSystem brushSystem;
     public BiomeSystem biomeSystem;
     public StorageSystem storageSystem;
@@ -75,7 +74,6 @@ public class WorldManager : MonoBehaviour
         
         noiseSystem = new NoiseSystem(noiseInput);
         meshSystem = new MeshSystem();
-        fluidSystem = new FluidSystem();
         
         brushSystem = new BrushSystem();
         biomeSystem = new BiomeSystem();
@@ -125,6 +123,7 @@ public class WorldManager : MonoBehaviour
                 yield break;
             }
             
+            // todo have a pool of gameobjects, filters, and coliders for mesh and water
             if (chunkSystem.generated.Count > chunkInput.maxChunksBeforeCull)
             {
                 int2 coord = chunkSystem.GetCull(player.transform.position);
@@ -136,9 +135,12 @@ public class WorldManager : MonoBehaviour
                 chunkMemory.chunk.Active = false;
                 chunkMemory.chunk.data = null;
 
-                Destroy(chunkMemory.gameObject.GetComponent<MeshFilter>().sharedMesh);
-                Destroy(chunkMemory.gameObject.GetComponent<MeshCollider>().sharedMesh);
-                Destroy(chunkMemory.gameObject);
+                Destroy(chunkMemory.meshChunk.GetComponent<MeshFilter>().sharedMesh);
+                Destroy(chunkMemory.meshChunk.GetComponent<MeshCollider>().sharedMesh);
+                Destroy(chunkMemory.meshChunk);
+                
+                Destroy(chunkMemory.waterChunk.GetComponent<MeshFilter>().sharedMesh);
+                Destroy(chunkMemory.waterChunk);
             }
             
             yield return new WaitForEndOfFrame();
@@ -179,7 +181,12 @@ public class WorldManager : MonoBehaviour
 
     private IEnumerator FluidCoroutine()
     {
-        // update fluid mesh per 0.5 secs
+        // simulate fluid mesh for nearby 25 chunks, every 1 seconds
+        // have a queue so only 2 shader is dispatched per frame, use coroutine
+        // when chunk is removed from queue and player is not with radius, dont simulate
+        
+        // is the queue is not empty when next check start, empty the previous queue
+        
         throw new NotImplementedException();
     }
     
@@ -230,13 +237,12 @@ public class WorldManager : MonoBehaviour
         MeshFilter meshFilterFluid = fluidObj.GetComponent<MeshFilter>();
         meshFilterFluid.sharedMesh = fluidMesh;
         fluidObj.GetComponent<MeshRenderer>().sharedMaterial = chunkInput.fluidMaterial;
-        Debug.Log("idk");
         
         // update ds
         int2 coord = new int2(chunk.coordX, chunk.coordZ);
         chunkSystem.generated.Add(coord);
         chunkSystem.inQueue.Remove(coord);
-        chunkSystem.chunksDict[coord] = new ChunkMemory(chunkObj, chunk);
+        chunkSystem.chunksDict[coord] = new ChunkMemory(chunkObj, fluidObj, chunk);
     }
     
     IEnumerator DisplayFPS()

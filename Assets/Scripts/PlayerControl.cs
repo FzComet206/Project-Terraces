@@ -222,7 +222,7 @@ public class PlayerControl : MonoBehaviour
                 continue;
             }
 
-            GameObject chunkObject = chunkMemory.gameObject;
+            GameObject chunkObject = chunkMemory.meshChunk;
             Chunk chunk = chunkMemory.chunk;
             
             (Vector3[] verts, int[] tris) = worldManager.meshSystem.GenerateMeshData(chunk.data);

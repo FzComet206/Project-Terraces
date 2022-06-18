@@ -59,7 +59,7 @@ public class MeshSystem
         
         return (verticies, triangles);
     }
-
+    
     public (Vector3[], int[]) GenerateFluidData(int[] fluids, int[] points)
     {
         triangleBuffer.SetCounterValue(0);
@@ -95,6 +95,17 @@ public class MeshSystem
         }
         
         return (verticies, triangles);
+    }
+
+    public bool SimulateFluidChunks(int[] fluids, int[] points, out Vector3[] verts, out int[] tris)
+    {
+        // get a count buffer, is the count is 0, return false. Buffers counts the number of change in simulation
+        
+        // inside shader, simulate water mask for 1 iteration. vertical first, then 8 horizontal directions
+        
+        // return the new verts and tris, but only make mesh if count buffer is > 0;
+        
+        throw new NotImplementedException();
     }
     public void Destroy()
     {
