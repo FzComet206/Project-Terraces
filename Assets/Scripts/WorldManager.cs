@@ -185,13 +185,18 @@ public class WorldManager : MonoBehaviour
     private void GetNewChunk()
     {
         Chunk chunk= chunkSystem.queue.Dequeue();
-        int[] points = noiseSystem.DispatchPointBuffer(chunk);
+        int[] points;
+        int[] fluids;
+        (points, fluids) = noiseSystem.DispatchPointBuffer(chunk);
         (Vector3[] verts, int[] tris) = meshSystem.GenerateMeshData(points);
+        (Vector3[] vertsfluid, int[] trisfluid) = meshSystem.GenerateFluidData(fluids, points);
 
         chunk.data = points;
+        chunk.fluid = fluids;
         chunk.Active = true;
         chunk.Generated = true;
 
+        // mesh generation
         Mesh mesh = new Mesh();
         mesh.SetVertices(verts);
         mesh.SetTriangles(tris, 0);
@@ -208,6 +213,24 @@ public class WorldManager : MonoBehaviour
         meshFilter.sharedMesh = mesh;
         meshCollider.sharedMesh = mesh;
         chunkObj.GetComponent<MeshRenderer>().sharedMaterial = chunkInput.meshMaterial;
+        
+        // fluid generation
+        
+        // bug many verts have nan and -infinity values
+        Mesh fluidMesh = new Mesh();
+        fluidMesh.SetVertices(vertsfluid);
+        fluidMesh.SetTriangles(trisfluid, 0);
+        fluidMesh.RecalculateNormals();
+        fluidMesh.RecalculateBounds();
+        
+        GameObject fluidObj = new GameObject("fluidChunk " + chunk.coordX + " " + chunk.coordZ,
+            typeof(MeshFilter), typeof(MeshCollider), typeof(MeshRenderer));
+        fluidObj.transform.parent = chunkInput.meshParent;
+        fluidObj.transform.position = new Vector3(chunk.startPositionX, 0, chunk.startPositionZ);
+        
+        MeshFilter meshFilterFluid = fluidObj.GetComponent<MeshFilter>();
+        meshFilterFluid.sharedMesh = fluidMesh;
+        fluidObj.GetComponent<MeshRenderer>().sharedMaterial = chunkInput.fluidMaterial;
 
         // update ds
         int2 coord = new int2(chunk.coordX, chunk.coordZ);

@@ -457,7 +457,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1901844668
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -546,32 +546,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
-      propertyPath: noiseInput.gain
-      value: 0.12
-      objectReference: {fileID: 0}
-    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
       propertyPath: chunkInput.meshParent
       value: 
       objectReference: {fileID: 1601801603}
     - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
-      propertyPath: noiseInput.parameterX
-      value: 25
-      objectReference: {fileID: 0}
-    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
-      propertyPath: noiseInput.parameterY
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
-      propertyPath: chunkInput.renderDistance
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
-      propertyPath: noiseInput.softFloorHeight
-      value: 60
-      objectReference: {fileID: 0}
-    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
-      propertyPath: chunkInput.maxChunksBeforeCull
-      value: 4200
-      objectReference: {fileID: 0}
+      propertyPath: chunkInput.fluidMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: e5744d9993f2aa844bbc3616f0027aa7, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}

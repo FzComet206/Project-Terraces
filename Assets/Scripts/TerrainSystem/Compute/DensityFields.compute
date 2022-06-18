@@ -2,9 +2,12 @@
 #include "Noise.compute"
 
 RWStructuredBuffer<int> points;
+RWStructuredBuffer<int> fluids;
 
 float startX;
 float startZ;
+
+int seaLevel;
 
 int octaves;
 float lacunarity;
@@ -87,9 +90,11 @@ void GenerateDensity (uint3 id : SV_DispatchThreadID)
     }
 
     value = ceil(value * 16);
-    value = (int) max(-32, min(31, value ));
-    
+    int final = (int) max(-32, min(31, value ));
+
+    if (id.y < 40 && final > 0) {
+        fluids[IndexFromCoord(id)] = 1;
+    }
     // right here is the value output that should be stored
-    
-    points[IndexFromCoord(id)] = value;
+    points[IndexFromCoord(id)] = final;
 }

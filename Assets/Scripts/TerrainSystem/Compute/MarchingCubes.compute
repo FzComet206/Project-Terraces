@@ -1,4 +1,6 @@
 ﻿#pragma kernel March
+#pragma kernel Fluid
+
 #include "MarchTables.compute"
 
 struct Triangle {
@@ -9,6 +11,7 @@ struct Triangle {
 
 AppendStructuredBuffer<Triangle> triangles;
 RWStructuredBuffer<int> points;
+RWStructuredBuffer<int> fluids;
 
 static const float isoLevel = 0;
 bool blocky;
@@ -18,9 +21,16 @@ float3 interpolateVerts(float4 v1, float4 v2) {
     return v1.xyz + t * (v2.xyz-v1.xyz);
 }
 
+float3 interpolateVertsFluid(float4 v2, float4 v1) {
+    float t = (isoLevel - v1.w) / (v2.w - v1.w);
+    t = saturate(t);
+    return v1.xyz + t * (v2.xyz-v1.xyz);
+}
+
 int indexFromCoord(int x, int y, int z) {
     return z * 16 * 256 + y * 16 + x;
 }
+
 [numthreads(4,4,4)]
 void March (int3 id : SV_DispatchThreadID)
 {   
@@ -79,6 +89,81 @@ void March (int3 id : SV_DispatchThreadID)
         tri.vertexA = interpolateVerts(cubeCorners[a0], cubeCorners[b0]);
         tri.vertexB = interpolateVerts(cubeCorners[a1], cubeCorners[b1]);
         tri.vertexC = interpolateVerts(cubeCorners[a2], cubeCorners[b2]);
+        triangles.Append(tri);
+    }
+}
+
+[numthreads(4,4,4)]
+void Fluid (int3 id : SV_DispatchThreadID)
+{   
+    // Stop one point before the end because voxel includes neighbouring points
+    if (id.x >= 15 || id.y >= 255 || id.z >= 15) {
+        return;
+    }
+
+    // 8 corners of the current cube
+    float4 cubeCorners[8] = {
+        float4(id.x, id.y, id.z, points[indexFromCoord(id.x, id.y, id.z)]),
+        float4(id.x + 1, id.y, id.z, points[indexFromCoord(id.x + 1, id.y, id.z)]),
+        float4(id.x + 1, id.y, id.z + 1, points[indexFromCoord(id.x + 1, id.y, id.z + 1)]),
+        float4(id.x, id.y, id.z + 1, points[indexFromCoord(id.x, id.y, id.z + 1)]),
+        float4(id.x, id.y + 1, id.z, points[indexFromCoord(id.x, id.y + 1, id.z)]),
+        float4(id.x + 1, id.y + 1, id.z, points[indexFromCoord(id.x + 1, id.y + 1, id.z)]),
+        float4(id.x + 1, id.y + 1, id.z + 1, points[indexFromCoord(id.x + 1, id.y + 1, id.z + 1)]),
+        float4(id.x, id.y + 1, id.z + 1, points[indexFromCoord(id.x, id.y + 1, id.z + 1)]),
+    };
+
+    // 8 corners of the fluid cube
+    bool fluidCorners[8] = {
+        fluids[indexFromCoord(id.x, id.y, id.z)],
+        fluids[indexFromCoord(id.x + 1, id.y, id.z)],
+        fluids[indexFromCoord(id.x + 1, id.y, id.z + 1)],
+        fluids[indexFromCoord(id.x, id.y, id.z + 1)],
+        fluids[indexFromCoord(id.x, id.y + 1, id.z)],
+        fluids[indexFromCoord(id.x + 1, id.y + 1, id.z)],
+        fluids[indexFromCoord(id.x + 1, id.y + 1, id.z + 1)],
+        fluids[indexFromCoord(id.x, id.y + 1, id.z + 1)],
+    };
+
+    // Calculate unique index for each cube configuration.
+    // There are 256 possible values
+    // A value of 0 means cube is entirely inside surface; 255 entirely outside.
+    // The value is used to look up the edge table, which indicates which edges of the cube are cut by the isosurface.
+    int cubeIndex = 0;
+    if (cubeCorners[0].w < isoLevel && fluidCorners[0] == 1) cubeIndex |= 1;
+    if (cubeCorners[1].w < isoLevel && fluidCorners[1] == 1) cubeIndex |= 2;
+    if (cubeCorners[2].w < isoLevel && fluidCorners[2] == 1) cubeIndex |= 4;
+    if (cubeCorners[3].w < isoLevel && fluidCorners[3] == 1) cubeIndex |= 8;
+    if (cubeCorners[4].w < isoLevel && fluidCorners[4] == 1) cubeIndex |= 16;
+    if (cubeCorners[5].w < isoLevel && fluidCorners[5] == 1) cubeIndex |= 32;
+    if (cubeCorners[6].w < isoLevel && fluidCorners[6] == 1) cubeIndex |= 64;
+    if (cubeCorners[7].w < isoLevel && fluidCorners[7] == 1) cubeIndex |= 128;
+
+    // Create triangles for current cube configuration
+    for (int i = 0; i < 16; i +=3) {
+
+        int index0 = triangulation[cubeIndex][i];
+        int index1 = triangulation[cubeIndex][i + 1];
+        int index2 = triangulation[cubeIndex][i + 2];
+        if (index0 == -1 || index1 == -1 || index2 == -1)
+        {
+            break;
+        }
+        
+        int a0 = cornerIndexAFromEdge[index0];
+        int b0 = cornerIndexBFromEdge[index0];
+
+        int a1 = cornerIndexAFromEdge[index1];
+        int b1 = cornerIndexBFromEdge[index1];
+
+        int a2 = cornerIndexAFromEdge[index2];
+        int b2 = cornerIndexBFromEdge[index2];
+
+        // lol just different direction of triangle would do
+        Triangle tri;
+        tri.vertexC = interpolateVertsFluid(cubeCorners[a0], cubeCorners[b0]);
+        tri.vertexB = interpolateVertsFluid(cubeCorners[a1], cubeCorners[b1]);
+        tri.vertexA = interpolateVertsFluid(cubeCorners[a2], cubeCorners[b2]);
         triangles.Append(tri);
     }
 }

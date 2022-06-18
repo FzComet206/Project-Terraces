@@ -42,17 +42,13 @@ public static class DataTypes
     }
     
     [System.Serializable]
-    public struct FluidInput 
-    {
-    }
-    
-    [System.Serializable]
     public struct ChunkInput
     {
         public int renderDistance;
         public int chunksPerFrame;
         public int maxChunksBeforeCull;
         public Material meshMaterial;
+        public Material fluidMaterial;
         public Transform meshParent;
     }
     
@@ -72,6 +68,7 @@ public class Chunk
     public int coordZ;
     
     public int[] data;
+    public int[] fluid;
 
     public Chunk(float startPositionX, float startPositionZ, int coordX, int coordZ)
     {
@@ -95,27 +92,8 @@ public class Chunk
         set => generated = value;
     }
     
-    private bool water;
-    public bool Water
-    {
-        get => water;
-        set => water = value;
-    }
-
-    private Texture2D shaderInput;
-    public Texture2D ShaderInput
-    {
-        get => shaderInput;
-        set => shaderInput = value;
-    }
-    
     public byte[] SerializeSelf()
     {
         return new byte[1];
-    }
-
-    public void InitSelfFromData()
-    {
-        
     }
 }
