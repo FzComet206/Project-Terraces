@@ -234,6 +234,7 @@ public class PlayerControl : MonoBehaviour
             mf.sharedMesh.SetTriangles(tris, 0);
             mf.sharedMesh.RecalculateNormals();
             mf.sharedMesh.RecalculateBounds();
+            mf.sharedMesh.RecalculateTangents();
 
             mc.sharedMesh = null;
             mc.sharedMesh = mf.sharedMesh;

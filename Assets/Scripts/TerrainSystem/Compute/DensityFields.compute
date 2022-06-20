@@ -90,11 +90,19 @@ void GenerateDensity (uint3 id : SV_DispatchThreadID)
     }
 
     value = ceil(value * 16);
-    int final = (int) max(-32, min(31, value ));
-
-    if (id.y < 45 && final > 0) {
-        fluids[IndexFromCoord(id)] = 1;
-    }
+    int final = (int) max(-32, min(31, value));
+    
     // right here is the value output that should be stored
     points[IndexFromCoord(id)] = final;
+
+    // fluid mask is wierd
+
+    if (id.y < 45 && final < 0)
+    {
+        fluids[IndexFromCoord(id)] = 1;
+    }
+    else
+    {
+        fluids[IndexFromCoord(id)] = 0;
+    }
 }

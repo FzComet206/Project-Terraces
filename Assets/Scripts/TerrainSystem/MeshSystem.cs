@@ -8,7 +8,6 @@ public class MeshSystem
     private ComputeBuffer triangleCountBuffer;
     
     private ComputeBuffer fluidBuffer;
-    private ComputeBuffer simulationCounter;
     
     private ComputeShader marchingCubes;
     public ComputeShader MarchingCubes
@@ -21,7 +20,7 @@ public class MeshSystem
     {
         set => fluidSim = value;
     }
-
+    
     public MeshSystem()
     {
         int numPoints = 16 * 16 * 256;
@@ -30,7 +29,6 @@ public class MeshSystem
         triangleCountBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.Raw);
         
         fluidBuffer = new ComputeBuffer(numPoints, sizeof(int));
-        simulationCounter = new ComputeBuffer(1, sizeof(int), ComputeBufferType.Counter);
     }
 
     public (Vector3[], int[]) GenerateMeshData(int[] points)
@@ -71,7 +69,6 @@ public class MeshSystem
     public (Vector3[], int[]) GenerateFluidData(int[] fluids, int[] points)
     {
         triangleBuffer.SetCounterValue(0);
-        
         int kernelFluid = marchingCubes.FindKernel("Fluid");
         pointsBuffer.SetData(points);
         fluidBuffer.SetData(fluids);
@@ -104,40 +101,11 @@ public class MeshSystem
         
         return (verticies, triangles);
     }
-
-    public bool SimulateFluidChunks(ref int[] fluids, int[] points)
-    {
-        // get a count buffer, is the count is 0, return false. Buffers counts the number of change in simulation
-        simulationCounter.SetCounterValue(0);
-        
-        int kernel = fluidSim.FindKernel("FluidSim");
-        pointsBuffer.SetData(points);
-        fluidBuffer.SetData(fluids);
-        marchingCubes.SetBuffer(kernel, "points", pointsBuffer);
-        marchingCubes.SetBuffer(kernel, "fluids", fluidBuffer);
-        marchingCubes.SetBuffer(kernel, "counter", simulationCounter);
-        marchingCubes.Dispatch(kernel, 4, 64, 4);
-        
-        // get count of the buffer
-        int[] _count = new int[1];
-        simulationCounter.GetData(_count);
-        int count = _count[0];
-
-        if (count == 0)
-        {
-            return false;
-        }
-        
-        fluidBuffer.GetData(fluids);
-        return true;
-    }
     public void Destroy()
     {
         pointsBuffer.Dispose();
         fluidBuffer.Dispose();
         triangleBuffer.Dispose();
-        
         triangleCountBuffer.Dispose();
-        simulationCounter.Dispose();
     }
 }

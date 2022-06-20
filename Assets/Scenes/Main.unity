@@ -288,7 +288,6 @@ GameObject:
   - component: {fileID: 1580652458}
   - component: {fileID: 1580652457}
   - component: {fileID: 1580652459}
-  - component: {fileID: 1580652460}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -393,23 +392,6 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
---- !u!114 &1580652460
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1580652456}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsGlobal: 1
-  priority: 0
-  blendDistance: 0
-  weight: 1
-  sharedProfile: {fileID: 11400000, guid: 01fbb7e011e679c489c8a9bf265bfba0, type: 2}
 --- !u!1 &1601801602
 GameObject:
   m_ObjectHideFlags: 0
@@ -546,20 +528,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
-      propertyPath: fluidSim
-      value: 
-      objectReference: {fileID: 7200000, guid: a6d7912892c1d8848b34c87b5c297f3d, type: 3}
-    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
-      propertyPath: waterVolume
-      value: 
-      objectReference: {fileID: 11400000, guid: 38ef6d84744a78c4cbb7d6ab958cb42b, type: 2}
-    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
       propertyPath: chunkInput.meshParent
       value: 
       objectReference: {fileID: 1601801603}
-    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
-      propertyPath: chunkInput.fluidMaterial
-      value: 
-      objectReference: {fileID: 2100000, guid: e5744d9993f2aa844bbc3616f0027aa7, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}

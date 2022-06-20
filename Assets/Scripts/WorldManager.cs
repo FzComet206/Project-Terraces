@@ -100,6 +100,8 @@ public class WorldManager : MonoBehaviour
         StartCoroutine(ChunkGenCoroutine());
         yield return new WaitForFixedUpdate();
         StartCoroutine(WorldCullCoroutine());
+        yield return new WaitForSecondsRealtime(5);
+        StartCoroutine(FluidCoroutine());
     }
 
     public IEnumerator WorldGenCoroutine()
@@ -185,20 +187,31 @@ public class WorldManager : MonoBehaviour
 
     private IEnumerator FluidCoroutine()
     {
-        // simulate fluid mesh for nearby 25 chunks, every 0.5 seconds
-        // when chunk is removed from queue and player is not with radius, dont simulate
-    
         while (true)
         {
             chunkSystem.GetNearbyChunks(player.transform.position, ref simulationQueue);
             while (simulationQueue.Count > 0)
             {
                 int2 coord = simulationQueue.Dequeue();
+                ChunkMemory cm = chunkSystem.chunksDict[coord];
+                
+                if (true)
+                {
+                    // update water mesh with the fluid and data
+                    (Vector3[] vertsfluid, int[] trisfluid) = meshSystem.GenerateFluidData(cm.chunk.fluid, cm.chunk.data);
+                    
+                    MeshFilter mf = cm.waterChunk.GetComponent<MeshFilter>();
+                    mf.sharedMesh.Clear();
+                    mf.sharedMesh.SetVertices(vertsfluid);
+                    mf.sharedMesh.SetTriangles(trisfluid, 0);
+                    mf.sharedMesh.RecalculateNormals();
+                    mf.sharedMesh.RecalculateTangents();
+                }
                 
                 yield return new WaitForEndOfFrame();
             }
 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(1);
         }
     }
     
@@ -219,13 +232,16 @@ public class WorldManager : MonoBehaviour
 
         // mesh generation
         Mesh mesh = new Mesh();
+        mesh.MarkDynamic();
         mesh.SetVertices(verts);
         mesh.SetTriangles(tris, 0);
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
+        mesh.RecalculateTangents();
         
         GameObject chunkObj = new GameObject("chunk " + chunk.coordX + " " + chunk.coordZ,
             typeof(MeshFilter), typeof(MeshCollider), typeof(MeshRenderer));
+        
         chunkObj.transform.parent = chunkInput.meshParent;
         chunkObj.transform.position = new Vector3(chunk.startPositionX, 0, chunk.startPositionZ);
 
@@ -237,9 +253,11 @@ public class WorldManager : MonoBehaviour
         
         // fluid generation
         Mesh fluidMesh = new Mesh();
+        fluidMesh.MarkDynamic();
         fluidMesh.SetVertices(vertsfluid);
         fluidMesh.SetTriangles(trisfluid, 0);
         fluidMesh.RecalculateNormals();
+        fluidMesh.RecalculateTangents();
 
         GameObject fluidObj = new GameObject("fluidChunk " + chunk.coordX + " " + chunk.coordZ,
             typeof(MeshFilter), typeof(MeshRenderer));
