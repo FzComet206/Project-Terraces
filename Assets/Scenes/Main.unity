@@ -220,6 +220,25 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c1bc4424ac7df4f6498124d44c3aa240, type: 3}
+--- !u!1 &957344412 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2698417190130562035, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
+  m_PrefabInstance: {fileID: 2698417189573107208}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &957344415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 957344412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb6666394d6402149b164efd49df44d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lookUpGrid: 
+  simulateGrid: 
 --- !u!1001 &990643270
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -528,8 +547,20 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
+      propertyPath: fluidSystem
+      value: 
+      objectReference: {fileID: 957344415}
+    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
       propertyPath: chunkInput.meshParent
       value: 
       objectReference: {fileID: 1601801603}
+    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
+      propertyPath: chunkInput.renderDistance
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
+      propertyPath: chunkInput.maxChunksBeforeCull
+      value: 3000
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}

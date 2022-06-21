@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2698417190130562036}
   - component: {fileID: 2698417190130562037}
+  - component: {fileID: 957344415}
   m_Layer: 0
   m_Name: WorldManager
   m_TagString: Untagged
@@ -66,7 +67,7 @@ MonoBehaviour:
   chunkInput:
     renderDistance: 12
     chunksPerFrame: 2
-    maxChunksBeforeCull: 4200
+    maxChunksBeforeCull: 3000
     meshMaterial: {fileID: 2100000, guid: 39cf2d8557fc74ce39c113b1f567b584, type: 2}
     fluidMaterial: {fileID: 2100000, guid: e5744d9993f2aa844bbc3616f0027aa7, type: 2}
     meshParent: {fileID: 0}
@@ -74,4 +75,19 @@ MonoBehaviour:
   pointsCompute: {fileID: 7200000, guid: 35ebdf0f5f6014df08e7b7e198db8bc3, type: 3}
   marchingCubes: {fileID: 7200000, guid: 24ee5eaf14e624ba5928a710ff884ba4, type: 3}
   fluidSim: {fileID: 7200000, guid: a6d7912892c1d8848b34c87b5c297f3d, type: 3}
+  fluidSystem: {fileID: 957344415}
   coroutinePause: 0
+--- !u!114 &957344415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2698417190130562035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb6666394d6402149b164efd49df44d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lookUpGrid: 
+  simulateGrid: 

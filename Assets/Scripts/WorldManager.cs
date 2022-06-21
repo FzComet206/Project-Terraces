@@ -62,6 +62,7 @@ public class WorldManager : MonoBehaviour
         StartWorld();
         
         fps = FindObjectOfType<Text>();
+        fluidSystem = FindObjectOfType<FluidSystem>();
         StartCoroutine(DisplayFPS());
     }
 
@@ -77,7 +78,6 @@ public class WorldManager : MonoBehaviour
         noiseSystem = new NoiseSystem(noiseInput);
         meshSystem = new MeshSystem();
         brushSystem = new BrushSystem();
-        fluidSystem = FindObjectOfType<FluidSystem>();
         biomeSystem = new BiomeSystem();
         storageSystem = new StorageSystem();
 
@@ -102,7 +102,7 @@ public class WorldManager : MonoBehaviour
         yield return new WaitForFixedUpdate();
         StartCoroutine(WorldCullCoroutine());
         yield return new WaitForSecondsRealtime(5);
-        StartCoroutine(FluidCoroutine());
+        StartCoroutine(fluidSystem.Simulate(Vector3.zero));
     }
 
     public IEnumerator WorldGenCoroutine()
