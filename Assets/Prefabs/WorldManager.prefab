@@ -64,8 +64,8 @@ MonoBehaviour:
     sprintFactor: 2
     jumpStrength: 1
   chunkInput:
-    renderDistance: 14
-    chunksPerFrame: 4
+    renderDistance: 12
+    chunksPerFrame: 2
     maxChunksBeforeCull: 4200
     meshMaterial: {fileID: 2100000, guid: 39cf2d8557fc74ce39c113b1f567b584, type: 2}
     fluidMaterial: {fileID: 2100000, guid: e5744d9993f2aa844bbc3616f0027aa7, type: 2}

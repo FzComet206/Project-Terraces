@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public class WorldManager : MonoBehaviour
@@ -32,6 +31,7 @@ public class WorldManager : MonoBehaviour
     public NoiseSystem noiseSystem;
     public MeshSystem meshSystem;
     public BrushSystem brushSystem;
+    public FluidSystem fluidSystem;
     public BiomeSystem biomeSystem;
     public StorageSystem storageSystem;
 
@@ -77,6 +77,7 @@ public class WorldManager : MonoBehaviour
         noiseSystem = new NoiseSystem(noiseInput);
         meshSystem = new MeshSystem();
         brushSystem = new BrushSystem();
+        fluidSystem = FindObjectOfType<FluidSystem>();
         biomeSystem = new BiomeSystem();
         storageSystem = new StorageSystem();
 
@@ -221,7 +222,9 @@ public class WorldManager : MonoBehaviour
         Chunk chunk = chunkSystem.queue.Dequeue();
         int[] points;
         int[] fluids;
+        
         (points, fluids) = noiseSystem.DispatchPointBuffer(chunk);
+
         (Vector3[] verts, int[] tris) = meshSystem.GenerateMeshData(points);
         (Vector3[] vertsfluid, int[] trisfluid) = meshSystem.GenerateFluidData(fluids, points);
 
@@ -233,23 +236,24 @@ public class WorldManager : MonoBehaviour
         // mesh generation
         Mesh mesh = new Mesh();
         mesh.MarkDynamic();
+        
         mesh.SetVertices(verts);
         mesh.SetTriangles(tris, 0);
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
         mesh.RecalculateTangents();
-        
+
         GameObject chunkObj = new GameObject("chunk " + chunk.coordX + " " + chunk.coordZ,
             typeof(MeshFilter), typeof(MeshCollider), typeof(MeshRenderer));
-        
         chunkObj.transform.parent = chunkInput.meshParent;
         chunkObj.transform.position = new Vector3(chunk.startPositionX, 0, chunk.startPositionZ);
-
         MeshFilter meshFilter = chunkObj.GetComponent<MeshFilter>();
         MeshCollider meshCollider = chunkObj.GetComponent<MeshCollider>();
+        chunkObj.GetComponent<MeshRenderer>().sharedMaterial = chunkInput.meshMaterial;
+        
         meshFilter.sharedMesh = mesh;
         meshCollider.sharedMesh = mesh;
-        chunkObj.GetComponent<MeshRenderer>().sharedMaterial = chunkInput.meshMaterial;
+        
         
         // fluid generation
         Mesh fluidMesh = new Mesh();
