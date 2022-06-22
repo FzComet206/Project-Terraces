@@ -104,7 +104,7 @@ public class WorldManager : MonoBehaviour
         StartCoroutine(ChunkGenCoroutine());
         yield return new WaitForFixedUpdate();
         StartCoroutine(WorldCullCoroutine());
-        yield return new WaitForSecondsRealtime(5);
+        yield return new WaitForSecondsRealtime(2);
         StartCoroutine(FluidCoroutine());
     }
 
@@ -191,13 +191,13 @@ public class WorldManager : MonoBehaviour
 
     private IEnumerator FluidCoroutine()
     {
-        fluidSystem.playerPos = Vector3.zero;
+        fluidSystem.playerPos = Vector3.one;
         Thread last = ThreadManager.Worker(fluidSystem);
         yield return new WaitForSecondsRealtime(1);
 
-        for (int i = -2; i < 3; i++)
+        for (int i = -3; i < 4; i++)
         {
-            for (int j = -2; j < 3; j++)
+            for (int j = -3; j < 4; j++)
             {
                 int2 coord = new int2(i, j);
                 
