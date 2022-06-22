@@ -113,8 +113,8 @@ public class PlayerControl : MonoBehaviour
             
             // rotation
             Vector2 delta = mouse.ReadValue<Vector2>();
-            float rx = delta.y * rotateSpeed * Time.deltaTime;
-            float ry = delta.x * rotateSpeed * Time.deltaTime;
+            float rx = delta.y * rotateSpeed * Time.fixedDeltaTime;
+            float ry = delta.x * rotateSpeed * Time.fixedDeltaTime;
             xRotation -= rx;
             xRotation = Mathf.Clamp(xRotation, -90, 90);
             yRotation += ry;

@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public class WorldManager : MonoBehaviour
@@ -62,7 +64,6 @@ public class WorldManager : MonoBehaviour
         StartWorld();
         
         fps = FindObjectOfType<Text>();
-        fluidSystem = FindObjectOfType<FluidSystem>();
         StartCoroutine(DisplayFPS());
     }
 
@@ -80,6 +81,8 @@ public class WorldManager : MonoBehaviour
         brushSystem = new BrushSystem();
         biomeSystem = new BiomeSystem();
         storageSystem = new StorageSystem();
+        
+        fluidSystem = new FluidSystem(chunkSystem);
 
         noiseSystem.PointsCompute = pointsCompute;
         meshSystem.MarchingCubes = marchingCubes;
@@ -102,7 +105,7 @@ public class WorldManager : MonoBehaviour
         yield return new WaitForFixedUpdate();
         StartCoroutine(WorldCullCoroutine());
         yield return new WaitForSecondsRealtime(5);
-        StartCoroutine(fluidSystem.Simulate(Vector3.zero));
+        StartCoroutine(FluidCoroutine());
     }
 
     public IEnumerator WorldGenCoroutine()
@@ -188,32 +191,31 @@ public class WorldManager : MonoBehaviour
 
     private IEnumerator FluidCoroutine()
     {
-        while (true)
-        {
-            chunkSystem.GetNearbyChunks(player.transform.position, ref simulationQueue);
-            while (simulationQueue.Count > 0)
-            {
-                int2 coord = simulationQueue.Dequeue();
-                ChunkMemory cm = chunkSystem.chunksDict[coord];
-                
-                if (true)
-                {
-                    // update water mesh with the fluid and data
-                    (Vector3[] vertsfluid, int[] trisfluid) = meshSystem.GenerateFluidData(cm.chunk.fluid, cm.chunk.data);
-                    
-                    MeshFilter mf = cm.waterChunk.GetComponent<MeshFilter>();
-                    mf.sharedMesh.Clear();
-                    mf.sharedMesh.SetVertices(vertsfluid);
-                    mf.sharedMesh.SetTriangles(trisfluid, 0);
-                    mf.sharedMesh.RecalculateNormals();
-                    mf.sharedMesh.RecalculateTangents();
-                }
-                
-                yield return new WaitForEndOfFrame();
-            }
+        fluidSystem.playerPos = Vector3.zero;
+        Thread last = ThreadManager.Worker(fluidSystem);
+        yield return new WaitForSecondsRealtime(1);
 
-            yield return new WaitForSeconds(1);
+        for (int i = -2; i < 3; i++)
+        {
+            for (int j = -2; j < 3; j++)
+            {
+                int2 coord = new int2(i, j);
+                
+                ChunkMemory cm = chunkSystem.chunksDict[coord];
+                GameObject chunkObject = cm.waterChunk;
+                Chunk chunk = cm.chunk;
+
+                (Vector3[] verts, int[] tris) = meshSystem.GenerateFluidData(chunk.fluid, chunk.data);
+                MeshFilter mf = chunkObject.GetComponent<MeshFilter>();
+
+                mf.sharedMesh.Clear();
+                mf.sharedMesh.SetVertices(verts);
+                mf.sharedMesh.SetTriangles(tris, 0);
+                mf.sharedMesh.RecalculateNormals();
+                mf.sharedMesh.RecalculateTangents();
+            }
         }
+
     }
     
     // ReSharper disable Unity.PerformanceAnalysis
@@ -235,6 +237,7 @@ public class WorldManager : MonoBehaviour
 
         // mesh generation
         Mesh mesh = new Mesh();
+        mesh.indexFormat = IndexFormat.UInt32;
         mesh.MarkDynamic();
         
         mesh.SetVertices(verts);
@@ -257,6 +260,7 @@ public class WorldManager : MonoBehaviour
         
         // fluid generation
         Mesh fluidMesh = new Mesh();
+        fluidMesh.indexFormat = IndexFormat.UInt32;
         fluidMesh.MarkDynamic();
         fluidMesh.SetVertices(vertsfluid);
         fluidMesh.SetTriangles(trisfluid, 0);

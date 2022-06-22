@@ -1,57 +1,128 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Unity.Mathematics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
-public class FluidSystem: MonoBehaviour
+public class FluidSystem
 {
-    public int[] lookUpGrid;
+    public int[] lookUpDensity;
+    public int[] lookUpFluid;
     public int[] simulateGrid;
 
-    private WorldManager worldManager;
-
-    public void Start()
+    public Vector3 playerPos;
+    private int width = 105;
+    private int offset = 45;
+    public Dictionary<int2, ChunkMemory> chunksDict;
+    public FluidSystem(ChunkSystem chunkSystem)
     {
-        worldManager = FindObjectOfType<WorldManager>();
-        
-        lookUpGrid = new int[135 * 135 * 255];
-        simulateGrid = new int[135 * 135 * 255];
+        lookUpDensity = new int[width * width * 256];
+        lookUpFluid = new int[width * width * 256];
+        simulateGrid = new int[width * width * 256];
+        chunksDict = chunkSystem.chunksDict;
     }
 
-    public IEnumerator Simulate(Vector3 playerPos)
+    public void Simulate()
     {
-        // copy data to simulator
-        Dictionary<int2, ChunkMemory> cd = worldManager.chunkSystem.chunksDict;
-        int indexesPerLocal = 15 * 15 * 255;
-
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+        
+        // copy data
+        Dictionary<int2, ChunkMemory> cd = chunksDict;
+        
         int2 origin = new int2((int)(playerPos.x / 15f), (int)(playerPos.z / 15f));
+        int2 lastCoord = new int2(Mathf.FloorToInt(offset / 15f), Mathf.FloorToInt(offset / 15f)) + origin;
 
-        for (int z = 0; z < 105 ; z++)
+        int[] currDensity = cd[lastCoord].chunk.data;
+        int[] currFluid = cd[lastCoord].chunk.fluid;
+
+        for (int z = 0; z < width ; z++)
         {
-            for (int y = 0; y < 255; y++)
+            for (int x = 0; x < width; x++)
             {
-                for (int x = 0; x < 105 ; x++)
+                for (int y = 0; y < 256; y++)
                 {
-                    // 9 x 9 chunks , from -4 to 4, offset coord by 4 * 15 = 60
-                    int2 relative = new int2(Mathf.FloorToInt((x - 60) / 15f), Mathf.FloorToInt((z - 60) / 15f));
+                    // 7 x 7 chunks , from -3 to 3, offset coord by 3 * 15 = 45
+                    int2 relative = new int2(Mathf.FloorToInt((x - offset) / 15f), Mathf.FloorToInt((z - offset) / 15f));
                     int2 curr = origin + relative;
-                    
-                    int globalIndex = z * 135 * 255 + y * 135 + x;
-                    int localIndex = globalIndex % indexesPerLocal;
 
-                    lookUpGrid[globalIndex] = cd[curr].chunk.fluid[localIndex];
+                    // do this to minimize dictionary lookup
+                    if (!curr.Equals(lastCoord))
+                    {
+                        lastCoord = curr;
+                        currDensity = cd[curr].chunk.data;
+                        currFluid = cd[curr].chunk.fluid;
+                    }
+                    
+                    int globalIndex = z * width * 256 + y * width + x;
+
+                    int _z = z % 15;
+                    int _x = x % 15;
+                    int localIndex = _z * 16 * 256 + y * 16 + _x;
+
+                    lookUpDensity[globalIndex] = currDensity[localIndex];
+                    lookUpFluid[globalIndex] = currFluid[localIndex];
                 }
             }
         }
         
-        Array.Copy(lookUpGrid, simulateGrid, lookUpGrid.Length);
-        
-        // above calculation use 0.15 seconds
 
+        // simulate
         
-        // simulate data
+        // if indexes are at global edge, water mask most be 0
+        for (int z = 0; z < width ; z++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < 256; y++)
+                {
+                    int globalIndex = z * width * 256 + y * width + x;
+
+                    if (z % 15 == 0 || x % 15 == 0 || y % 255 == 0)
+                    {
+                        simulateGrid[globalIndex] = 0;
+                    }
+                    else
+                    {
+                        simulateGrid[globalIndex] = 1;
+                    }
+                }
+            }
+        }
         
-        yield break;
+        
+        // put simulateGrid back into ds 
+        // need to deal with edge cases for chunks
+        lastCoord = new int2(Mathf.FloorToInt(offset / 15f), Mathf.FloorToInt(offset / 15f)) + origin;
+        currFluid = cd[lastCoord].chunk.fluid;
+        for (int z = 0; z < width ; z++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < 256; y++)
+                {
+                    int2 relative = new int2(Mathf.FloorToInt((x - offset) / 15f), Mathf.FloorToInt((z - offset) / 15f));
+                    int2 curr = origin + relative;
+                    
+                    if (!curr.Equals(lastCoord))
+                    {
+                        lastCoord = curr;
+                        currFluid = cd[curr].chunk.fluid;
+                    }
+                    
+                    int globalIndex = z * width * 256 + y * width + x;
+                    
+                    int _z = z % 15;
+                    int _x = x % 15;
+                    int localIndex = _z * 16 * 256 + y * 16 + _x;
+                    
+                    currFluid[localIndex] = simulateGrid[globalIndex];
+                }
+            }
+        }
+
+        stopwatch.Stop();
+        float ts = stopwatch.ElapsedMilliseconds;
+        Debug.Log("fluid ended in " + ts);
     }
 }
