@@ -13,7 +13,8 @@ public enum OperationType
 {
     set,
     add,
-    special
+    special,
+    water
 }
 
 public struct VoxelOperation

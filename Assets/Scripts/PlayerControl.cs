@@ -165,15 +165,13 @@ public class PlayerControl : MonoBehaviour
             int op = voxelOperation.densityOperation;
             OperationType opType = voxelOperation.opType;
 
-            ChunkMemory chunkMemory;
-            bool contains = worldManager.chunkSystem.chunksDict.TryGetValue(coord, out chunkMemory);
+            Chunk chunk;
+            bool contains = worldManager.chunkSystem.chunksDict.TryGetValue(coord, out chunk);
 
             if (!contains)
             {
                 continue;
             }
-
-            Chunk chunk = chunkMemory.chunk;
 
             switch (opType)
             {
@@ -214,20 +212,19 @@ public class PlayerControl : MonoBehaviour
 
         foreach (var coord in coords)
         {
-            ChunkMemory chunkMemory;
-            bool contains = worldManager.chunkSystem.chunksDict.TryGetValue(coord, out chunkMemory);
+            Chunk chunk;
+            bool contains = worldManager.chunkSystem.chunksDict.TryGetValue(coord, out chunk);
             
             if (!contains)
             {
                 continue;
             }
 
-            GameObject chunkObject = chunkMemory.meshChunk;
-            Chunk chunk = chunkMemory.chunk;
+            GameObject chunkObject = chunk.MeshObj;
             
             (Vector3[] verts, int[] tris) = worldManager.meshSystem.GenerateMeshData(chunk.data);
-            MeshFilter mf = chunkObject.GetComponent<MeshFilter>();
-            MeshCollider mc = chunkObject.GetComponent<MeshCollider>();
+            MeshFilter mf = chunk.MeshFil;
+            MeshCollider mc = chunk.MeshCol;
 
             mf.sharedMesh.Clear();
             mf.sharedMesh.SetVertices(verts);

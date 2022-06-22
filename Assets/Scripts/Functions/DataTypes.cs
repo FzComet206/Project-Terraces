@@ -91,7 +91,43 @@ public class Chunk
         get => generated;
         set => generated = value;
     }
-    
+
+    private GameObject meshObj;
+    public GameObject MeshObj
+    {
+        get => meshObj;
+        set => meshObj = value;
+    }
+
+    private GameObject fluidObj;
+    public GameObject FluidObj
+    {
+        get => fluidObj;
+        set => fluidObj = value;
+    }
+
+    private MeshFilter meshFil;
+    public MeshFilter MeshFil
+    {
+        get => meshFil;
+        set => meshFil = value;
+    }
+
+    private MeshFilter fluidFil;
+    public MeshFilter FluidFil
+    {
+        get => fluidFil;
+        set => fluidFil = value;
+    }
+
+    private MeshCollider meshCol;
+
+    public MeshCollider MeshCol
+    {
+        get => meshCol;
+        set => meshCol = value;
+    }
+
     public byte[] SerializeSelf()
     {
         return new byte[1];

@@ -139,20 +139,20 @@ public class WorldManager : MonoBehaviour
             if (chunkSystem.generated.Count > chunkInput.maxChunksBeforeCull)
             {
                 int2 coord = chunkSystem.GetCull(player.transform.position);
-                ChunkMemory chunkMemory = chunkSystem.chunksDict[coord];
+                Chunk chunk = chunkSystem.chunksDict[coord];
                 
                 chunkSystem.chunksDict.Remove(coord);
                 chunkSystem.generated.Remove(coord);
                 
-                chunkMemory.chunk.Active = false;
-                chunkMemory.chunk.data = null;
+                chunk.Active = false;
+                chunk.data = null;
 
-                Destroy(chunkMemory.meshChunk.GetComponent<MeshFilter>().sharedMesh);
-                Destroy(chunkMemory.meshChunk.GetComponent<MeshCollider>().sharedMesh);
-                Destroy(chunkMemory.meshChunk);
-                
-                Destroy(chunkMemory.waterChunk.GetComponent<MeshFilter>().sharedMesh);
-                Destroy(chunkMemory.waterChunk);
+                Destroy(chunk.MeshFil.sharedMesh);
+                Destroy(chunk.MeshCol.sharedMesh);
+                Destroy(chunk.MeshObj);
+
+                Destroy(chunk.FluidFil.sharedMesh);
+                Destroy(chunk.FluidObj);
             }
             
             yield return new WaitForEndOfFrame();
@@ -220,28 +220,36 @@ public class WorldManager : MonoBehaviour
             }
 
             // chain update
-            StartCoroutine(FluidUpdate(process));
+            StartCoroutine(FluidUpdate(fluidSystem.update));
         }
     }
 
-    private IEnumerator FluidUpdate(Queue<int2> process)
+    private IEnumerator FluidUpdate(List<int2> process)
     {
-        while (process.Count > 0)
+        List<int2> update = new List<int2>();
+        foreach (var v in process)
         {
-            ChunkMemory cm = chunkSystem.chunksDict[process.Dequeue()];
-            GameObject chunkObject = cm.waterChunk;
-            Chunk chunk = cm.chunk;
+            update.Add(v);
+        }
 
-            (Vector3[] verts, int[] tris) = meshSystem.GenerateFluidData(chunk.fluid, chunk.data);
-            MeshFilter mf = chunkObject.GetComponent<MeshFilter>();
+        int c = 0;
+        foreach (var coord in update)
+        {
+            Chunk ck = chunkSystem.chunksDict[coord];
+            GameObject chunkObject = ck.FluidObj;
 
-            mf.sharedMesh.Clear();
-            mf.sharedMesh.SetVertices(verts);
-            mf.sharedMesh.SetTriangles(tris, 0);
-            mf.sharedMesh.RecalculateNormals();
-            mf.sharedMesh.RecalculateTangents();
+            (Vector3[] verts, int[] tris) = meshSystem.GenerateFluidData(ck.fluid, ck.data);
 
-            yield return new WaitForEndOfFrame();
+            ck.FluidFil.sharedMesh.Clear();
+            ck.FluidFil.sharedMesh.SetVertices(verts);
+            ck.FluidFil.sharedMesh.SetTriangles(tris, 0);
+            ck.FluidFil.sharedMesh.RecalculateNormals();
+            ck.FluidFil.sharedMesh.RecalculateTangents();
+            c++;
+            if (c % 3 == 0)
+            {
+                yield return new WaitForEndOfFrame();
+            }
         }
     }
     
@@ -283,6 +291,7 @@ public class WorldManager : MonoBehaviour
         
         meshFilter.sharedMesh = mesh;
         meshCollider.sharedMesh = mesh;
+
         
         
         // fluid generation
@@ -305,9 +314,16 @@ public class WorldManager : MonoBehaviour
         
         // update ds
         int2 coord = new int2(chunk.coordX, chunk.coordZ);
+        
+        chunk.MeshObj = chunkObj;
+        chunk.FluidObj = fluidObj;
+        chunk.MeshFil = meshFilter;
+        chunk.FluidFil = meshFilterFluid;
+        chunk.MeshCol = meshCollider;
+        
         chunkSystem.generated.Add(coord);
         chunkSystem.inQueue.Remove(coord);
-        chunkSystem.chunksDict[coord] = new ChunkMemory(chunkObj, fluidObj, chunk);
+        chunkSystem.chunksDict[coord] = chunk;
     }
     
     IEnumerator DisplayFPS()

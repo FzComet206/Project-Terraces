@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
@@ -8,13 +7,6 @@ public class ChunkMemory
     public GameObject meshChunk;
     public GameObject waterChunk;
     public Chunk chunk;
-
-    public ChunkMemory(GameObject meshChunk, GameObject waterChunk, Chunk chk)
-    {
-        this.meshChunk = meshChunk;
-        this.waterChunk= waterChunk;
-        chunk = chk;
-    }
 }
 public class ChunkSystem
 {
@@ -25,13 +17,13 @@ public class ChunkSystem
         set => renderDistance = value;
     }
 
-    public Dictionary<int2, ChunkMemory> chunksDict;
+    public Dictionary<int2, Chunk> chunksDict;
     public HashSet<int2> inQueue;
     public HashSet<int2> generated;
     public Queue<Chunk> queue;
     public ChunkSystem()
     {
-        this.chunksDict = new Dictionary<int2, ChunkMemory>(); 
+        this.chunksDict = new Dictionary<int2, Chunk>(); 
         this.inQueue = new HashSet<int2>();
         this.generated = new HashSet<int2>(); 
         this.queue = new Queue<Chunk>();

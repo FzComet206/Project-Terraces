@@ -14,12 +14,12 @@ public class FluidSystem
 
     private int width = 105;
     private int offset = 45;
+    private int[][] eightDir;
     
     public Vector3 playerPos;
-    public Queue<int2> updateQueue;
-    public HashSet<int2> updateSet;
+    public List<int2> update;
 
-    public Dictionary<int2, ChunkMemory> chunksDict;
+    public Dictionary<int2, Chunk> chunksDict;
 
     public float threadSpeed;
     public FluidSystem(ChunkSystem chunkSystem)
@@ -28,29 +28,28 @@ public class FluidSystem
         lookUpFluid = new int[width * width * 256];
         simulateGrid = new int[width * width * 256];
         chunksDict = chunkSystem.chunksDict;
-        
-        updateQueue = new Queue<int2>();
-        updateSet = new HashSet<int2>();
+
+        update = new List<int2>();
     }
 
     public void Simulate()
     {
-        updateQueue.Clear();
-        updateSet.Clear();
-        
+        update.Clear();
+        HashSet<int2> _updateSet = new HashSet<int2>();
+
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
 
         simulateGrid = new int[width * width * 256];
         
         // copy data
-        Dictionary<int2, ChunkMemory> cd = chunksDict;
+        Dictionary<int2, Chunk> cd = chunksDict;
         
         int2 origin = new int2((int)(playerPos.x / 15f), (int)(playerPos.z / 15f));
         int2 lastCoord = new int2(Mathf.FloorToInt(offset / 15f), Mathf.FloorToInt(offset / 15f)) + origin;
 
-        int[] currDensity = cd[lastCoord].chunk.data;
-        int[] currFluid = cd[lastCoord].chunk.fluid;
+        int[] currDensity = cd[lastCoord].data;
+        int[] currFluid = cd[lastCoord].fluid;
 
         for (int z = 0; z < width ; z++)
         {
@@ -66,8 +65,8 @@ public class FluidSystem
                     if (!curr.Equals(lastCoord))
                     {
                         lastCoord = curr;
-                        currDensity = cd[curr].chunk.data;
-                        currFluid = cd[curr].chunk.fluid;
+                        currDensity = cd[curr].data;
+                        currFluid = cd[curr].fluid;
                     }
                     
                     int globalIndex = z * width * 256 + y * width + x;
@@ -97,25 +96,93 @@ public class FluidSystem
                     
                     // indexes
                     int current = z * width * 256 + y * width + x;
-                    int below = z * width * 256 + (y - 1) * width + x;
 
-                    // drop
-                    if (y - 1 < 0)
+
+                    if (lookUpFluid[current] > 0)
                     {
-                        continue;
+                        simulateGrid[current] = lookUpFluid[current];
+
+                        // drop
+
+                        for (int i = 1; i < 3; i++)
+                        {
+                            if (y - i < 0)
+                            {
+                                continue;
+                            }
+
+                            int below = z * width * 256 + (y - i) * width + x;
+
+                            if (lookUpDensity[below] < 0 && lookUpFluid[below] == 0)
+                            {
+                                // the part that changes
+                                simulateGrid[below] = 2;
+                                if (!_updateSet.Contains(curr))
+                                {
+                                    _updateSet.Add(curr);
+                                }
+                            }
+                        }
                     }
-                    
+
+
                     if (lookUpFluid[current] == 1)
                     {
-                        simulateGrid[current] = 1;
-                        if (lookUpDensity[below] < 0 && lookUpFluid[below] == 0)
+                        // normal 
+                        for (int i = -2; i < 3; i++)
                         {
-                            // the part that changes
-                            simulateGrid[below] = 1;
-                            if (!updateSet.Contains(curr))
+                            for (int j = -2; j < 3; j++)
                             {
-                                updateSet.Add(curr);
-                                updateQueue.Enqueue(curr);
+                                int _x = x + i;
+                                int _z = z + j;
+
+                                if (_x < width && _x >= 0 && _z < width && _z >= 0)
+                                {
+                                    int dirIndex = _z * width * 256 + y * width + _x;
+                                    if (lookUpDensity[dirIndex] < 0 && lookUpFluid[dirIndex] == 0)
+                                    {
+                                        simulateGrid[dirIndex] = 1;
+                                        if (!_updateSet.Contains(curr))
+                                        {
+                                            _updateSet.Add(curr);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (lookUpFluid[current] == 2)
+                    {
+                        // volatile only spread if near ground
+                        int a = y - 1;
+
+                        if (a >= 0)
+                        {
+                            int belowA = z * width * 256 + a * width + x;
+                            if (lookUpDensity[belowA] > 0)
+                            {
+                                for (int i = -5; i < 6; i++)
+                                {
+                                    for (int j = -5; j < 6; j++)
+                                    {
+                                        int _x = x + i;
+                                        int _z = z + j;
+
+                                        if (_x < width && _x >= 0 && _z < width && _z >= 0)
+                                        {
+                                            int dirIndex = _z * width * 256 + a * width + _x;
+                                            if (lookUpDensity[dirIndex] < 0 && lookUpFluid[dirIndex] == 0)
+                                            {
+                                                simulateGrid[dirIndex] = 2;
+                                                if (!_updateSet.Contains(curr))
+                                                {
+                                                    _updateSet.Add(curr);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -127,7 +194,7 @@ public class FluidSystem
         // put simulateGrid back into ds 
         // need to deal with edge cases for chunks
         lastCoord = new int2(Mathf.FloorToInt(offset / 15f), Mathf.FloorToInt(offset / 15f)) + origin;
-        currFluid = cd[lastCoord].chunk.fluid;
+        currFluid = cd[lastCoord].fluid;
         for (int z = 0; z < width ; z++)
         {
             for (int x = 0; x < width; x++)
@@ -140,7 +207,7 @@ public class FluidSystem
                     if (!curr.Equals(lastCoord))
                     {
                         lastCoord = curr;
-                        currFluid = cd[curr].chunk.fluid;
+                        currFluid = cd[curr].fluid;
                     }
                     
                     int globalIndex = z * width * 256 + y * width + x;
@@ -191,6 +258,10 @@ public class FluidSystem
             }
         }
 
+        foreach (var i in _updateSet)
+        {
+            update.Add(i);
+        }
         stopwatch.Stop();
         threadSpeed = stopwatch.ElapsedMilliseconds;
     }
