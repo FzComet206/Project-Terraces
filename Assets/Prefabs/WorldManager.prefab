@@ -57,14 +57,14 @@ MonoBehaviour:
     hardFloorHeight: 1
     hardFloorWeight: 64
     domainWrapWeight: 1
-    seed: 1314
+    seed: 5634
   controllerInput:
     walkSpeed: 3000
     rotateSpeed: 20
     sprintFactor: 2
     jumpStrength: 1
   chunkInput:
-    renderDistance: 5
+    renderDistance: 10
     chunksPerFrame: 2
     maxChunksBeforeCull: 3000
     meshMaterial: {fileID: 2100000, guid: 39cf2d8557fc74ce39c113b1f567b584, type: 2}
@@ -73,5 +73,4 @@ MonoBehaviour:
   playerRig: {fileID: 1709310827449926998, guid: d8bec0aa4e1794609b5395fcd3c72d08, type: 3}
   pointsCompute: {fileID: 7200000, guid: 35ebdf0f5f6014df08e7b7e198db8bc3, type: 3}
   marchingCubes: {fileID: 7200000, guid: 24ee5eaf14e624ba5928a710ff884ba4, type: 3}
-  fluidSim: {fileID: 7200000, guid: a6d7912892c1d8848b34c87b5c297f3d, type: 3}
   coroutinePause: 0

@@ -15,12 +15,6 @@ public class MeshSystem
         set => marchingCubes = value;
     }
     
-    private ComputeShader fluidSim;
-    public ComputeShader FluidSim
-    {
-        set => fluidSim = value;
-    }
-    
     public MeshSystem()
     {
         int numPoints = 16 * 16 * 256;

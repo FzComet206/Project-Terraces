@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Debug = UnityEngine.Debug;
 
 public class PlayerControl : MonoBehaviour
 {
@@ -41,7 +42,7 @@ public class PlayerControl : MonoBehaviour
     private float yRotation = 0f;
 
     private Vector3 cursorPosition;
-    private bool mod = false;
+    public bool mod = false;
 
     private WorldManager worldManager;
 
@@ -179,6 +180,10 @@ public class PlayerControl : MonoBehaviour
                     if (add)
                     {
                         chunk.data[localIndex] += op;
+                        if (chunk.data[localIndex] > 0)
+                        {
+                            chunk.fluid[localIndex] = 0;
+                        }
                     }
                     else
                     {
@@ -191,6 +196,7 @@ public class PlayerControl : MonoBehaviour
                     {
                         if (op > 0)
                         {
+                            chunk.fluid[localIndex] = 0;
                             chunk.data[localIndex] = op;
                         }
                     }
@@ -207,9 +213,27 @@ public class PlayerControl : MonoBehaviour
                     int diff = Math.Abs(Math.Clamp(chunk.data[localIndex], -32, 31));
                     chunk.data[localIndex] -= diff;
                     break;
+                
+                case OperationType.water:
+                    if (add)
+                    {
+                        chunk.fluid[localIndex] = 2;
+                    }
+                    else
+                    {
+                        chunk.fluid[localIndex] = 0;
+                    }
+                    break;
             }
         }
 
+        if (ops[0].opType == OperationType.water)
+        {
+            ProcessFluidOp(coords);
+            return;
+        }
+
+        ProcessFluidOp(coords);
         foreach (var coord in coords)
         {
             Chunk chunk;
@@ -220,8 +244,6 @@ public class PlayerControl : MonoBehaviour
                 continue;
             }
 
-            GameObject chunkObject = chunk.MeshObj;
-            
             (Vector3[] verts, int[] tris) = worldManager.meshSystem.GenerateMeshData(chunk.data);
             MeshFilter mf = chunk.MeshFil;
             MeshCollider mc = chunk.MeshCol;
@@ -235,6 +257,30 @@ public class PlayerControl : MonoBehaviour
 
             mc.sharedMesh = null;
             mc.sharedMesh = mf.sharedMesh;
+        }
+    }
+
+    private void ProcessFluidOp(HashSet<int2> coords)
+    {
+        foreach (var coord in coords)
+        {
+            Chunk chunk;
+            bool contains = worldManager.chunkSystem.chunksDict.TryGetValue(coord, out chunk);
+
+            if (!contains)
+            {
+                continue;
+            }
+
+            (Vector3[] verts, int[] tris) = worldManager.meshSystem.GenerateFluidData(chunk.fluid, chunk.data);
+            MeshFilter mf = chunk.FluidFil;
+
+            mf.sharedMesh.Clear();
+            mf.sharedMesh.SetVertices(verts);
+            mf.sharedMesh.SetTriangles(tris, 0);
+            mf.sharedMesh.RecalculateNormals();
+            mf.sharedMesh.RecalculateBounds();
+            mf.sharedMesh.RecalculateTangents();
         }
     }
 

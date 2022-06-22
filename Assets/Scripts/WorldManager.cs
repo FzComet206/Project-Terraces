@@ -26,7 +26,6 @@ public class WorldManager : MonoBehaviour
     // compute shaders
     [SerializeField] private ComputeShader pointsCompute;
     [SerializeField] private ComputeShader marchingCubes;
-    [SerializeField] private ComputeShader fluidSim;
     
     // systems
     public ChunkSystem chunkSystem;
@@ -88,7 +87,6 @@ public class WorldManager : MonoBehaviour
 
         noiseSystem.PointsCompute = pointsCompute;
         meshSystem.MarchingCubes = marchingCubes;
-        meshSystem.FluidSim = fluidSim;
 
         simulationQueue = new Queue<int2>();
     }
@@ -106,7 +104,7 @@ public class WorldManager : MonoBehaviour
         StartCoroutine(ChunkGenCoroutine());
         yield return new WaitForFixedUpdate();
         StartCoroutine(WorldCullCoroutine());
-        yield return new WaitForSecondsRealtime(3f);
+        yield return new WaitForSecondsRealtime(5f);
         StartCoroutine(FluidCoroutine());
     }
 
@@ -196,6 +194,12 @@ public class WorldManager : MonoBehaviour
         while (true)
         {
             // start thread
+            if (player.updating)
+            {
+                yield return new WaitForEndOfFrame();
+                continue;
+            }
+            
             fluidSystem.playerPos = player.transform.position;
             Thread last = ThreadManager.Worker(fluidSystem);
             

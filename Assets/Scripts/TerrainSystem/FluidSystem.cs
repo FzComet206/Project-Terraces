@@ -1,10 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Security.Policy;
-using System.Transactions;
 using Unity.Mathematics;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 public class FluidSystem
 {
@@ -91,12 +88,18 @@ public class FluidSystem
             {
                 for (int y = 0; y < 256; y++)
                 {
+                    int current = z * width * 256 + y * width + x;
+                    
+                    if (z % (width - 1) == 0 || x % (width - 1) == 0 || y % 255 == 0)
+                    {
+                        simulateGrid[current] = lookUpFluid[current];
+                        continue;
+                    }
+
                     int2 relative = new int2(Mathf.FloorToInt((x - offset) / 15f), Mathf.FloorToInt((z - offset) / 15f));
                     int2 curr = origin + relative;
                     
                     // indexes
-                    int current = z * width * 256 + y * width + x;
-
 
                     if (lookUpFluid[current] > 0)
                     {
@@ -104,7 +107,7 @@ public class FluidSystem
 
                         // drop
 
-                        for (int i = 1; i < 3; i++)
+                        for (int i = 1; i < 4; i++)
                         {
                             if (y - i < 0)
                             {
@@ -129,9 +132,10 @@ public class FluidSystem
                     if (lookUpFluid[current] == 1)
                     {
                         // normal 
-                        for (int i = -2; i < 3; i++)
+                        simulateGrid[current] = lookUpFluid[current];
+                        for (int i = -3; i < 4; i++)
                         {
-                            for (int j = -2; j < 3; j++)
+                            for (int j = -3; j < 4; j++)
                             {
                                 int _x = x + i;
                                 int _z = z + j;
@@ -155,16 +159,17 @@ public class FluidSystem
                     if (lookUpFluid[current] == 2)
                     {
                         // volatile only spread if near ground
+                        simulateGrid[current] = lookUpFluid[current];
                         int a = y - 1;
 
                         if (a >= 0)
                         {
                             int belowA = z * width * 256 + a * width + x;
-                            if (lookUpDensity[belowA] > 0)
+                            if (lookUpDensity[belowA] > 0 )
                             {
-                                for (int i = -5; i < 6; i++)
+                                for (int i = -3; i < 4; i++)
                                 {
-                                    for (int j = -5; j < 6; j++)
+                                    for (int j = -3; j < 4; j++)
                                     {
                                         int _x = x + i;
                                         int _z = z + j;
@@ -172,7 +177,8 @@ public class FluidSystem
                                         if (_x < width && _x >= 0 && _z < width && _z >= 0)
                                         {
                                             int dirIndex = _z * width * 256 + a * width + _x;
-                                            if (lookUpDensity[dirIndex] < 0 && lookUpFluid[dirIndex] == 0)
+                                            if (lookUpDensity[dirIndex] < 0 && lookUpFluid[dirIndex] == 0 &&
+                                                lookUpDensity[dirIndex] <= lookUpDensity[current])
                                             {
                                                 simulateGrid[dirIndex] = 2;
                                                 if (!_updateSet.Contains(curr))
