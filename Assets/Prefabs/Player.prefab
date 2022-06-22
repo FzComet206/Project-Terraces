@@ -214,10 +214,47 @@ MonoBehaviour:
       m_Action: Quit
       m_Flags: 0
     m_Flags: 0
-  deleted: 0
+  switchBrush:
+    m_Name: Switch Brush
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: ceee9cbd-39c7-4ece-adb8-078025374628
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 1b98372c-853b-4d83-b507-9f1483ba26d1
+      m_Path: <Keyboard>/c
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Switch Brush
+      m_Flags: 0
+    m_Flags: 0
+  mouseScrollDelta:
+    m_Name: Mouse Scroll Delta
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: a5709755-565a-47df-ad8d-5fa8ccf88081
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 07045798-50d9-4813-99de-5fe50ce7601f
+      m_Path: <Mouse>/scroll
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Mouse Scroll Delta
+      m_Flags: 0
+    m_Flags: 0
   cruiseSpeed: 3000
   rotateSpeed: 5
   cursorHead: {fileID: 1925858161143433088}
+  addBrush: {fileID: 2100000, guid: 17b53fcf0eeab1741976ec24560ab0c6, type: 2}
+  waterBrush: {fileID: 2100000, guid: 62a5fdea797a94491acd19187375bc97, type: 2}
+  specialBrush: {fileID: 2100000, guid: 0339916a6511a4d4184617a4440361b5, type: 2}
+  mod: 0
   updating: 0
 --- !u!1 &1925858161143433088
 GameObject:
@@ -280,7 +317,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 62a5fdea797a94491acd19187375bc97, type: 2}
+  - {fileID: 2100000, guid: 17b53fcf0eeab1741976ec24560ab0c6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

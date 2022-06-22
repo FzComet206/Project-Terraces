@@ -22,17 +22,20 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private InputAction modify;
     [SerializeField] private InputAction adding;
     [SerializeField] private InputAction subtracting;
-    
     [SerializeField] private InputAction cruise;
     [SerializeField] private InputAction mouse;
-    
     [SerializeField] private InputAction quit;
-    
-    public bool deleted = false;
 
+    [SerializeField] private InputAction switchBrush;
+    [SerializeField] private InputAction mouseScrollDelta;
+    
     [SerializeField] float cruiseSpeed;
     [SerializeField] float rotateSpeed;
     [SerializeField] GameObject cursorHead;
+
+    [SerializeField] private Material addBrush;
+    [SerializeField] private Material waterBrush;
+    [SerializeField] private Material specialBrush;
 
     private Rigidbody rb;
     private Camera cam;
@@ -58,7 +61,8 @@ public class PlayerControl : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         
         StartCoroutine(BrushCoroutine());
-        StartCoroutine(MoveAndRotate());
+        StartCoroutine(FixedInputUpdate());
+        StartCoroutine(InputCapture());
     }
 
     void Update()
@@ -91,6 +95,7 @@ public class PlayerControl : MonoBehaviour
         {
             cursorHead.SetActive(false);
         }
+        
 
         if (quit.ReadValue<float>() > 0f)
         {
@@ -100,10 +105,52 @@ public class PlayerControl : MonoBehaviour
         }
     }
 
-    IEnumerator MoveAndRotate()
+    IEnumerator InputCapture()
+    {
+        BrushSystem brushSystem = worldManager.brushSystem;
+        while (true)
+        {
+            if (switchBrush.ReadValue<float>() > 0)
+            {
+                if (brushSystem.opType == OperationType.add)
+                {
+                    brushSystem.opType = OperationType.water;
+                    cursorHead.GetComponent<MeshRenderer>().material = waterBrush;
+                } else if (brushSystem.opType == OperationType.water)
+                {
+                    brushSystem.opType = OperationType.special;
+                    cursorHead.GetComponent<MeshRenderer>().material = specialBrush;
+                }
+                else
+                {
+                    brushSystem.opType = OperationType.add;
+                    cursorHead.GetComponent<MeshRenderer>().material = addBrush;
+                }
+
+                // cooldown
+            }
+
+
+            yield return new WaitForSecondsRealtime(0.1f);
+        }
+    }
+
+    IEnumerator FixedInputUpdate()
     {
         while (true)
         {
+            // brush size
+            cursorHead.transform.localScale = Vector3.one * worldManager.brushSystem.brushSize / 1.5f;
+            Vector2 deltaScroll = mouseScrollDelta.ReadValue<Vector2>();
+            float sx = deltaScroll.y * 1f * Time.fixedDeltaTime;
+            float sy = deltaScroll.x * 1f * Time.fixedDeltaTime;
+            float size = (float) worldManager.brushSystem.brushSize;
+
+            size += sx;
+            size -= sy;
+            int fsize = Mathf.Clamp(Mathf.RoundToInt(size), 2, 10);
+            worldManager.brushSystem.brushSize = fsize;
+            
             // movement
             Vector3 c = cruise.ReadValue<Vector3>();
             Vector3 forward = c.z * transform.forward;
@@ -297,6 +344,8 @@ public class PlayerControl : MonoBehaviour
         modify.Enable();
         adding.Enable();
         subtracting.Enable();
+        switchBrush.Enable();
+        mouseScrollDelta.Enable();
         quit.Enable();
     }
 
@@ -307,6 +356,8 @@ public class PlayerControl : MonoBehaviour
         modify.Disable();
         adding.Disable();
         subtracting.Disable();
+        switchBrush.Disable();
+        mouseScrollDelta.Disable();
         quit.Disable();
     }
 }
