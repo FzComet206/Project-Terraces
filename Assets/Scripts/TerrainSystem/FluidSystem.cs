@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Security.Policy;
+using System.Transactions;
 using Unity.Mathematics;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -10,20 +12,32 @@ public class FluidSystem
     public int[] lookUpFluid;
     public int[] simulateGrid;
 
-    public Vector3 playerPos;
     private int width = 105;
     private int offset = 45;
+    
+    public Vector3 playerPos;
+    public Queue<int2> updateQueue;
+    public HashSet<int2> updateSet;
+
     public Dictionary<int2, ChunkMemory> chunksDict;
+
+    public float threadSpeed;
     public FluidSystem(ChunkSystem chunkSystem)
     {
         lookUpDensity = new int[width * width * 256];
         lookUpFluid = new int[width * width * 256];
         simulateGrid = new int[width * width * 256];
         chunksDict = chunkSystem.chunksDict;
+        
+        updateQueue = new Queue<int2>();
+        updateSet = new HashSet<int2>();
     }
 
     public void Simulate()
     {
+        updateQueue.Clear();
+        updateSet.Clear();
+        
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
 
@@ -78,6 +92,10 @@ public class FluidSystem
             {
                 for (int y = 0; y < 256; y++)
                 {
+                    int2 relative = new int2(Mathf.FloorToInt((x - offset) / 15f), Mathf.FloorToInt((z - offset) / 15f));
+                    int2 curr = origin + relative;
+                    
+                    // indexes
                     int current = z * width * 256 + y * width + x;
                     int below = z * width * 256 + (y - 1) * width + x;
 
@@ -90,9 +108,15 @@ public class FluidSystem
                     if (lookUpFluid[current] == 1)
                     {
                         simulateGrid[current] = 1;
-                        if (lookUpDensity[below] <= 0)
+                        if (lookUpDensity[below] < 0 && lookUpFluid[below] == 0)
                         {
+                            // the part that changes
                             simulateGrid[below] = 1;
+                            if (!updateSet.Contains(curr))
+                            {
+                                updateSet.Add(curr);
+                                updateQueue.Enqueue(curr);
+                            }
                         }
                     }
                 }
@@ -168,7 +192,6 @@ public class FluidSystem
         }
 
         stopwatch.Stop();
-        float ts = stopwatch.ElapsedMilliseconds;
-        Debug.Log("fluid ended in " + ts);
+        threadSpeed = stopwatch.ElapsedMilliseconds;
     }
 }

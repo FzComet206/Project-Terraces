@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using System.Threading;
-using Microsoft.Win32.SafeHandles;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -47,6 +45,7 @@ public class WorldManager : MonoBehaviour
 
     // Utils
     private Text fps;
+    private Text threadSpeed;
 
     private void Awake()
     {
@@ -65,7 +64,8 @@ public class WorldManager : MonoBehaviour
         InitSystems();
         StartWorld();
         
-        fps = FindObjectOfType<Text>();
+        fps = FindObjectsOfType<Text>()[1];
+        threadSpeed = FindObjectsOfType<Text>()[0];
         StartCoroutine(DisplayFPS());
     }
 
@@ -226,47 +226,23 @@ public class WorldManager : MonoBehaviour
 
     private IEnumerator FluidUpdate(Queue<int2> process)
     {
-        while (process.Count != 0)
+        while (process.Count > 0)
         {
-            if (process.Count == 1)
-            {
-                ChunkMemory cm = chunkSystem.chunksDict[process.Dequeue()];
-                GameObject chunkObject = cm.waterChunk;
-                Chunk chunk = cm.chunk;
+            ChunkMemory cm = chunkSystem.chunksDict[process.Dequeue()];
+            GameObject chunkObject = cm.waterChunk;
+            Chunk chunk = cm.chunk;
 
-                (Vector3[] verts, int[] tris) = meshSystem.GenerateFluidData(chunk.fluid, chunk.data);
-                MeshFilter mf = chunkObject.GetComponent<MeshFilter>();
+            (Vector3[] verts, int[] tris) = meshSystem.GenerateFluidData(chunk.fluid, chunk.data);
+            MeshFilter mf = chunkObject.GetComponent<MeshFilter>();
 
-                mf.sharedMesh.Clear();
-                mf.sharedMesh.SetVertices(verts);
-                mf.sharedMesh.SetTriangles(tris, 0);
-                mf.sharedMesh.RecalculateNormals();
-                mf.sharedMesh.RecalculateTangents();
+            mf.sharedMesh.Clear();
+            mf.sharedMesh.SetVertices(verts);
+            mf.sharedMesh.SetTriangles(tris, 0);
+            mf.sharedMesh.RecalculateNormals();
+            mf.sharedMesh.RecalculateTangents();
 
-                yield return new WaitForEndOfFrame();
-            }
-            else
-            {
-                for (int i = 0; i < 2; i++)
-                {
-                    ChunkMemory cm = chunkSystem.chunksDict[process.Dequeue()];
-                    GameObject chunkObject = cm.waterChunk;
-                    Chunk chunk = cm.chunk;
-
-                    (Vector3[] verts, int[] tris) = meshSystem.GenerateFluidData(chunk.fluid, chunk.data);
-                    MeshFilter mf = chunkObject.GetComponent<MeshFilter>();
-
-                    mf.sharedMesh.Clear();
-                    mf.sharedMesh.SetVertices(verts);
-                    mf.sharedMesh.SetTriangles(tris, 0);
-                    mf.sharedMesh.RecalculateNormals();
-                    mf.sharedMesh.RecalculateTangents();
-
-                    yield return new WaitForEndOfFrame();
-                }
-            }
+            yield return new WaitForEndOfFrame();
         }
-        Debug.Log("all simulated chunks has updated for this second");
     }
     
     // ReSharper disable Unity.PerformanceAnalysis
@@ -339,6 +315,7 @@ public class WorldManager : MonoBehaviour
         while (true)
         {
             fps.text = String.Format("{0} FPS", Mathf.RoundToInt(1f / Time.deltaTime));
+            threadSpeed.text = String.Format("TS {0} ms", fluidSystem.threadSpeed);
             yield return new WaitForSeconds(0.5f);
         }
     }

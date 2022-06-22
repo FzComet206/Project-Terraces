@@ -130,6 +130,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1132773523, guid: c1bc4424ac7df4f6498124d44c3aa240, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1132773524, guid: c1bc4424ac7df4f6498124d44c3aa240, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 51.80005
+      objectReference: {fileID: 0}
+    - target: {fileID: 1132773524, guid: c1bc4424ac7df4f6498124d44c3aa240, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -30.599976
+      objectReference: {fileID: 0}
     - target: {fileID: 5297375941645377111, guid: c1bc4424ac7df4f6498124d44c3aa240, type: 3}
       propertyPath: m_Name
       value: Canvas
@@ -533,7 +545,7 @@ PrefabInstance:
       objectReference: {fileID: 1601801603}
     - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
       propertyPath: chunkInput.renderDistance
-      value: 10
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
