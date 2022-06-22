@@ -12,7 +12,7 @@ public class FluidSystem
 
     public Vector3 playerPos;
     private int width = 105;
-    private int offset = 60;
+    private int offset = 45;
     public Dictionary<int2, ChunkMemory> chunksDict;
     public FluidSystem(ChunkSystem chunkSystem)
     {
@@ -26,6 +26,8 @@ public class FluidSystem
     {
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
+
+        simulateGrid = new int[width * width * 256];
         
         // copy data
         Dictionary<int2, ChunkMemory> cd = chunksDict;
@@ -76,15 +78,22 @@ public class FluidSystem
             {
                 for (int y = 0; y < 256; y++)
                 {
-                    int globalIndex = z * width * 256 + y * width + x;
+                    int current = z * width * 256 + y * width + x;
+                    int below = z * width * 256 + (y - 1) * width + x;
 
-                    if (y % 255 == 0 || z % (width - 1) == 0 || x % (width - 1) == 0)
+                    // drop
+                    if (y - 1 < 0)
                     {
-                        simulateGrid[globalIndex] = 0;
+                        continue;
                     }
-                    else
+                    
+                    if (lookUpFluid[current] == 1)
                     {
-                        simulateGrid[globalIndex] = 1;
+                        simulateGrid[current] = 1;
+                        if (lookUpDensity[below] <= 0)
+                        {
+                            simulateGrid[below] = 1;
+                        }
                     }
                 }
             }

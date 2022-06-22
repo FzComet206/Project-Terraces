@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.Threading;
+using Microsoft.Win32.SafeHandles;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -104,7 +106,7 @@ public class WorldManager : MonoBehaviour
         StartCoroutine(ChunkGenCoroutine());
         yield return new WaitForFixedUpdate();
         StartCoroutine(WorldCullCoroutine());
-        yield return new WaitForSecondsRealtime(2.5f);
+        yield return new WaitForSecondsRealtime(3f);
         StartCoroutine(FluidCoroutine());
     }
 
@@ -191,17 +193,44 @@ public class WorldManager : MonoBehaviour
 
     private IEnumerator FluidCoroutine()
     {
-        fluidSystem.playerPos = Vector3.one;
-        Thread last = ThreadManager.Worker(fluidSystem);
-        yield return new WaitForSecondsRealtime(1);
-
-        for (int i = -2; i < 3; i++)
+        while (true)
         {
-            for (int j = -2; j < 3; j++)
+            // start thread
+            fluidSystem.playerPos = player.transform.position;
+            Thread last = ThreadManager.Worker(fluidSystem);
+            
+            // get update coord
+            int2 origin = new int2((int)(player.transform.position.x / 15f), (int)(player.transform.position.z / 15f));
+            Queue<int2> process = new Queue<int2>();
+            for (int i = -3; i < 4; i++)
             {
-                int2 coord = new int2(i, j);
-                
-                ChunkMemory cm = chunkSystem.chunksDict[coord];
+                for (int j = -3; j < 4 ; j++)
+                {
+                    process.Enqueue(new int2(i, j) + origin);
+                }
+            }
+            
+            // wait
+            yield return new WaitForSecondsRealtime(0.5f);
+
+            if (last.IsAlive)
+            {
+                Debug.Log("aborting thread");
+                last.Abort();
+            }
+
+            // chain update
+            StartCoroutine(FluidUpdate(process));
+        }
+    }
+
+    private IEnumerator FluidUpdate(Queue<int2> process)
+    {
+        while (process.Count != 0)
+        {
+            if (process.Count == 1)
+            {
+                ChunkMemory cm = chunkSystem.chunksDict[process.Dequeue()];
                 GameObject chunkObject = cm.waterChunk;
                 Chunk chunk = cm.chunk;
 
@@ -213,9 +242,31 @@ public class WorldManager : MonoBehaviour
                 mf.sharedMesh.SetTriangles(tris, 0);
                 mf.sharedMesh.RecalculateNormals();
                 mf.sharedMesh.RecalculateTangents();
+
+                yield return new WaitForEndOfFrame();
+            }
+            else
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    ChunkMemory cm = chunkSystem.chunksDict[process.Dequeue()];
+                    GameObject chunkObject = cm.waterChunk;
+                    Chunk chunk = cm.chunk;
+
+                    (Vector3[] verts, int[] tris) = meshSystem.GenerateFluidData(chunk.fluid, chunk.data);
+                    MeshFilter mf = chunkObject.GetComponent<MeshFilter>();
+
+                    mf.sharedMesh.Clear();
+                    mf.sharedMesh.SetVertices(verts);
+                    mf.sharedMesh.SetTriangles(tris, 0);
+                    mf.sharedMesh.RecalculateNormals();
+                    mf.sharedMesh.RecalculateTangents();
+
+                    yield return new WaitForEndOfFrame();
+                }
             }
         }
-
+        Debug.Log("all simulated chunks has updated for this second");
     }
     
     // ReSharper disable Unity.PerformanceAnalysis
