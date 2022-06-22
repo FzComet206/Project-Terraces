@@ -11,8 +11,8 @@ public class FluidSystem
     public int[] simulateGrid;
 
     public Vector3 playerPos;
-    private int width = 45;
-    private int offset = 15;
+    private int width = 105;
+    private int offset = 60;
     public Dictionary<int2, ChunkMemory> chunksDict;
     public FluidSystem(ChunkSystem chunkSystem)
     {
@@ -110,7 +110,6 @@ public class FluidSystem
                         currFluid = cd[curr].chunk.fluid;
                     }
                     
-                    
                     int globalIndex = z * width * 256 + y * width + x;
                     
                     // normal case
@@ -120,38 +119,37 @@ public class FluidSystem
                     currFluid[localIndex] = simulateGrid[globalIndex];
                     
                     // edge case
-                    if (_z == 0 && _x == 0)
+                    if (_z == 14 && _x == 14)
                     {
-                        if (z + 15 < width && x + 15 < width)
+                        if (z + 1 < width && x + 1 < width)
                         {
-                            Debug.Log(curr);
-                            int duplicateGlobal0 = (z + 15) * width * 256 + y * width + (x + 15);
+                            int duplicateGlobal0 = (z + 1) * width * 256 + y * width + (x + 1);
                             int duplicateLocal0 = 15 * 16 * 256 + y * 16 + 15;
                             currFluid[duplicateLocal0] = simulateGrid[duplicateGlobal0];
                             
-                            int duplicateGlobal1 = (z + 15) * width * 256 + y * width + x;
+                            int duplicateGlobal1 = (z + 1) * width * 256 + y * width + x;
                             int duplicateLocal1 = 15 * 16 * 256 + y * 16 + _x;
                             currFluid[duplicateLocal1] = simulateGrid[duplicateGlobal1];
                             
-                            int duplicateGlobal2 = z * width * 256 + y * width + (x + 15);
+                            int duplicateGlobal2 = z * width * 256 + y * width + (x + 1);
                             int duplicateLocal2 = _z * 16 * 256 + y * 16 + 15;
                             currFluid[duplicateLocal2] = simulateGrid[duplicateGlobal2];
                         }
 
-                    } else if (_z == 0 )
+                    } else if (_z == 14)
                     {
-                        if (z + 15 < width)
+                        if (z + 1 < width)
                         {
-                            int duplicateGlobal = (z + 15) * width * 256 + y * width + x;
+                            int duplicateGlobal = (z + 1) * width * 256 + y * width + x;
                             int duplicateLocal = 15 * 16 * 256 + y * 16 + _x;
                             currFluid[duplicateLocal] = simulateGrid[duplicateGlobal];
                         }
                         
-                    } else if (_x == 0 )
+                    } else if (_x == 14)
                     {
-                        if (x + 15 < width)
+                        if (x + 1 < width)
                         {
-                            int duplicateGlobal = z * width * 256 + y * width + (x + 15);
+                            int duplicateGlobal = z * width * 256 + y * width + (x + 1);
                             int duplicateLocal = _z * 16 * 256 + y * 16 + 15;
                             currFluid[duplicateLocal] = simulateGrid[duplicateGlobal];
                         }
