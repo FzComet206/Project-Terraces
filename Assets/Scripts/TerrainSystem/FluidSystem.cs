@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Unity.Mathematics;
@@ -9,8 +10,8 @@ public class FluidSystem
     public int[] lookUpFluid;
     public int[] simulateGrid;
 
-    private int width = 105;
-    private int offset = 45;
+    private int width = 130;
+    private int offset = 60;
     private int[][] eightDir;
     
     public Vector3 playerPos;
@@ -33,6 +34,8 @@ public class FluidSystem
     {
         update.Clear();
         HashSet<int2> _updateSet = new HashSet<int2>();
+        HashSet<int> tempI = new HashSet<int>();
+        HashSet<int> tempJ = new HashSet<int>();
 
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
@@ -80,8 +83,7 @@ public class FluidSystem
         
 
         // simulate
-        
-        // if indexes are at global edge, water mask most be 0
+
         for (int z = 0; z < width ; z++)
         {
             for (int x = 0; x < width; x++)
@@ -90,12 +92,6 @@ public class FluidSystem
                 {
                     int current = z * width * 256 + y * width + x;
                     
-                    if (z % (width - 1) == 0 || x % (width - 1) == 0 || y % 255 == 0)
-                    {
-                        simulateGrid[current] = lookUpFluid[current];
-                        continue;
-                    }
-
                     int2 relative = new int2(Mathf.FloorToInt((x - offset) / 15f), Mathf.FloorToInt((z - offset) / 15f));
                     int2 curr = origin + relative;
                     
@@ -103,11 +99,10 @@ public class FluidSystem
 
                     if (lookUpFluid[current] > 0)
                     {
+                        // drop
                         simulateGrid[current] = lookUpFluid[current];
 
-                        // drop
-
-                        for (int i = 1; i < 4; i++)
+                        for (int i = 1; i < 5; i++)
                         {
                             if (y - i < 0)
                             {
@@ -120,14 +115,25 @@ public class FluidSystem
                             {
                                 // the part that changes
                                 simulateGrid[below] = 2;
-                                if (!_updateSet.Contains(curr))
+                                // optimizer
+                                for (int j = -1; j < 2; j++)
                                 {
-                                    _updateSet.Add(curr);
+                                    for (int k = -1; k < 2; k++)
+                                    {
+                                        int2 _curr = new int2(curr.x + j, curr.y + k);
+                                        if (!_updateSet.Contains(_curr))
+                                        {
+                                            _updateSet.Add(_curr);
+                                        }
+                                    }
                                 }
+                            }
+                            else
+                            {
+                                break;
                             }
                         }
                     }
-
 
                     if (lookUpFluid[current] == 1)
                     {
@@ -143,47 +149,60 @@ public class FluidSystem
                                 if (_x < width && _x >= 0 && _z < width && _z >= 0)
                                 {
                                     int dirIndex = _z * width * 256 + y * width + _x;
-                                    if (lookUpDensity[dirIndex] < 0 && lookUpFluid[dirIndex] == 0)
+                                    if (lookUpDensity[dirIndex] < 0 && lookUpFluid[dirIndex] == 0 &&
+                                        !tempI.Contains(i) && !tempJ.Contains(j))
                                     {
                                         simulateGrid[dirIndex] = 1;
-                                        if (!_updateSet.Contains(curr))
+                                        // optimizer
+                                        for (int k = -1; k < 2; k++)
                                         {
-                                            _updateSet.Add(curr);
+                                            for (int l = -1; l < 2; l++)
+                                            {
+                                                int2 _curr = new int2(curr.x + k, curr.y + l);
+                                                if (!_updateSet.Contains(_curr))
+                                                {
+                                                    _updateSet.Add(_curr);
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
+                        continue;
                     }
 
                     if (lookUpFluid[current] == 2)
                     {
                         // volatile only spread if near ground
-                        simulateGrid[current] = lookUpFluid[current];
-                        int a = y - 1;
-
-                        if (a >= 0)
+                        int below = z * width * 256 + (y-1) * width + x;
+                        if (lookUpDensity[below] >= 0)
                         {
-                            int belowA = z * width * 256 + a * width + x;
-                            if (lookUpDensity[belowA] > 0 )
+                            simulateGrid[current] = lookUpFluid[current];
+                            for (int i = -2; i < 3; i++)
                             {
-                                for (int i = -3; i < 4; i++)
+                                for (int j = -2; j < 3; j++)
                                 {
-                                    for (int j = -3; j < 4; j++)
-                                    {
-                                        int _x = x + i;
-                                        int _z = z + j;
+                                    int _x = x + i;
+                                    int _z = z + j;
 
-                                        if (_x < width && _x >= 0 && _z < width && _z >= 0)
+                                    if (_x < width && _x >= 0 && _z < width && _z >= 0)
+                                    {
+                                        int dirIndex = _z * width * 256 + y * width + _x;
+                                        
+                                        if (lookUpDensity[dirIndex] < 0 && lookUpFluid[dirIndex] == 0)
                                         {
-                                            int dirIndex = _z * width * 256 + a * width + _x;
-                                            if (lookUpDensity[dirIndex] < 0 && lookUpFluid[dirIndex] == 0 &&
-                                                lookUpDensity[dirIndex] <= lookUpDensity[current])
+                                            simulateGrid[dirIndex] = 2;
+                                            // optimizer
+                                            for (int k = -1; k < 2; k++)
                                             {
-                                                simulateGrid[dirIndex] = 2;
-                                                if (!_updateSet.Contains(curr))
+                                                for (int l = -1; l < 2; l++)
                                                 {
-                                                    _updateSet.Add(curr);
+                                                    int2 _curr = new int2(curr.x + k, curr.y + l);
+                                                    if (!_updateSet.Contains(_curr))
+                                                    {
+                                                        _updateSet.Add(_curr);
+                                                    }
                                                 }
                                             }
                                         }

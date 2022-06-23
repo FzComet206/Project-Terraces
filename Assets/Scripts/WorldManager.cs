@@ -203,19 +203,8 @@ public class WorldManager : MonoBehaviour
             fluidSystem.playerPos = player.transform.position;
             Thread last = ThreadManager.Worker(fluidSystem);
             
-            // get update coord
-            int2 origin = new int2((int)(player.transform.position.x / 15f), (int)(player.transform.position.z / 15f));
-            Queue<int2> process = new Queue<int2>();
-            for (int i = -3; i < 4; i++)
-            {
-                for (int j = -3; j < 4 ; j++)
-                {
-                    process.Enqueue(new int2(i, j) + origin);
-                }
-            }
-            
             // wait
-            yield return new WaitForSecondsRealtime(0.5f);
+            yield return new WaitForSecondsRealtime(0.6f);
 
             if (last.IsAlive)
             {
@@ -230,6 +219,7 @@ public class WorldManager : MonoBehaviour
 
     private IEnumerator FluidUpdate(List<int2> process)
     {
+        Debug.Log(process.Count);
         List<int2> update = new List<int2>();
         foreach (var v in process)
         {
@@ -250,7 +240,7 @@ public class WorldManager : MonoBehaviour
             ck.FluidFil.sharedMesh.RecalculateNormals();
             ck.FluidFil.sharedMesh.RecalculateTangents();
             c++;
-            if (c % 3 == 0)
+            if (c % 4 == 0)
             {
                 yield return new WaitForEndOfFrame();
             }
