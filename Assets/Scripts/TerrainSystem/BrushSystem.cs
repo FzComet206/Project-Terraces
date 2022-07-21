@@ -7,6 +7,8 @@ public enum BrushShape
 {
     Square,
     Sphere,
+    special,
+    smooth,
 }
 
 public enum OperationType
@@ -14,7 +16,8 @@ public enum OperationType
     set,
     add,
     special,
-    water
+    water,
+    smooth
 }
 
 public struct VoxelOperation
@@ -35,9 +38,10 @@ public struct VoxelOperation
 public class BrushSystem
 {
     // debug parameters
+    public Dictionary<int2, Chunk> chunkDict;
 
     public int brushSize = 10;
-    public int brushMultiplier = 2;
+    public int brushMultiplier = 1;
 
     public BrushShape brushShape;
     public OperationType opType;
@@ -169,9 +173,68 @@ public class BrushSystem
                 }
                 
                 return (int) value * brushMultiplier;
-                
+            
+            case BrushShape.special:
+                int origin = SampleLocalVoxel(x, y, z);
+
+                if (0 < origin)
+                {
+                    return 1;
+                }
+                return -1;
+            
+            case BrushShape.smooth:
+                int count = 0;
+                int avg = 0;
+
+                for (int i = -1; i < 2; i++)
+                {
+                    for (int j = -1; j < 2; j++)
+                    {
+                        for (int k = -1; k < 2; k++)
+                        {
+                            if (y + j < 255 && y + j >= 0)
+                            {
+                                count++;
+                                avg += SampleLocalVoxel(x + i, y + j, z + k);
+                            }
+                        }
+                    }
+                }
+
+                if (count == 0)
+                {
+                    return -1;
+                }
+
+                return avg / count;
+
             default:
                 return -1;
         }
+    }
+
+    private int SampleLocalVoxel(int x, int y, int z)
+    {
+        int coordX = Mathf.FloorToInt(x / 15f);
+        int coordZ = Mathf.FloorToInt(z / 15f);
+        int2 coord = new int2(coordX, coordZ);
+        
+        int localX = x % 15;
+        int localZ = z % 15;
+        
+        if (x < 0)
+        {
+            localX = 14 - Math.Abs((x + 1) % 15);
+        }
+
+        if (z < 0)
+        {
+            localZ = 14 - Math.Abs((z + 1) % 15);
+        }
+
+        int data = chunkDict[coord].data[localZ * 16 * 256 + y * 16 + localX];
+        
+        return data;
     }
 }

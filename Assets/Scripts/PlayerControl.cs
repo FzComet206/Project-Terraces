@@ -35,6 +35,7 @@ public class PlayerControl : MonoBehaviour
 
     [SerializeField] private Material addBrush;
     [SerializeField] private Material waterBrush;
+    [SerializeField] private Material smoothBrush;
     [SerializeField] private Material specialBrush;
 
     private Rigidbody rb;
@@ -74,7 +75,7 @@ public class PlayerControl : MonoBehaviour
         Ray cursorRay = cam.ScreenPointToRay(screenPoint);
         RaycastHit hit = new RaycastHit();
         Physics.Raycast(cursorRay, out hit, 300f);
-        cursorPosition = hit.point + Vector3.ClampMagnitude(hit.normal, 0.2f);
+        cursorPosition = hit.point;
         
         // determine is modifying
         float m = modify.ReadValue<float>();
@@ -105,6 +106,37 @@ public class PlayerControl : MonoBehaviour
         }
     }
 
+    private void FixedUpdate()
+    {
+        cursorHead.transform.localScale = Vector3.one * worldManager.brushSystem.brushSize / 1.5f;
+        Vector2 deltaScroll = mouseScrollDelta.ReadValue<Vector2>();
+        float sx = deltaScroll.y * 1f * Time.fixedDeltaTime;
+        float sy = deltaScroll.x * 1f * Time.fixedDeltaTime;
+        float size = worldManager.brushSystem.brushSize;
+
+        size += sx;
+        size -= sy;
+        int fsize = Mathf.Clamp(Mathf.RoundToInt(size), 2, 10);
+        worldManager.brushSystem.brushSize = fsize;
+        
+        // movement
+        Vector3 c = cruise.ReadValue<Vector3>();
+        Vector3 forward = c.z * transform.forward;
+        Vector3 right = c.x * transform.right;
+        Vector3 up = c.y * Vector3.up;
+        Vector3 vel = (forward + up + right).normalized * (cruiseSpeed * Time.fixedDeltaTime);
+        rb.velocity = vel;
+        
+        // rotation
+        Vector2 delta = mouse.ReadValue<Vector2>();
+        float rx = delta.y * rotateSpeed * Time.fixedDeltaTime;
+        float ry = delta.x * rotateSpeed * Time.fixedDeltaTime;
+        xRotation -= rx;
+        xRotation = Mathf.Clamp(xRotation, -90, 90);
+        yRotation += ry;
+        transform.rotation = Quaternion.Euler(xRotation, yRotation, 0f).normalized;
+    }
+
     IEnumerator InputCapture()
     {
         BrushSystem brushSystem = worldManager.brushSystem;
@@ -115,60 +147,39 @@ public class PlayerControl : MonoBehaviour
                 if (brushSystem.opType == OperationType.add)
                 {
                     brushSystem.opType = OperationType.water;
+                    brushSystem.brushShape = BrushShape.Sphere;
                     cursorHead.GetComponent<MeshRenderer>().material = waterBrush;
-                } else if (brushSystem.opType == OperationType.water)
+                    yield return new WaitForSecondsRealtime(0.2f);
+                }
+                else if (brushSystem.opType == OperationType.water)
+                {
+                    brushSystem.opType = OperationType.smooth;
+                    brushSystem.brushShape = BrushShape.smooth;
+                    cursorHead.GetComponent<MeshRenderer>().material = smoothBrush;
+                    yield return new WaitForSecondsRealtime(0.2f);
+                }
+                else if (brushSystem.opType == OperationType.smooth)
                 {
                     brushSystem.opType = OperationType.special;
+                    brushSystem.brushShape = BrushShape.special;
                     cursorHead.GetComponent<MeshRenderer>().material = specialBrush;
+                    yield return new WaitForSecondsRealtime(0.2f);
                 }
-                else
+                else if (brushSystem.opType == OperationType.special)
                 {
                     brushSystem.opType = OperationType.add;
+                    brushSystem.brushShape = BrushShape.Sphere;
                     cursorHead.GetComponent<MeshRenderer>().material = addBrush;
+                    yield return new WaitForSecondsRealtime(0.2f);
                 }
-
-                // cooldown
             }
-
-
-            yield return new WaitForSecondsRealtime(0.1f);
+            yield return new WaitForEndOfFrame();
         }
     }
 
     IEnumerator FixedInputUpdate()
     {
-        while (true)
-        {
-            // brush size
-            cursorHead.transform.localScale = Vector3.one * worldManager.brushSystem.brushSize / 1.5f;
-            Vector2 deltaScroll = mouseScrollDelta.ReadValue<Vector2>();
-            float sx = deltaScroll.y * 1f * Time.fixedDeltaTime;
-            float sy = deltaScroll.x * 1f * Time.fixedDeltaTime;
-            float size = (float) worldManager.brushSystem.brushSize;
-
-            size += sx;
-            size -= sy;
-            int fsize = Mathf.Clamp(Mathf.RoundToInt(size), 2, 10);
-            worldManager.brushSystem.brushSize = fsize;
-            
-            // movement
-            Vector3 c = cruise.ReadValue<Vector3>();
-            Vector3 forward = c.z * transform.forward;
-            Vector3 right = c.x * transform.right;
-            Vector3 up = c.y * Vector3.up;
-            Vector3 vel = (forward + up + right).normalized * (cruiseSpeed * Time.fixedDeltaTime);
-            rb.velocity = vel;
-            
-            // rotation
-            Vector2 delta = mouse.ReadValue<Vector2>();
-            float rx = delta.y * rotateSpeed * Time.fixedDeltaTime;
-            float ry = delta.x * rotateSpeed * Time.fixedDeltaTime;
-            xRotation -= rx;
-            xRotation = Mathf.Clamp(xRotation, -90, 90);
-            yRotation += ry;
-            transform.rotation = Quaternion.Euler(xRotation, yRotation, 0f).normalized;
-            yield return new WaitForFixedUpdate();
-        }
+        yield return null;
     }
 
     IEnumerator BrushCoroutine()
@@ -255,16 +266,23 @@ public class PlayerControl : MonoBehaviour
                         }
                     }
                     break;
+                
                 case OperationType.special:
 
-                    int diff = Math.Abs(Math.Clamp(chunk.data[localIndex], -32, 31));
-                    chunk.data[localIndex] -= diff;
+                    chunk.data[localIndex] += op;
+                    break;
+                
+                case OperationType.smooth:
+                    chunk.data[localIndex] = op;
                     break;
                 
                 case OperationType.water:
                     if (add)
                     {
-                        chunk.fluid[localIndex] = 2;
+                        if (voxelOperation.densityOperation > 0)
+                        {
+                            chunk.fluid[localIndex] = 2;
+                        }
                     }
                     else
                     {

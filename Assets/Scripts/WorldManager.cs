@@ -39,8 +39,6 @@ public class WorldManager : MonoBehaviour
     // properties
     public bool coroutinePause;
     
-    // runtimes
-    public Queue<int2> simulationQueue;
 
     // Utils
     private Text fps;
@@ -80,6 +78,7 @@ public class WorldManager : MonoBehaviour
         noiseSystem = new NoiseSystem(noiseInput);
         meshSystem = new MeshSystem();
         brushSystem = new BrushSystem();
+        brushSystem.chunkDict = chunkSystem.chunksDict;
         biomeSystem = new BiomeSystem();
         storageSystem = new StorageSystem();
         
@@ -87,8 +86,6 @@ public class WorldManager : MonoBehaviour
 
         noiseSystem.PointsCompute = pointsCompute;
         meshSystem.MarchingCubes = marchingCubes;
-
-        simulationQueue = new Queue<int2>();
     }
 
     public void StartWorld()
@@ -204,14 +201,14 @@ public class WorldManager : MonoBehaviour
             Thread last = ThreadManager.Worker(fluidSystem);
             
             // wait
-            yield return new WaitForSecondsRealtime(0.6f);
+            yield return new WaitForSecondsRealtime(0.5f);
 
             if (last.IsAlive)
             {
                 Debug.Log("aborting thread");
                 last.Abort();
             }
-
+            
             // chain update
             StartCoroutine(FluidUpdate(fluidSystem.update));
         }

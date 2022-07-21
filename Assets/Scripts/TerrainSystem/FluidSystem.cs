@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Unity.Mathematics;
@@ -9,17 +8,18 @@ public class FluidSystem
     public int[] lookUpDensity;
     public int[] lookUpFluid;
     public int[] simulateGrid;
+    public HashSet<int2> _updateSet;
 
-    private int width = 130;
-    private int offset = 60;
-    private int[][] eightDir;
+    private int width = 150;
+    private int offset = 75;
     
     public Vector3 playerPos;
+    public int2 origin;
     public List<int2> update;
-
     public Dictionary<int2, Chunk> chunksDict;
 
     public float threadSpeed;
+    
     public FluidSystem(ChunkSystem chunkSystem)
     {
         lookUpDensity = new int[width * width * 256];
@@ -27,15 +27,14 @@ public class FluidSystem
         simulateGrid = new int[width * width * 256];
         chunksDict = chunkSystem.chunksDict;
 
+        _updateSet = new HashSet<int2>();
         update = new List<int2>();
     }
 
     public void Simulate()
     {
+        _updateSet.Clear();
         update.Clear();
-        HashSet<int2> _updateSet = new HashSet<int2>();
-        HashSet<int> tempI = new HashSet<int>();
-        HashSet<int> tempJ = new HashSet<int>();
 
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
@@ -45,7 +44,7 @@ public class FluidSystem
         // copy data
         Dictionary<int2, Chunk> cd = chunksDict;
         
-        int2 origin = new int2((int)(playerPos.x / 15f), (int)(playerPos.z / 15f));
+        origin = new int2((int)(playerPos.x / 15f), (int)(playerPos.z / 15f));
         int2 lastCoord = new int2(Mathf.FloorToInt(offset / 15f), Mathf.FloorToInt(offset / 15f)) + origin;
 
         int[] currDensity = cd[lastCoord].data;
@@ -80,7 +79,7 @@ public class FluidSystem
                 }
             }
         }
-        
+
 
         // simulate
 
@@ -91,124 +90,20 @@ public class FluidSystem
                 for (int y = 0; y < 256; y++)
                 {
                     int current = z * width * 256 + y * width + x;
-                    
-                    int2 relative = new int2(Mathf.FloorToInt((x - offset) / 15f), Mathf.FloorToInt((z - offset) / 15f));
-                    int2 curr = origin + relative;
-                    
+
                     // indexes
-
-                    if (lookUpFluid[current] > 0)
+                    int density = lookUpFluid[current];
+                    if (density > 0)
                     {
-                        // drop
-                        simulateGrid[current] = lookUpFluid[current];
-
-                        for (int i = 1; i < 5; i++)
+                        if (density == 1)
                         {
-                            if (y - i < 0)
-                            {
-                                continue;
-                            }
-
-                            int below = z * width * 256 + (y - i) * width + x;
-
-                            if (lookUpDensity[below] < 0 && lookUpFluid[below] == 0)
-                            {
-                                // the part that changes
-                                simulateGrid[below] = 2;
-                                // optimizer
-                                for (int j = -1; j < 2; j++)
-                                {
-                                    for (int k = -1; k < 2; k++)
-                                    {
-                                        int2 _curr = new int2(curr.x + j, curr.y + k);
-                                        if (!_updateSet.Contains(_curr))
-                                        {
-                                            _updateSet.Add(_curr);
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                break;
-                            }
+                            simulateGrid[current] = density;
+                            SearchAndAppendIndexes1(x, y, z);
                         }
-                    }
-
-                    if (lookUpFluid[current] == 1)
-                    {
-                        // normal 
-                        simulateGrid[current] = lookUpFluid[current];
-                        for (int i = -3; i < 4; i++)
+                        else if (density == 2)
                         {
-                            for (int j = -3; j < 4; j++)
-                            {
-                                int _x = x + i;
-                                int _z = z + j;
-
-                                if (_x < width && _x >= 0 && _z < width && _z >= 0)
-                                {
-                                    int dirIndex = _z * width * 256 + y * width + _x;
-                                    if (lookUpDensity[dirIndex] < 0 && lookUpFluid[dirIndex] == 0 &&
-                                        !tempI.Contains(i) && !tempJ.Contains(j))
-                                    {
-                                        simulateGrid[dirIndex] = 1;
-                                        // optimizer
-                                        for (int k = -1; k < 2; k++)
-                                        {
-                                            for (int l = -1; l < 2; l++)
-                                            {
-                                                int2 _curr = new int2(curr.x + k, curr.y + l);
-                                                if (!_updateSet.Contains(_curr))
-                                                {
-                                                    _updateSet.Add(_curr);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        continue;
-                    }
-
-                    if (lookUpFluid[current] == 2)
-                    {
-                        // volatile only spread if near ground
-                        int below = z * width * 256 + (y-1) * width + x;
-                        if (lookUpDensity[below] >= 0)
-                        {
-                            simulateGrid[current] = lookUpFluid[current];
-                            for (int i = -2; i < 3; i++)
-                            {
-                                for (int j = -2; j < 3; j++)
-                                {
-                                    int _x = x + i;
-                                    int _z = z + j;
-
-                                    if (_x < width && _x >= 0 && _z < width && _z >= 0)
-                                    {
-                                        int dirIndex = _z * width * 256 + y * width + _x;
-                                        
-                                        if (lookUpDensity[dirIndex] < 0 && lookUpFluid[dirIndex] == 0)
-                                        {
-                                            simulateGrid[dirIndex] = 2;
-                                            // optimizer
-                                            for (int k = -1; k < 2; k++)
-                                            {
-                                                for (int l = -1; l < 2; l++)
-                                                {
-                                                    int2 _curr = new int2(curr.x + k, curr.y + l);
-                                                    if (!_updateSet.Contains(_curr))
-                                                    {
-                                                        _updateSet.Add(_curr);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            simulateGrid[current] = density;
+                            SearchAndAppendIndexes2(x, y, z);
                         }
                     }
                 }
@@ -289,5 +184,126 @@ public class FluidSystem
         }
         stopwatch.Stop();
         threadSpeed = stopwatch.ElapsedMilliseconds;
+    }
+
+    private void SearchAndAppendIndexes2(int x, int y, int z)
+    {
+        if (y - 1 >= 0)
+        {
+            int below = z * width * 256 + (y - 1) * width + x;
+            if (lookUpDensity[below] < 0)
+            {
+                simulateGrid[below] = 2;
+
+                if (lookUpFluid[below] == 0)
+                {
+                    int2 relative = new int2(Mathf.FloorToInt((x - offset) / 15f),
+                        Mathf.FloorToInt((z - offset) / 15f));
+                    int2 curr = origin + relative;
+                    for (int k = -1; k < 2; k++)
+                    {
+                        for (int l = -1; l < 2; l++)
+                        {
+                            int2 _curr = new int2(curr.x + k, curr.y + l);
+                            _updateSet.Add(_curr);
+                        }
+                    }
+                }
+                return;
+            }
+        }
+        
+        int current = z * width * 256 + y * width + x;
+        
+        for (int i = -1; i < 2; i++)
+        {
+            for (int j = -1; j < 2; j++)
+            {
+                int a = x + j;
+                int c = z + i;
+                if (a >= 0 && a < width && c >= 0 && c < width)
+                {
+                    int index = c * width * 256 + y * width + a;
+                    if (lookUpDensity[index] < 0 && lookUpDensity[index] <= lookUpDensity[current])
+                    {
+                        simulateGrid[index] = 2;
+                        
+                        if (lookUpFluid[index] == 0)
+                        {
+                            int2 relative = new int2(Mathf.FloorToInt((x - offset) / 15f),
+                                Mathf.FloorToInt((z - offset) / 15f));
+                            int2 curr = origin + relative;
+                            for (int k = -1; k < 2; k++)
+                            {
+                                for (int l = -1; l < 2; l++)
+                                {
+                                    int2 _curr = new int2(curr.x + k, curr.y + l);
+                                    _updateSet.Add(_curr);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private void SearchAndAppendIndexes1(int x, int y, int z)
+    {
+        for (int i = -1; i < 2; i++)
+        {
+            for (int j = -1; j < 2; j++)
+            {
+                int a = x + j;
+                int c = z + i;
+                if (a >= 0 && a < width && c >= 0 && c < width)
+                {
+                    int index = c * width * 256 + y * width + a;
+                    if (lookUpDensity[index] < 0)
+                    {
+                        simulateGrid[index] = 1;
+
+                        if (lookUpFluid[index] == 0)
+                        {
+                            int2 relative = new int2(Mathf.FloorToInt((x - offset) / 15f),
+                                Mathf.FloorToInt((z - offset) / 15f));
+                            int2 curr = origin + relative;
+                            for (int k = -1; k < 2; k++)
+                            {
+                                for (int l = -1; l < 2; l++)
+                                {
+                                    int2 _curr = new int2(curr.x + k, curr.y + l);
+                                    _updateSet.Add(_curr);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (y - 1 > 0)
+        {
+            int below = z * width * 256 + (y - 1) * width + x;
+            if (lookUpDensity[below] < 0)
+            {
+                simulateGrid[below] = 2;
+
+                if (lookUpFluid[below] == 0)
+                {
+                    int2 relative = new int2(Mathf.FloorToInt((x - offset) / 15f),
+                        Mathf.FloorToInt((z - offset) / 15f));
+                    int2 curr = origin + relative;
+                    for (int k = -1; k < 2; k++)
+                    {
+                        for (int l = -1; l < 2; l++)
+                        {
+                            int2 _curr = new int2(curr.x + k, curr.y + l);
+                            _updateSet.Add(_curr);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

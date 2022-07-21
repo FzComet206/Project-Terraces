@@ -253,6 +253,7 @@ MonoBehaviour:
   cursorHead: {fileID: 1925858161143433088}
   addBrush: {fileID: 2100000, guid: 17b53fcf0eeab1741976ec24560ab0c6, type: 2}
   waterBrush: {fileID: 2100000, guid: 62a5fdea797a94491acd19187375bc97, type: 2}
+  smoothBrush: {fileID: 2100000, guid: bb745791e136fa94997df4b6c0d845de, type: 2}
   specialBrush: {fileID: 2100000, guid: 0339916a6511a4d4184617a4440361b5, type: 2}
   mod: 0
   updating: 0

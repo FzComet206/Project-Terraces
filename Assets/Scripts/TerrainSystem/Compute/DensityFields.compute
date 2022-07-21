@@ -75,7 +75,7 @@ void GenerateDensity (uint3 id : SV_DispatchThreadID)
     float heightWrap = Fbm((pos + float3(123, 653, 15)) / 200) * 5;
 
     // moduloWrap
-    parameterX += Fbm((pos + float3(653, 103, 913)) / 200) * 2;
+    // parameterX += Fbm((pos + float3(653, 103, 913)) / 200) * 2;
 
     // edgeWrap
     parameterY += Fbm((pos + float3(84, 999, 8)) / 200) * 1.5;
@@ -95,7 +95,6 @@ void GenerateDensity (uint3 id : SV_DispatchThreadID)
     // right here is the value output that should be stored
     points[IndexFromCoord(id)] = final;
 
-    // fluid mask is wierd
 
     if (id.y < 45 && final < 0)
     {

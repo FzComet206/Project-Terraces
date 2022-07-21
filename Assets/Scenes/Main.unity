@@ -540,6 +540,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
+      propertyPath: noiseInput.gain
+      value: 0.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
       propertyPath: noiseInput.seed
       value: 1314
       objectReference: {fileID: 0}
@@ -552,6 +556,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1601801603}
     - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
+      propertyPath: noiseInput.parameterX
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
+      propertyPath: noiseInput.parameterY
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
       propertyPath: chunkInput.chunksPerFrame
       value: 4
       objectReference: {fileID: 0}
@@ -562,6 +574,18 @@ PrefabInstance:
     - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
       propertyPath: controllerInput.walkSpeed
       value: 5000
+      objectReference: {fileID: 0}
+    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
+      propertyPath: noiseInput.softFloorWeight
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
+      propertyPath: noiseInput.domainWrapWeight
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2698417190130562037, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
+      propertyPath: chunkInput.maxChunksBeforeCull
+      value: 4000
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dfe97639d21b4ec7961c7f81ef1c988, type: 3}
