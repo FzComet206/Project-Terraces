@@ -47,8 +47,16 @@ public class FluidSystem
         origin = new int2((int)(playerPos.x / 15f), (int)(playerPos.z / 15f));
         int2 lastCoord = new int2(Mathf.FloorToInt(offset / 15f), Mathf.FloorToInt(offset / 15f)) + origin;
 
-        int[] currDensity = cd[lastCoord].data;
-        int[] currFluid = cd[lastCoord].fluid;
+        Chunk chunk;
+        
+        bool contains = cd.TryGetValue(lastCoord, out chunk);
+        if (!contains)
+        {
+            return;
+        }
+
+        int[] currDensity = chunk.data;
+        int[] currFluid = chunk.fluid;
 
         for (int z = 0; z < width ; z++)
         {
@@ -64,8 +72,14 @@ public class FluidSystem
                     if (!curr.Equals(lastCoord))
                     {
                         lastCoord = curr;
-                        currDensity = cd[curr].data;
-                        currFluid = cd[curr].fluid;
+
+                        bool ok = cd.TryGetValue(curr, out chunk);
+                        if (!ok)
+                        {
+                            return;
+                        }
+                        currDensity = chunk.data;
+                        currFluid = chunk.fluid;
                     }
                     
                     int globalIndex = z * width * 256 + y * width + x;

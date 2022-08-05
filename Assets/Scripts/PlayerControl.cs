@@ -202,7 +202,8 @@ public class PlayerControl : MonoBehaviour
                     updating = false;
                 }
             }
-            yield return new WaitForSecondsRealtime(0.02f);
+            // do this 20 times per second
+            yield return new WaitForSecondsRealtime(0.05f);
         }
     }
 
