@@ -41,7 +41,7 @@ public class BrushSystem
     public Dictionary<int2, Chunk> chunkDict;
 
     public int brushSize = 10;
-    public int brushMultiplier = 2;
+    public int brushMultiplier = 1;
 
     public BrushShape brushShape;
     public OperationType opType;

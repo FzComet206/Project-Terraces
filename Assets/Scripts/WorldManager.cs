@@ -227,7 +227,6 @@ public class WorldManager : MonoBehaviour
         foreach (var coord in update)
         {
             Chunk ck = chunkSystem.chunksDict[coord];
-            GameObject chunkObject = ck.FluidObj;
 
             (Vector3[] verts, int[] tris) = meshSystem.GenerateFluidData(ck.fluid, ck.data);
 
