@@ -1,6 +1,6 @@
 ### Download Link ###
 
-> Download here: <a href = https://github.com/FzComet206/Project-Terraces/releases/tag/Experiment/Build.zip> Prototype </a>
+> Windows 64: <a href = https://github.com/FzComet206/Project-Terraces/releases/download/Experiment/Build.zip> An experimental world prototype </a>
 
 ### Controls ###
 
