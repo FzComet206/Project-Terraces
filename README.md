@@ -4,14 +4,14 @@
 
 ### Controls ###
 
-  Move: W A S D Shift Space
+>> Move: W A S D Shift Space
 
-  Toggle Brush: F
+>> Toggle Brush: F
 
-  Change Brush: C
+>> Change Brush: C
 
-  Apply Brush: left click
+>> Apply Brush: left click
 
-  Undo Brush: right click
+>> Undo Brush: right click
 
-  Quit Applicaiton: Q
+>> Quit Applicaiton: Q
