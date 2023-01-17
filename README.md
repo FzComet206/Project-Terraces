@@ -1,8 +1,8 @@
 ### Download Link ###
 
-> Windows 64 Smooth: <a href = https://github.com/FzComet206/Project-Terraces/releases/download/Experiment/Build.zip> An experimental world prototype smooth</a>
+> Windows 64 Smooth: <a href = https://github.com/FzComet206/Project-Terraces/releases/download/Experiment/Build.zip> An experimental world prototype smooth version</a>
 >
-> Windows 64 Blocky: <a href = https://github.com/FzComet206/Project-Terraces/releases/download/ExperimentBlocky/Project.Terraces.Blocky.zip> An experimental world prototype blocky </a>
+> Windows 64 Blocky: <a href = https://github.com/FzComet206/Project-Terraces/releases/download/ExperimentBlocky/Project.Terraces.Blocky.zip> An experimental world prototype blocky version</a>
 
 ### Controls ###
 
