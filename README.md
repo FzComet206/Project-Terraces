@@ -82,8 +82,11 @@ Above image taken from Wikipedia
 
 ### Brushes and how it works
 
-insert video here
+</br>
 
+There are four types of brushes implemented in this experiment. One to add/remove terrrain, one to smooth the terrain, and one to make the terain look more blocky.
+
+An example of how the brush works: The cursor position as an origin and brush size as a radius. The density values are added/subtracted based on how far the voxel is away from the origin.
 
 https://user-images.githubusercontent.com/24278214/213022556-b4877bed-7301-44ce-b6cc-059829094e59.mp4
 
@@ -92,8 +95,13 @@ https://user-images.githubusercontent.com/24278214/213022556-b4877bed-7301-44ce-
 
 ### Simple Voxel fluids
 
-insert videos here
+</br>
 
+Since it would be unpractical to implement a fluid simulation due to performance limits. I implemented voxel fluid mechanic in this game just for fun. The fluid voxel flows horizontally and drops vertically by each fixed intervals.
+
+One of the most challenging problem in this project is how to deal with edge cases. Since everything is split into chunks, the meshes have overlapping verticies, the brushes have to take account of adding density in the correct chunk, and the water voxel can only be simulated within a certain range.
+
+Simulating water voxel requires merging the chunks into a large grid and then spliting them into chunks again. All of this is done on a different thread, and the implementation might not be the best way to do this.
 
 https://user-images.githubusercontent.com/24278214/213022570-8285e8b1-06b3-4f44-a1b2-717ea7da77ce.mp4
 
@@ -102,13 +110,62 @@ https://user-images.githubusercontent.com/24278214/213022570-8285e8b1-06b3-4f44-
 
 ### Forging Simplex Noises
 
-insert images here
+</br>
+
+Forging simplex noises was quit some fun. There are many operations that can be used on a gradient noise (add, subtract, power, modulo, etc), and each operation can have various effects.
+
+Take this line of code in the project as an example:
+```
+float value = -(yOffset - softFloor) * softFloorWeight + noise * noiseWeight + (yOffset % parameterX) * parameterY;
+```
+
+> The 'yOffset' variable is a float which is hight offset.
+
+> The 'softFloor' variable is a float that determines generally how high along y axis the noise gets evaluated
+
+> The 'softFloorWeight' variable is a float that determines how much the softFloor variable affects the terrain.
+
+> The 'noise' variable is the noise sampled through a simplex noise library, and then modified with fractals.
+
+> The 'noiseWeight' variable is a float that scales the noise's amplitude.
+
+> The 'parameterX' variable is the most interesting one. It is a int that determins the height of each tarrace steps. A value of 0 means no terraces.
+
+> The 'parameterY' variable is a float that determines how far the edges of a terrace extend.
+
+Another example of noise manipulation is Domain Wrapping:
+```
+float3 domainWrap = float3(
+	Fbm((pos + float3(123, 653, 15)) / scale),
+	0,
+	Fbm((pos + float3(683, 103, 69)) / scale)
+	);
+
+float3 domainInput = pos / scale + domainWrapWeight * domainWrap;
+float noise = Fbm(domainInput);
+```
+
+Basically, domain wrapping makes the noise look more distorted instead of uniform, which might be more visually intersting.
+
+Below are a few examples with different inputs:
+
+No domain wrap no Terrace:
+![NoNo](Images/nothing.png)
+
+No domain wrap:
+![NoYes](Images/noWrap.png)
+
+No Terrace:
+![YesNo](Images/noTerrace.png)
+
+More Terrace:
+![yesYES](Images/moreTerrace.png)
 
 ---
 
 ### Remark
 
-insert GIF here
+</br>
 
 At the time i write this blog, this project has already been finished for 6 months. Revisiting my code, there are definitely quite a lot of spaces for improvement. Here are the potential problems in the project:
 
